@@ -339,3 +339,10 @@
 - 오픈소스 운영체제 개발에는 누구나 참여가능하고 새로운 운영체제를 만들 수 있음
 
 - ex) 리눅스
+
+
+
+##### Reference
+
+- https://parksb.github.io/article/5.html
+- Provided by Operating Systems Concepts, 10th Edition

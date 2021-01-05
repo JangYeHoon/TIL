@@ -29,4 +29,7 @@
 
 - [01. Overview](OS/01_Overview.md)
   - 운영체제에 대한 전반적인 내용 및 용어 정리
+- [02. System Structures](OS/02_System_Structures.md)
+  - 운영체제에서 제공하는 서비스와 System call
+  - 그리고 운영체제 시스템 구조의 종류에 대해 설명
 
