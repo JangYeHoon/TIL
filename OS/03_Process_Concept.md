@@ -26,6 +26,8 @@
 - waiiting - 실행 중 작업이 완료되어 기다릴 때
 - terminated - 프로세스가 실행을 마침
 
+![Diagram of Process State](images/Diagram%20of%20Process%20State.png)
+
 
 
 ## Process Control Block(PCB)
@@ -89,6 +91,8 @@
 
 - Multiple programming의 정도를 줄이기 위해 Medium-term Scheduler를 추가
   - 메모리에서 프로세스를 제거하고 디스크에 저장하고 디스크에서 다시 가져와 실행을 계속 : Swapping
+
+![Addition of medium-term scheduling](images/Addition%20of%20medium-term%20scheduling.png)
 
 
 
@@ -274,6 +278,8 @@
   - 서버의 실제 절차에 대한 클라이언트 측 프록시
   - 클라이언트측 스텁에서 서버를 찾고 파라미터를 마샬링(Marshalls)
   - 서버측 스텁은 메시지를 수신하고, 마샬링된 파라미터의 포장을 풀고, 서버에서 절차를 수행
+
+![Remote Procedure Call](images/Remote%20Procedure%20Call.png)
 
 
 
