@@ -37,4 +37,8 @@
   - 클라이언트-서버 통신 기법
 - [04. Multithreaded Programming](OS/04_Multithreaded_Programming.md)
   - 스레드에 대한 개념과 다양한 멀티스레드 설계와 구현 방법
+- [05. CPU Scheduling](OS/05_CPU_Scheduling.md)
+  - CPU 스케줄링 기법과 다양한 알고리즘 소개
+  - FCFS, SJF, Priority Scheduling, RR, Multilevel Queue Scheduling, Multilevel Feedback Queue Scheduling
+  - Real-Time CPU Scheduling : Rate Monotonic Scheduling, Earliest Deadline First Scheduling
 

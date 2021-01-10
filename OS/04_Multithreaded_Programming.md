@@ -258,3 +258,10 @@
 - 이 통신을 위해 애플리케이션은 올바른 수의 커널 스레드를 유지할 수 있음
 
 ![image-20210108072249536](images/image-20210108072249536.png)
+
+
+
+##### Reference
+
+- https://parksb.github.io/article/8.html
+- Provided by Operating Systems Concepts, 10th Edition
