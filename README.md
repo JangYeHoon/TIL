@@ -41,4 +41,6 @@
   - CPU 스케줄링 기법과 다양한 알고리즘 소개
   - FCFS, SJF, Priority Scheduling, RR, Multilevel Queue Scheduling, Multilevel Feedback Queue Scheduling
   - Real-Time CPU Scheduling : Rate Monotonic Scheduling, Earliest Deadline First Scheduling
+- [06. Process Synchronization](OS/06_Process_Synchronization.md)
+  - 공유 데이터를 사용할때 발생하는 문제와 해결법
 
