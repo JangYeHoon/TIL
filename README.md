@@ -43,4 +43,8 @@
   - Real-Time CPU Scheduling : Rate Monotonic Scheduling, Earliest Deadline First Scheduling
 - [06. Process Synchronization](OS/06_Process_Synchronization.md)
   - 공유 데이터를 사용할때 발생하는 문제와 해결법
+- [07. Classic Problems of Synchronization](OS/07_Classic_Problems_of_Synchronization.md)
+  - Synchronization에서 예전부터 발생하는 문제와 해결법
+- [08. Deadlock](OS/08_Deadlock.md)
+  - 데드락의 발생 조건과 해결 방법
 
