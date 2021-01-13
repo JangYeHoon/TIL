@@ -47,4 +47,8 @@
   - Synchronization에서 예전부터 발생하는 문제와 해결법
 - [08. Deadlock](OS/08_Deadlock.md)
   - 데드락의 발생 조건과 해결 방법
+- [09. Memory Management Strategy](OS/09_Memory_Management_Strategy)
+  - 다양한 메모리 관리 기법 소개와 메모리 보호, 논리적 물리적 주소 차이 설명
+  - Memory Allocation Schemes
+    - Continuous memory allocation, Paging, Segmentation
 
