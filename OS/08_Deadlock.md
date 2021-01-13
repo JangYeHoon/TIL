@@ -349,19 +349,19 @@
 
      go to step 2
 
-  4. 만약 몇몇의 i에 대해 `Finish[i] == false`이면 시스템이 데드락 상태임. 또한 `Finish[i] == false`이면 프로세스 P<sub>i<sub>는 데드락 프로세스가 됨
+  4. 만약 몇몇의 i에 대해 `Finish[i] == false`이면 시스템이 데드락 상태임. 또한 `Finish[i] == false`이면 프로세스 P<sub>i는 데드락 프로세스가 됨
 
-  알고리즘은 시스템이 데드락 상태인지 여부를 감지하기 위해 O(m*n<sup>2<sup>)의 작업 순서가 필요
+  알고리즘은 시스템이 데드락 상태인지 여부를 감지하기 위해 O(m*n<sup>2)의 작업 순서가 필요
 
 - Example
 
-  - 5 processes - P<sub>0<sub>, ..., P<sub>4<sub>
+  - 5 processes - P<sub>0, ..., P<sub>4<sub>
 
   - 3 resource types
 
     - A (7 instances), B (2 instances), C (6 instances)
 
-  - At time T<sub>0<sub>:
+  - At time T<sub>0:
 
     ![image-20210112142843451](images/image-20210112142843451.png)
 
