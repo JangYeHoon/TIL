@@ -248,17 +248,17 @@
 
   4. 만약 모든 i에 대해 `Finish[i] == true`이면 시스템은 안전한 상태이다
 
-- Resource-Request Algorithm for P<sub>i<sub>
+- Resource-Request Algorithm for P<sub>i</sub>
 
-  - Request<sub>i<sub> : P<sub>i<sub>에 대한 request vector
+  - Request<sub>i</sub> : P<sub>i</sub>에 대한 request vector
 
-    : 만약 Request<sub>i<sub>[j] = k이면 P<sub>i<sub>는 리소스 유형 R<sub>j<sub>의 k인스턴스를 원함
+    : 만약 Request<sub>i<sub>[j] = k이면 P<sub>i</sub>는 리소스 유형 R<sub>j</sub>의 k인스턴스를 원함
 
-  1. 만약 Request<sub>i<sub> <= Need<sub>i<sub>이면 2번으로 이동하고 아니면 오류 발생
+  1. 만약 Request<sub>i</sub> <= Need<sub>i</sub>이면 2번으로 이동하고 아니면 오류 발생
 
-  2. 만약 Request<sub>i<sub> <= Available이면 3번으로 이동하고 아니면 리소스를 사용할 수 없으므로 기다려야 함
+  2. 만약 Request<sub>i</sub> <= Available이면 3번으로 이동하고 아니면 리소스를 사용할 수 없으므로 기다려야 함
 
-  3. 다음과 같이 상태를 수정하여 요청된 리소스를 P<sub>i<sub>에 할당하는 척함
+  3. 다음과 같이 상태를 수정하여 요청된 리소스를 P<sub>i</sub>에 할당하는 척함
 
      ```c
      Available = Available - Request[i]
@@ -266,16 +266,16 @@
      Need[i] = Need[i] - Request[i]
      ```
 
-     만약 안전한 상태면 리소스는 P<sub>i<sub>에 할당됨
+     만약 안전한 상태면 리소스는 P<sub>i</sub>에 할당됨
 
-     안전한 상태가 아니면 P<sub>i<sub>는 기다려야하며 이전 resource-allocation 상태가 복원
+     안전한 상태가 아니면 P<sub>i</sub>는 기다려야하며 이전 resource-allocation 상태가 복원
 
 - Example
 
-  - 5 processes : P<sub>0<sub>, ..., P<sub>4<sub>
+  - 5 processes : P<sub>0</sub>, ..., P<sub>4</sub>
   - 3 resource types
     - A (10 instances), B(5 instances), C(7 instances)
-  - At time T<sub>0<sub>:
+  - At time T<sub>0</sub>:
 
   ![image-20210112131636693](images/image-20210112131636693.png)
 
@@ -293,7 +293,7 @@
 
     4. Check if the system is in a safe state
 
-       **Safe sequence = <P<sub>1<sub>, P<sub>3<sub>, P<sub>4<sub>, P<sub>0<sub>, P<sub>2<sub>**
+       **Safe sequence = <P<sub>1</sub>, P<sub>3</sub>, P<sub>4</sub>, P<sub>0</sub>, P<sub>2</sub>**
 
 
 
@@ -311,7 +311,7 @@
 
 ### Wait-for graph
 
-- P<sub>i<sub> -> P<sub>j<sub> if P<sub>i<sub> is waiting for P<sub>j<sub>
+- P<sub>i</sub> -> P<sub>j</sub> if P<sub>i<sub> is waiting for P<sub>j<sub>
 
   ![image-20210112132422488](images/image-20210112132422488.png)
 
@@ -349,13 +349,13 @@
 
      go to step 2
 
-  4. 만약 몇몇의 i에 대해 `Finish[i] == false`이면 시스템이 데드락 상태임. 또한 `Finish[i] == false`이면 프로세스 P<sub>i는 데드락 프로세스가 됨
+  4. 만약 몇몇의 i에 대해 `Finish[i] == false`이면 시스템이 데드락 상태임. 또한 `Finish[i] == false`이면 프로세스 P<sub>i</sub>는 데드락 프로세스가 됨
 
-  알고리즘은 시스템이 데드락 상태인지 여부를 감지하기 위해 O(m*n<sup>2)의 작업 순서가 필요
+  알고리즘은 시스템이 데드락 상태인지 여부를 감지하기 위해 O(m*n<sup>2</sup>)의 작업 순서가 필요
 
 - Example
 
-  - 5 processes - P<sub>0, ..., P<sub>4<sub>
+  - 5 processes - P<sub>0</sub>, ..., P<sub>4</sub>
 
   - 3 resource types
 
