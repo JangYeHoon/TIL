@@ -252,7 +252,7 @@
 
   - Request<sub>i</sub> : P<sub>i</sub>에 대한 request vector
 
-    : 만약 Request<sub>i<sub>[j] = k이면 P<sub>i</sub>는 리소스 유형 R<sub>j</sub>의 k인스턴스를 원함
+    : 만약 Request<sub>i</sub>[j] = k이면 P<sub>i</sub>는 리소스 유형 R<sub>j</sub>의 k인스턴스를 원함
 
   1. 만약 Request<sub>i</sub> <= Need<sub>i</sub>이면 2번으로 이동하고 아니면 오류 발생
 
@@ -281,13 +281,13 @@
 
 - Example #2
 
-  - P<sub>1<sub> request(1, 0, 2)
+  - P<sub>1</sub> request(1, 0, 2)
 
-    1. Check Request<sub>i<sub> <= Need<sub>i<sub> -> (1, 0, 2) <= (1, 2, 2)
+    1. Check Request<sub>i</sub> <= Need<sub>i</sub> -> (1, 0, 2) <= (1, 2, 2)
 
-    2. Check Request<sub>i<sub> <= Available -> (1, 0, 2) <= (3, 3, 2)
+    2. Check Request<sub>i</sub> <= Available -> (1, 0, 2) <= (3, 3, 2)
 
-    3. Modification the state of T<sub>0<sub>
+    3. Modification the state of T<sub>0</sub>
 
        ![image-20210112131810944](images/image-20210112131810944.png)
 
@@ -311,7 +311,7 @@
 
 ### Wait-for graph
 
-- P<sub>i</sub> -> P<sub>j</sub> if P<sub>i<sub> is waiting for P<sub>j<sub>
+- P<sub>i</sub> -> P<sub>j</sub> if P<sub>i</sub> is waiting for P<sub>j</sub>
 
   ![image-20210112132422488](images/image-20210112132422488.png)
 
@@ -329,7 +329,7 @@
 
 - Request
 
-  - n*m 행렬은 각 프로세스의 현재 요청을 나타냄. Request[i, j]가 k와 같으면 프로세스 P<sub>i<sub>는 리소스 유형 R<sub>j<sub>의 인스턴스 k개를 더 요청
+  - n*m 행렬은 각 프로세스의 현재 요청을 나타냄. Request[i, j]가 k와 같으면 프로세스 P<sub>i</sub>는 리소스 유형 R<sub>j</sub>의 인스턴스 k개를 더 요청
 
 - Algorithm
 
@@ -361,7 +361,7 @@
 
     - A (7 instances), B (2 instances), C (6 instances)
 
-  - At time T<sub>0:
+  - At time T</sub>0:
 
     ![image-20210112142843451](images/image-20210112142843451.png)
 
