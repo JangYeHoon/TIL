@@ -51,4 +51,9 @@
   - 다양한 메모리 관리 기법 소개와 메모리 보호, 논리적 물리적 주소 차이 설명
   - Memory Allocation Schemes
     - Continuous memory allocation, Paging, Segmentation
+- [10. Virtual Memory Management Strategy](OS/10_Virtual_Memory_Management_Strategy.md)
+  - Virtual Memory의 기법에 대한 소개
+    - Demand Paging
+  - Page Replacement Algorithms 소개
+  - Allocation of Frames와 Thrashing, Kernel Memory Allocation 기법들 소개
 
