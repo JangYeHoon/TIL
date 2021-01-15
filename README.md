@@ -57,3 +57,9 @@
   - Page Replacement Algorithms 소개
   - Allocation of Frames와 Thrashing, Kernel Memory Allocation 기법들 소개
 
+
+
+## Naver Cloud
+
+- Naver Cloud Associate 자격증을 위한 강의 정리 및 용어 정리
+- [01. Overview](Naver_Cloud/01_Overview.md)
