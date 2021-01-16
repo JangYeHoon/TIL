@@ -63,3 +63,4 @@
 
 - Naver Cloud Associate 자격증을 위한 강의 정리 및 용어 정리
 - [01. Overview](Naver_Cloud/01_Overview.md)
+- [02. Compute Service](Naver_Cloud/02_Compute_Service.md)
