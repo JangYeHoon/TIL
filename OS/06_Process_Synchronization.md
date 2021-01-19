@@ -59,14 +59,14 @@
 
 - counter = 5로 인터리빙하는 실행 고려
 
-  - T0 : **Producer executes** register1 = counter [r1 = 5]
-  - T1 : **Producer executes** register1 = register1+1 [r1 = 6]
-  - T2 : **Consumer executes** register2 = counter [r2 = 5]
-  - T3 : **Consumer executes** register2 = register2-1 [r2 = 4]
-  - T4 : **Producer executes** counter = register1 [counter = 6]
-  - T5 : **Consumer executes** counter = register2 [counter = 4]
+  - T<sub>0</sub> : **Producer executes** register1 = counter [r1 = 5]
+  - T<sub>1</sub> : **Producer executes** register1 = register1+1 [r1 = 6]
+  - T<sub>2</sub> : **Consumer executes** register2 = counter [r2 = 5]
+  - T<sub>3</sub> : **Consumer executes** register2 = register2-1 [r2 = 4]
+  - T<sub>4</sub> : **Producer executes** counter = register1 [counter = 6]
+  - T<sub>5</sub> : **Consumer executes** counter = register2 [counter = 4]
 
-- 위와 같은 상황에서 여러 프로세스가 동시에 동일한 데이터에 액세스하고 조작하고 실해 결과가 액세스가 발생하는 특정 순서에 따라 달라지는 상황을 **race condition**이라고 함
+- 위와 같은 상황에서 여러 프로세스가 동시에 동일한 데이터에 액세스하고 조작하고 실행 결과가 액세스가 발생하는 특정 순서에 따라 달라지는 상황을 **race condition**이라고 함
 
 
 
@@ -89,6 +89,10 @@
 
   - Critical Sections에는 동시에 두개의 프로세스가 실행되면 안됨
 
+- General structure of a typical process
+
+  ![image-20210120064610114](images/image-20210120064610114.png)
+
 - Critical-Section 문제에 대한 솔루션은 다음 요구사항을 충족해야 함
 
   - Mutual exclusion
@@ -99,7 +103,7 @@
   - Bounded waiting
     - critical section에 진입하려는 프로세스가 무한하게 대기하면 안됨
     - 프로세스가 critical section에 들어가려고 요청한 후 해당 요청이 승인되기 전에 다른 프로세스가 중요 섹션에 들어갈 수 있는 횟수를 제한
-    - N 프로세스의 상대 속도에 대한 가정 없ㅇ므
+    - N 프로세스의 상대 속도에 대한 가정 없음
 
 - Non-preemptive kernels로 구현하면 임계 영역 문제가 발생하지 않음
 
@@ -113,7 +117,7 @@
 
 - LOAD / STORE 명령어가 atomic하다고 가정
 
-  - 즉 중단할 수 없음
+  - 즉 중단할 수 없음(that is, cannot be interrupted)
 
 - Two process solution
 
@@ -143,7 +147,20 @@
   } while (TRUE)
   ```
 
-
+- Mutual exclusion
+  - P<sub>i</sub>가 critical section에 들d어갈려면, `flag[j] == FALSE` or `turn == i`
+  - P<sub>i</sub>와 P<sub>j</sub>가 동시에 critical section에서 실행될 경우, `flag[i] == flag[j] == TRUE`
+  - P<sub>i</sub>와 P<sub>j</sub>는 동시에 성공적으로 실행하지 못함. 왜냐하면 turn의 값은 i 또는 j만 가질 수 있기 떄문에 한번에 하나만 실행
+  - **Mutual exclusion 만족**
+- Progress & Bounded waiting
+  - 만약 P<sub>j</sub>가 critical section에 들어갈 준비가 되지 않은 경우라면 `flag[j] == FALSE` -> P<sub>i</sub>가 critical section에 들어갈 수 있음
+  - 만약 P<sub>j</sub>가 `flag[i]`를 `TRUE`로 설정하고 while 루프에서 계쏙 실행중이라면, `turn == i` or `turn == j`
+    - `turn == i` -> P<sub>i</sub> will enter the critical secion
+    - `turn == j` -> P<sub>j</sub> will enter the critical section
+  - critical section을 종료하면 `falg[j]`는 `FALSE`로 재설정 -> P<sub>i</sub> will enter the critical section
+  - 만약P<sub>j</sub>가 `flag[j]`를 `TRUE`로 재설정하면 `turn`을 `i`로 설정
+    - P<sub>i</sub>는 while문에서 실행하는 동안 turn의 값을 변경하지 않아 P<sub>i</sub>는 P<sub>j</sub>에 의해 최대 1개 항목만 critical section에 진입함
+  - **Progress 만족**, **Bounded waiting 만족**
 
 ## Synchronization Hardware
 
@@ -172,7 +189,7 @@
   - TestAndSet() 명령어
   - Swap() 명령어
 
-- TestAndSet 명령어
+- TestAndSet 명령어 : 들어온 값을 TRUE로 바꾸고 원래있던 값을 반환
 
   ```c
   boolean TestAndSet (boolean *target) {
@@ -184,16 +201,23 @@
 
 - Solution using TestAndSet
 
+  - lock은 FALSE로 초기화되어 있음
+  - 맨처음 들어오면 lock은 TRUE로 바뀌고 critical section에 진입
+  - context-switch가 일어나도 lock은 FALSE이기 때문에 다른 프로세스들은 while 루프를 돌게됨
+  - 하지만 임의의 순서대로 Critical Section에 들어가기 때문에 어느 한 프로세스는 계속 기다리는 경우의 수가 발생할 수 있음 -> **Bounded waiting 만족하지 못함**
+
   ```c
   do {
-  	while (TestAndSet(&lock));
+  	while (TestAndSet(&lock));	// lock을 검사하고 TRUE면 루프를 FALSE면 Critical Section 진입
   	// critical section
-  	lock = false;
+  	lock = false;	// Critical Section을 통과하고 다른 프로세스의 진입을 허용한다는 의미로 lock을 FALSE로 바꿔줌
   	// reminder section
   } while (true)
   ```
 
 - compare_and_swap  명령어
+
+  - 특정 메모리 위치의 값이 주어진 값과 동일하다면 해당 메모리 주소를 새로운 값으로 대체
 
   ```c
   int compare_and_swap(int *value, int expected, int new_value) {
@@ -216,6 +240,10 @@
   	// reminder section
   } while (true);
   ```
+  
+  - compare_and_swap도 Bounded waiting을 만족하지 못함
+  
+- **최종적인 코드(Bounded waiting 만족)**
 
 ```c
 do {
@@ -475,7 +503,7 @@ do {
 
 ### Condition variables Choices
 
-- 프로세스 P가 x.signal()를 호출하고 프로세스 Q가 x.wait9)로 일시 중단되면 다음에 어떻게 되는가?
+- 프로세스 P가 x.signal()를 호출하고 프로세스 Q가 x.wait()로 일시 중단되면 다음에 어떻게 되는가?
   - Q와 P 모두 병렬로 실행할 수 없음. Q가 재개되면 P가 대기해야 함
 - 옵션은 다음과 같음
   - Signal and wait - P는 Q가 모니터를 떠날때까지 기다리거나 다른 상태를 기다림
