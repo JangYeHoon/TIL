@@ -65,3 +65,4 @@
 - [01. Overview](Naver_Cloud/01_Overview.md)
 - [02. Compute Service](Naver_Cloud/02_Compute_Service.md)
 - [03. Network Service](Naver_Cloud/03_Network_Service.md)
+- [04. Network Service Practical](Naver_Cloud/04_Network_Service_Practical.md)
