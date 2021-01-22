@@ -29,9 +29,9 @@
 
 ## System Model
 
-- 자원 종류 : R1, R2, ... , Rm
+- 자원 종류 : R<sub>1</sub>, R<sub>2</sub>, ... , R<sub>m</sub>
   - CPU 사이클, 메모리 공간, I/O 장치 등
-- 각 자원 종류 Ri에는 Wi 인스턴스가 있음
+- 각 자원 종류 R<sub>i</sub>에는 W<sub>i</sub> 인스턴스가 있음
 - 프로세스는 다음과 같은 흐름으로 자원을 사용
   - Request
     - 리소스를 요청. 다른 프로세스가 리소스를 사용중이면 리소스를 받을 수 없어 대기함
@@ -126,7 +126,7 @@
 
   - 리소스의 타입에 따라 프로세스마다 일대일 함수로 순서를 지정함
   - 모든 리소스 유형의 전체 순서를 적용하고 각 프로세스가 증가하는 열거 순서로 리스소를 요청하도록 요구
-  - R이 현재 보유하고 있는 인스턴스의 유형이 있는 경우 프로세스는 자원 유형 Rj의 인스턴스를 요청할 수 있음. 단 F(Rj)>F(Ri)인 경우에만 가능
+  - R이 현재 보유하고 있는 인스턴스의 유형이 있는 경우 프로세스는 자원 유형 R<sub>j</sub>의 인스턴스를 요청할 수 있음. 단 F(R<sub>j</sub>)>F(R<sub>i</sub>)인 경우에만 가능
 
 - Deadlock Example
 
@@ -169,11 +169,11 @@
 
 - 프로세스가 사용 가능한 리소스를 요청하면 시스템은 즉시 할당이 시스템을 안전한 상태로 남겨 둘지 결정해야 함
 
-- 시스템에 있는 모든 프로세스의 시퀀스 {P0, P1, ..., Pn}이 있으면 시스템은 안전한 상태. 따라서 각 프로세스 Pi에 대해 Pi가 여전히 요청할 수 있는 리소스는 현재 사용 가능한 리소스로 충족 + j<i인 모든 Pj가 보유한 자원
+- 시스템에 있는 모든 프로세스의 시퀀스 {P<sub>0</sub>, P<sub>1</sub>, ..., P<sub>n</sub>}이 있으면 시스템은 안전한 상태. 따라서 각 프로세스 P<sub>i</sub>에 대해 P<sub>i</sub>가 여전히 요청할 수 있는 리소스는 현재 사용 가능한 리소스로 충족 + j<i인 모든 P<sub>j</sub>가 보유한 자원
 
-  - Pi 리소스 필요를 즉시 사용할 수 없는 경우 Pi는 모든 Pj가 완료될 때까지 기다릴 수 있음
-  - Pj가 완료되면 Pi는 필요한 리소스를 얻고 할당된 리소스를 실행하고 반환하고 종료할 수 있음
-  - Pi가 종료되면 Pi+1은 필요한 리소스를 얻을 수 있음
+  - P<sub>i</sub> 리소스 필요를 즉시 사용할 수 없는 경우 P<sub>i</sub>는 모든 P<sub>j</sub>가 완료될 때까지 기다릴 수 있음
+  - P<sub>j</sub>가 완료되면 P<sub>i</sub>는 필요한 리소스를 얻고 할당된 리소스를 실행하고 반환하고 종료할 수 있음
+  - P<sub>i</sub>가 종료되면 P<sub>i+1</sub>은 필요한 리소스를 얻을 수 있음
 
 - 시스템이 안전한 상태인 경우 -> 데드락 없음
 
@@ -196,12 +196,12 @@
 
 #### Resource-Allocation Graph Scheme
 
-- 클레임 엣지(Claim edge) Pi>Rj는 프로세스 Pimay가 점선으로 표시된 리소스 Rj를 요청함을 나타냄
-- 프로세스가 리소스를 요청하면 클레임 에지가 요청 에지로 변환
-- 프로세스에 자원이 할당되면 Request edge가 할당 edge로 전환
-- 프로세스에 의해 리소스가 해제되면 할당 에지가 클레임 에지로 다시 변환
+- 클레임 엣지(Claim edge) P<sub>i</sub> -> R<sub>j</sub>는 프로세스 P<sub>i</sub> 가 리소스 R<sub>j</sub>를 요청했다는 것을 점선으로 표시
+- 프로세스가 리소스를 요청하면 클레임 에지가 Request edge로 변환
+- 프로세스에 자원이 할당되면 Request edge가 assignment edge로 전환
+- 프로세스에 의해 리소스가 해제되면assignment edge가 클레임 에지로 다시 변환
 - 시스템에서 먼저 리소스를 할당해야 함
-- 요청 에지 Pi->Rj를 할당 에지 Ri->Pj로 변환해도 리소스 할당 그래프에서 주기가 형성되지 않는 경우에만 요청을 승인할 수 있음
+- request edge P<sub>i</sub>->R<sub>j</sub>를 assignment edge R<sub>i</sub>->P<sub>j</sub>로 변환해도 리소스 할당 그래프에서 주기가 형성되지 않는 경우에만 요청을 승인할 수 있음
 
 ![image-20210112114706237](images/image-20210112114706237.png)
 
@@ -223,9 +223,9 @@
   - Max
     - n*m 행렬, 만약 `Max[i, j] = k`이면 프로세스 Pi는 리소스 유형 Rj의 인스턴스를 최대 k개까지 요청할 수 있음
   - Allocation
-    - n*m 행렬, 만약 `Allocation[i, j] = k`이면 프로세스 Pi는 현재 자원 유형 Rj의 k인 인스턴스에 할당
+    - n*m 행렬, 만약 `Allocation[i, j] = k`이면 프로세스 P<sub>i</sub>는 현재 자원 유형 R<sub>j</sub>의 k인 인스턴스에 할당
   - Need
-    - n*m 행렬, 만약 Need[i, j] = k이면 프로세스 Pi는 작업을 완료하기 위해 리소스 유형 Rj의 인스턴스 k개가 더 필요할 수 있음
+    - n*m 행렬, 만약 `Need[i, j] = k`이면 프로세스 P<sub>i</sub>는 작업을 완료하기 위해 리소스 유형 R<sub>j</sub>의 인스턴스 k개가 더 필요할 수 있음
     - `Need[i, j] = Max[i, j] - Allocation[i, j]`
 
 - Safety Algorithm
@@ -240,9 +240,9 @@
 
      만약 존재하지 않으면 4단계로 이동
 
-  3. `Work = Work + Allocationi
+  3. `Work = Work + Allocation`
 
-     Finish[i] = true
+     `Finish[i] = true`
 
      2단계로 이동
 
@@ -293,7 +293,7 @@
 
     4. Check if the system is in a safe state
 
-       **Safe sequence = <P<sub>1</sub>, P<sub>3</sub>, P<sub>4</sub>, P<sub>0</sub>, P<sub>2</sub>**
+       **Safe sequence = <P<sub>1</sub>, P<sub>3</sub>, P<sub>4</sub>, P<sub>0</sub>, P<sub>2</sub>>**
 
 
 
@@ -361,7 +361,7 @@
 
     - A (7 instances), B (2 instances), C (6 instances)
 
-  - At time T</sub>0:
+  - At time T<sub>0</sub>:
 
     ![image-20210112142843451](images/image-20210112142843451.png)
 
@@ -389,7 +389,7 @@
 - Process termination
   - 모든 데드락 상태 프로세스 중단
   - 데드락 상태가 제거될 때까지 한번에 하나의 프로세스를 중단
-- 이때 어떤 프로세스를 종료시킬지 정하는 것이 중요
+- 이때 어떤 프로세스        를 종료시킬지 정하는 것이 중요
 - 판단 기준
   - 프로세스의 중요도
   - 프로세스가 얼마나 오래 실행되었는지
