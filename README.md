@@ -66,3 +66,4 @@
 - [02. Compute Service](Naver_Cloud/02_Compute_Service.md)
 - [03. Network Service](Naver_Cloud/03_Network_Service.md)
 - [04. Network Service Practical](Naver_Cloud/04_Network_Service_Practical.md)
+- [05. Storage Service](Naver_Cloud/05_Storage_Service.md)
