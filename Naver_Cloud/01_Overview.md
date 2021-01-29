@@ -55,11 +55,13 @@
   - 하이브리드 클라우드, 클라우드 커넥트(Cloud Connect),  Vmware on NCP
   - 레거시 인프라와 연동할 수 있는 상품 존재
 - 6개의 리전
-  - 서버, 스토리지, 네트워크
-  - 데이터베이스, 아날리티스, 미디어, 게임
-  - AI 서비스, DEV TOOLS, Application Service
-  - 전체 상품을 관리하는 MANAGEMENT
-  - 외부로부터 위협을 막는 SECURITY
+- 서버, 스토리지, 네트워크
+- 데이터베이스, 아날리티스, 미디어, 게임
+- AI 서비스, DEV TOOLS, Application Service
+- 전체 상품을 관리하는 MANAGEMENT
+- 외부로부터 위협을 막는 SECURITY
+
+![image-20210129115231422](images/image-20210129115231422.png)
 
 
 
