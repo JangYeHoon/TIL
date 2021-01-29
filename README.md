@@ -68,3 +68,6 @@
 - [04. Network Service Practical](Naver_Cloud/04_Network_Service_Practical.md)
 - [05. Storage Service](Naver_Cloud/05_Storage_Service.md)
 - [06. Cloud Database](Naver_Cloud/06_Cloud_Database.md)
+- [07. AI Service](Naver_Cloud/07_AI_Service.md)
+- [08. Application Service](Naver_Cloud/08_Application_Service.md)
+- [09. Management_Service](Naver_Cloud/09_Management_Service.md)
