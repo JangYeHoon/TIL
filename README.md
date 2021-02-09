@@ -85,3 +85,5 @@
 - [02. Open Networking Ecosystem 1](SDN&NFV/02_Open_Networking_Ecosystem_1.md)
 - [03. Open Networking Ecosystem 2](SDN&NFV/03_Open_Networking_Ecosystem_2.md)
 - [04. SDN/NFV Use Cases](SDN&NFV/04_SDN&NFV_Use_Cases.md)
+- [05. SDNNFV_Forums_Conferences_Journals and Summary][SDN&NFV/05_SDNNFV_Forums_Conferences_Journals_and_Summary.md]
+
