@@ -62,9 +62,9 @@
 - 2차버전 Helium Architecture
 
   - 여러 하위 프로젝트를 통하여 더 많은 모듈들이 추가
-    - 대표적으로 South-bound에는 SNMP, BGP-lS등이 추가
+    - 대표적으로 South-bound에는 SNMP, BGP-LS등이 추가
     - SAL 확장하여 오픈플로우 뿐만 아니라 다양한 South-bound 프로토콜 지원
-  - Service Function Chaining(SFC), 트리플 어웨이, Virtual Tenent Network(VTN), OVS Neutron 등 실용성 있는 어플리케이션을 개발하여 컨트롤러와 통합
+  - Service Function Chaining(SFC), AAA, Virtual Tenent Network(VTN), OVS Neutron 등 실용성 있는 어플리케이션을 개발하여 컨트롤러와 통합
 
   ![image-20210216133649564](images/image-20210216133649564.png)
 
