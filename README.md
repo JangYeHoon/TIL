@@ -94,4 +94,5 @@
 - [11. SDN Controllers 1](SDN&NFV/11_SDN_Controllers_1.md)
 - [12. SDN Controllers 2](SDN&NFV/12_SDN_Controller_2.md)
 - [13. Introduction to Open Network Operating System](13_Introduction_to_Open_Network_Operating_System(ONOS).md)
+- [14. SDN Distribute Core](14_SDN_Distributed_Core.md)
 
