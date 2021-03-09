@@ -60,3 +60,44 @@
 
 
 
+### Performance Evaluation
+
+- (3)과 (4)의 성능 비교
+
+  <img src="images/image-20210309125837245.png" alt="image-20210309125837245" style="zoom:50%;" />
+
+#### Bare Metal
+
+-  추가적인 패킷 프로세싱 없이 단순히 throughput 측정
+
+- 20G/bps의 throuput을 패킷 사이즈에 관계없이 보여줌
+
+  ![image-20210309130355481](images/image-20210309130355481.png)
+
+#### SR-IOV (with DPDK)
+
+- 64바이트 패킷에서 성능이 떨어짐
+
+![image-20210309130554526](images/image-20210309130554526.png)
+
+#### OVS-DPDK
+
+- 다른 패킷 사이즈에서는 비슷한 성능을 보이지만 64바이트 패킷에서 50% 정도의 성능을 보임
+
+- 성능이 감소하는 이유
+
+  - DPDK에 PMD thread가 잘 동작하기 위해서는 호스트 서버에 CPU 코어를 전용해서 사용해야함
+  - 이때 코어가 감당할 수 있는 수준 이상으로 패킷이 많이 발생해 pps값이 급증하게 되면 CPU 코어에 대한 감당할 수 있는 이상으로 부하가 발생해 패킷 드랍이 발생 
+
+  ![image-20210309130652933](images/image-20210309130652933.png)
+
+#### Conclusion
+
+- OVS-DPDK 기반 데이터 패스 구성이 SR-IOV 구성에 비해서 평균 90% 정도 수준의 throughput을 보여주는 것을 확인 가능
+- 반면에 OVS-DPDK가 가장 좋은 성능을 낸다고 보이는 SR-IOV 기술 대비 굉장히 근접한 성능을 보이기 때문에 실효성에 대해 설명할 수 있음
+- SR-IOV에서 제공하지 못하는 다양한 SDN 기반 가상 스위치 제어 기능을 OVS-DPDK에서 사용 가능
+  - 따라서 다양한 VNF 예제들에 적용할 수 있음
+- 또한 OVS-DPDK가 버전 업을 하고 있기 때문에 성능 수준이 증가
+- https://download.01.org/packet-processing/
+- ![image-20210309132806947](images/image-20210309132806947.png)
+
