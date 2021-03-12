@@ -115,6 +115,7 @@
 - [2. Launching an EC2 instance in a Custom Virtual Private Cloud(VPC)](AWS_Cloud/02_Launching_an_EC2_instance_in_a_Custom_Virtual_Private_Cloud(VPC).md)
 - [3. Creating and Working with an EC2 Instance in AWS](AWS_Cloud/03_Creating_and_Working_with_an_EC2_Instance_in_AWS.md)
 - [4. Creating an Auto Scaling Group and Application Load Balancer in AWS](AWS_Cloud/04_Creating_an_Auto_Scaling_Group_and_Application_Load_Balancer_in_AWS.md)
-- [05 Working with Docker Containers](AWS_Cloud/05_Working_with_Docker_Containers.md)
-- [06. Auto Scaling Group and Application Load Balancer(NGINX).md](AWS_Cloud/06_Auto_Scaling_Group_and_Application_Load_Balancer(NGINX).md)
+- [5 Working with Docker Containers](AWS_Cloud/05_Working_with_Docker_Containers.md)
+- [6. Auto Scaling Group and Application Load Balancer(NGINX)](AWS_Cloud/06_Auto_Scaling_Group_and_Application_Load_Balancer(NGINX).md)
+- [7. Using EC2 Roles and Instance Profiles in AWS](AWS_Cloud/07_Using_EC2_Roles_and_Instance_Profiles_in_AWS.md)
 
