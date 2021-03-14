@@ -118,5 +118,6 @@
 - [5 Working with Docker Containers](AWS_Cloud/05_Working_with_Docker_Containers.md)
 - [6. Auto Scaling Group and Application Load Balancer(NGINX)](AWS_Cloud/06_Auto_Scaling_Group_and_Application_Load_Balancer(NGINX).md)
 - [7. Using EC2 Roles and Instance Profiles in AWS](AWS_Cloud/07_Using_EC2_Roles_and_Instance_Profiles_in_AWS.md)
-- [8. Creating an EC2 Instance with Lambda in AWS](SDN&NFV/08_Creating_an_EC2_Instance_with_Lambda_in_AWS.md)
+- [8. Creating an EC2 Instance with Lambda in AWS](AWS_Cloud/08_Creating_an_EC2_Instance_with_Lambda_in_AWS.md)
+- [9. Creating a Basic Lambda Function to Shut Down an EC2 Instance](AWS_Cloud/09_Creating_a_Basic_Lambda_Function_to_Shut_Down_an_EC2_Instance.md)
 
