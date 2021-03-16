@@ -105,6 +105,7 @@
 - [22. Datapath Composition](SDN&NFV/22_Datapath_Composition.md)
 - [23. OpenStack Introduction](SDN&NFV/23_OpenStack_Introduction.md)
 - [24. OpenStack Networking](SDN&NFV/24_OpenStack_Networking.md)
+- [25. OpenStack_Installation](SDN&NFV/25_OpenStack_Installation.md)
 
 
 
