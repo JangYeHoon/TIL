@@ -77,3 +77,53 @@
   - Adapter 3 : Host-only Adapter (vboxnet1, 10.10.1.0/24), Adapter Type (virtio-net)
 
     ![image-20210316125616477](images/image-20210316125616477.png)
+
+
+
+### Packstack Installation
+
+- Stat the two VMs(Host-only ssh 접속을 위한 VM)
+
+- Stop NetworkManager, firewalld service stop, SELinux가 permissive mode로 동작하도록 설정
+
+  ```bash
+  $ systemctl disable NetworkManager
+  $ service NetworkManager stop
+  $ systemctl disable firewalld
+  $ service firewalld stop
+  $ setenforce 0
+  ```
+
+- Install Packstack package( only in the Controller VM)
+
+  - Packstack : 레드햇 기반의 리눅스 서버에서 오픈 스택을 자동으로 설치해주는 툴
+  - Packstack을 통해서 설치할 오픈스택은 오픈스택 Mitaka 버전 사용
+
+  ```bash
+  $ vim /etc/environment
+  LANG=en_US.utf-8
+  LC_ALL=en_US.utf-8
+  $ yum install -y centos-release-openstack-mitaka
+  $ yum update -y
+  $ yum install -y openstack-packstack
+  $ yum install -y openstack-utils
+  ```
+
+
+
+### Packstack Answer File
+
+- Packstack은 설치 툴이고 Packstack이 자동 설치를 하기 위해서 참고하는 configuration 파일
+
+  ![image-20210317125635302](images/image-20210317125635302.png)
+
+#### Details on the Answer File Configurations
+
+- `_SWIFT_INSTALL=n`, `_CEILOMETER_INSTALL=n`, `_CINDER_INSTALL=n`, `_NAGIOS_INSTALL=n`
+  - 오픈스택의 부가적인 서비스 컴포넌트들 설치할지
+  - 튜토리얼이기 때문에 자원이 한정적이라 필수적인 컴포넌트만 설치하고 부가적인 컴포넌트들은 설치하지 않음
+- `_CONTROLLER_HOST=192.168.11.11`, `_COMPUTE_HOSTS=192.168.11.21`, `_NETWORK_HOSTS=192.168.11.11`
+  - Management network IP on controller node, List of management network IPs on compute nodes, Management network IP on network nodes
+- `_NETWORK_OVS_BRIDGE_MAPPINGS=extnet:br-ex,physnet1:br-vlan`
+- 
+
