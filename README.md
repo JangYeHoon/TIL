@@ -121,4 +121,5 @@
 - [7. Using EC2 Roles and Instance Profiles in AWS](AWS_Cloud/07_Using_EC2_Roles_and_Instance_Profiles_in_AWS.md)
 - [8. Creating an EC2 Instance with Lambda in AWS](AWS_Cloud/08_Creating_an_EC2_Instance_with_Lambda_in_AWS.md)
 - [9. Creating a Basic Lambda Function to Shut Down an EC2 Instance](AWS_Cloud/09_Creating_a_Basic_Lambda_Function_to_Shut_Down_an_EC2_Instance.md)
+- [10. Creating and Subscribing to AWS SNS Topics](AWS_Cloud/10_Creating_and_Subscribing_to_AWS_SNS_Topics.md)
 
