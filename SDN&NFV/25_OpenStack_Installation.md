@@ -124,6 +124,23 @@
   - 튜토리얼이기 때문에 자원이 한정적이라 필수적인 컴포넌트만 설치하고 부가적인 컴포넌트들은 설치하지 않음
 - `_CONTROLLER_HOST=192.168.11.11`, `_COMPUTE_HOSTS=192.168.11.21`, `_NETWORK_HOSTS=192.168.11.11`
   - Management network IP on controller node, List of management network IPs on compute nodes, Management network IP on network nodes
-- `_NETWORK_OVS_BRIDGE_MAPPINGS=extnet:br-ex,physnet1:br-vlan`
-- 
+- `_NETWORK_OVS_BRIDGE_MAPPINGS=extnet:br-ex,physnet1:br-vlan`, `_NEUTRON_OVS_BRIDGE_IFACES=br-ex:eth0,br-vlan:eth1`
+  - ,를 기준으로 구분하고 :값으로 페어를 이룸
+  - 앞에는 네트워크 이름, 뒤에는 해당 네트워크에 연결되는 브릿지 이름
+  - extnet은 br-ex로 매핑되고 br-ex는 eth0인터페이스로 매핑됨
+    - VM으로 생성한 NAT Network(eth0)에 물리는 노드의 네트워크 인터페이스가 br-ex브릿지로 연결이되고 br-ex 브릿지는 오픈스택 설치 이후에 생성되는데 br-ex 브릿지는 extnet이라는 네트워크로 연결
+- `_NEUTRON_ML2_TENANT_NETWORK_TYPES=vlan`, `_NEUTRON_ML2_MECHANISM_DRIVERS=openvswitch`, `_NEUTRON_ML2_TYPE_DRIVERS=flat,vlan`
+  - 테넌트 네트워크 타입은 vlan
+    - 테넌트 트래픽을 구분하기 위해 vlan id 사용
+  - ML2 메커니즘 드라이버는 openvswitch를 이용해 네트워크를 구현
+  - TYPE Driver는 flat과 vlan 두 가지 유형의 네트워크를 오픈스택 구성할 때 사용하겠다고 명시
+    - vlan은 게스트 네트워크를 위해서 사용
+    - flat은 NAT Network(extnet)를 flat 타입으로 사용하기 때문에 명시
+- `_NEUTRON_L2_AGENT=openvswitch`
+  - 각 노드에서 openvswitch 에이전트를 설치하겠다고 명시
+- `_NEUTRON_OVS_BRIDGES_COMPUTE=br-vlan`
+  - 컴퓨트 노드가 추가됬을 때 컴퓨트 노드에 생성되는 VM 인스턴스들 간에 br-vlan에 연결되는 게스트 네트워크를 통해서 통신하겠다고 선언
+- `_PROVISION_DEMO=n`
+  - yes값으로 두면 샘플 환경(데몬 환경)이 구성됨
+- https://github.com/openstack/packstack/blob/master/docs/packstack.rst
 
