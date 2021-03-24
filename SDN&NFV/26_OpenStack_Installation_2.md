@@ -55,3 +55,33 @@
   - 컨트롤러 노드에서 다음 파일을 수정하여 외부 어떤 요청이든 허용
 
   ![image-20210320152932167](images/image-20210320152932167.png)
+
+- web browser를 이용해  접속
+
+  - URL : http://{HOST_SERVER_IP}:8888/dashboard
+  - ID : admin, PW : admin
+
+  ![image-20210324100707437](images/image-20210324100707437.png)
+
+  ![image-20210324100751360](images/image-20210324100751360.png)
+
+  ![image-20210324100823515](images/image-20210324100823515.png)
+
+
+
+## Compute Node Setup
+
+- Compute 노드는 VM으로 설치되어 있음, 실제 환경에서는 bare metal 서버를 사용하여 구성
+
+- bare metal 서버에 컴퓨트 노드를 사용하는 경우
+
+  - QEMU라는 하이퍼바이저를 기반으로 bare metal 서버의 KVM이 제공하는 다양한 기능들을 이용해서 오픈스택에 VM 인스턴스를 생성하고 매니지먼트함 
+
+- 본 환경은 컴퓨트 노드가 VM 위에 있기 때문에 그리고 VM 위에서 오픈스택을 통해서 VM 인스턴스를 생성하게 되면 VM위에 VM을 생성하는 개념
+
+- 이러한 환경에서는 호스트서버에서 사용하는 Virtual Box가 호스트 서버의 KVM에 제공하는 기능들을 활용을 못함
+
+  - KVM을 사용하지 않고 QEMU를 사용
+
+  ![image-20210324112140890](images/image-20210324112140890.png)
+
