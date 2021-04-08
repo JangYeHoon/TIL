@@ -15,7 +15,7 @@
 - [Git](#git)
 - [OS](#os)
 - [Naver Cloud](#naver-cloud)
-- [SDN / NFV](#sdn-/-nfv)
+- [SDN / NFV](#sdn/nfv)
 - [AWS Cloud](#aws-cloud)
 
 
@@ -88,7 +88,7 @@
 
 
 
-## SDN / NFV
+## SDN/NFV
 
 - 2019년 들었던 포항공대 MOOC 과정 SDN & NFV 교육 재정리
 - [01. Challenges by Telcos](SDN&NFV/01_Challenges_by_Telcos.md)
