@@ -24,7 +24,7 @@
 
 - Flavor를 이용해서 생성되는 VM이 cpu, 메모리, 디스크 등의 자원 값을 지정
 
-  ![image-20210402102349830](images\image-20210402102349830.png)
+  ![image-20210402102349830](images/image-20210402102349830.png)
 
 
 
@@ -37,7 +37,7 @@
 
 - Identity-Projects-Create Project
 
-  <img src="C:\Users\jkjk1\바탕 화면\TIL\SDN&NFV\images\image-20210402102649266.png" alt="image-20210402102649266" style="zoom:50%;" />
+  <img src="images\image-20210402102649266.png" alt="image-20210402102649266" style="zoom:50%;" />
 
   <img src="C:\Users\jkjk1\바탕 화면\TIL\SDN&NFV\images\image-20210402102709029.png" alt="image-20210402102709029" style="zoom:50%;" />
 
@@ -54,7 +54,7 @@
 
   - Flat과 extnet은 Packstack에서 설정함
 
-  ![image-20210402103022704](C:\Users\jkjk1\바탕 화면\TIL\SDN&NFV\images\image-20210402103022704.png)
+  ![image-20210402103022704](images/image-20210402103022704.png)
 
 
 
@@ -68,7 +68,7 @@
 
 - System-Networks-"provider network"-Create Subnet
 
-  ![image-20210402103851867](C:\Users\jkjk1\바탕 화면\TIL\SDN&NFV\images\image-20210402103851867.png)
+  ![image-20210402103851867](images/image-20210402103851867.png)
 
 
 
@@ -78,4 +78,4 @@
 
 - External -- OpenStack Provider network -- Virtual router (NAT) -- VM
 
-  ![image-20210402104906517](C:\Users\jkjk1\바탕 화면\TIL\SDN&NFV\images\image-20210402104906517.png)
+  ![image-20210402104906517](images/image-20210402104906517.png)
