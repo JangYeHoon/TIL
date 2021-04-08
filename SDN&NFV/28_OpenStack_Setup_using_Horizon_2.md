@@ -2,7 +2,7 @@
 
 - 오픈스택에 관리자 입장이 아닌 관리자가 제공한 인프라를 사용하는 tenant 입장에서 오픈스택을 설정하기 때문에 Demo 프로젝트로 변환해서 진행
 
-  ![image-20210406150343583](C:\Users\jkjk1\바탕 화면\TIL\SDN&NFV\images\image-20210406150343583.png)
+  ![image-20210406150343583](images/image-20210406150343583.png)
 
 
 
@@ -30,14 +30,14 @@
   - Allocation pools
     - 테넌트에 의해서 생성될 VM 인스턴스들이 가질 수 있는 Private IP의 서브넷 어드레스 풀
 
-  <img src="C:\Users\jkjk1\바탕 화면\TIL\SDN&NFV\images\image-20210406151325600.png" alt="image-20210406151325600" style="zoom:50%;" />
+  <img src="images\image-20210406151325600.png" alt="image-20210406151325600" style="zoom:50%;" />
 
 - 테넌트 네트워크 생성 완료 모습
 
   - Demo 프로젝트로 생성하지만 Demo 프로젝트로는 이러한 시스템에 있는 네트워크 패널에 정보가 안보임
   - 생성된 정보를 확인하기 위해서는 admin으로 변경 후 확인
 
-  ![image-20210406151508106](C:\Users\jkjk1\바탕 화면\TIL\SDN&NFV\images\image-20210406151508106.png)
+  ![image-20210406151508106](images/image-20210406151508106.png)
 
 
 
@@ -53,7 +53,7 @@
 
 - Virtual Router에서 NAT 기술 수행
 
-  ![image-20210406152324816](C:\Users\jkjk1\바탕 화면\TIL\SDN&NFV\images\image-20210406152324816.png)
+  ![image-20210406152324816](images/image-20210406152324816.png)
 
 
 
@@ -74,7 +74,7 @@
   - Virtual Router의 private network 쪽 인터페이스를 생성하는 단계
   - tenant1 서브넷 설정
 
-  <img src="C:\Users\jkjk1\바탕 화면\TIL\SDN&NFV\images\image-20210406152835141.png" alt="image-20210406152835141" style="zoom:50%;" />
+  <img src="images/image-20210406152835141.png" alt="image-20210406152835141" style="zoom:50%;" />
 
 
 
@@ -94,7 +94,7 @@
 
 - Compute - Access & Security - Key Pairs - Create Key Pairs
 
-  <img src="C:\Users\jkjk1\바탕 화면\TIL\SDN&NFV\images\image-20210406153457579.png" alt="image-20210406153457579" style="zoom:50%;" />
+  <img src="images\image-20210406153457579.png" alt="image-20210406153457579" style="zoom:50%;" />
 
 
 
@@ -108,4 +108,4 @@
 
 - 들어오고 나가는(ingress/egress) 모든 ICMP와 SSH 트래픽을 허용
 
-  ![image-20210406153928675](C:\Users\jkjk1\바탕 화면\TIL\SDN&NFV\images\image-20210406153928675.png)
+  ![image-20210406153928675](images/image-20210406153928675.png)

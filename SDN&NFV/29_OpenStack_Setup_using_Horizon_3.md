@@ -19,9 +19,9 @@
   3. Flavor : 생성했던 flavor 1을 선택
   4. Networks : 생성한 tenant network 선택
 
-  ![image-20210407101704491](C:\Users\jkjk1\바탕 화면\TIL\SDN&NFV\images\image-20210407101704491.png)
+  ![image-20210407101704491](images/image-20210407101704491.png)
 
-  ![image-20210407101746999](C:\Users\jkjk1\바탕 화면\TIL\SDN&NFV\images\image-20210407101746999.png)
+  ![image-20210407101746999](images/image-20210407101746999.png)
 
 
 
@@ -33,7 +33,7 @@
 
 - "Port to be associated" : 현재 선택된 VM 인스턴스의 네트워크 인터페이스 중에서 tenant1 네트워크와 연결된 IP가 할당된 인터페이스를 선택
 
-  ![image-20210407102157596](C:\Users\jkjk1\바탕 화면\TIL\SDN&NFV\images\image-20210407102157596.png)
+  ![image-20210407102157596](images/image-20210407102157596.png)
 
 
 
@@ -43,7 +43,7 @@
 
 - 접속하기 위해서는 Floating IP 대역이 호스트 서버의 NAT 네트워크로 구현되어 있기 때문에 오픈스택 설치 후에 대시보드에 접근하기 위해서 Virtual Box를 이용해서 PortFowarding Rule을 설정한 것 처럼 동일하게 VM 인스턴스들에 대해서도 룰 추가
 
-  ![image-20210407102439082](C:\Users\jkjk1\바탕 화면\TIL\SDN&NFV\images\image-20210407102439082.png)
+  ![image-20210407102439082](images/image-20210407102439082.png)
 
 
 
@@ -51,7 +51,7 @@
 
 - 구성완료 모습
 
-  ![image-20210407102608923](C:\Users\jkjk1\바탕 화면\TIL\SDN&NFV\images\image-20210407102608923.png)
+  ![image-20210407102608923](images/image-20210407102608923.png)
 
 
 
@@ -71,7 +71,7 @@
   $ ip a
   ```
 
-  ![image-20210407103306349](C:\Users\jkjk1\바탕 화면\TIL\SDN&NFV\images\image-20210407103306349.png)
+  ![image-20210407103306349](images/image-20210407103306349.png)
 
 
 
@@ -79,7 +79,7 @@
 
 - ping test
 
-  <img src="C:\Users\jkjk1\바탕 화면\TIL\SDN&NFV\images\image-20210407103608818.png" alt="image-20210407103608818" style="zoom:50%;" />
+  <img src="images\image-20210407103608818.png" alt="image-20210407103608818" style="zoom:50%;" />
 
 
 
@@ -87,4 +87,4 @@
 
 - 지금까지 설정했던 내용이 표현됨
 
-  ![image-20210407103847457](C:\Users\jkjk1\바탕 화면\TIL\SDN&NFV\images\image-20210407103847457.png)
+  ![image-20210407103847457](images/image-20210407103847457.png)
