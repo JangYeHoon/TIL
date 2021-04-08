@@ -12,7 +12,7 @@
 
   - http://download.cirros-cloud.net/0.3.4/cirros-0.3.4-x86_64-disk.img
 
-  <img src="C:\Users\jkjk1\바탕 화면\TIL\SDN&NFV\images\image-20210402102227040.png" alt="image-20210402102227040" style="zoom:50%;" />
+  <img src="images\image-20210402102227040.png" alt="image-20210402102227040" style="zoom:50%;" />
 
 
 
@@ -24,7 +24,7 @@
 
 - Flavor를 이용해서 생성되는 VM이 cpu, 메모리, 디스크 등의 자원 값을 지정
 
-  ![image-20210402102349830](C:\Users\jkjk1\바탕 화면\TIL\SDN&NFV\images\image-20210402102349830.png)
+  ![image-20210402102349830](images\image-20210402102349830.png)
 
 
 
