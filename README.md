@@ -110,6 +110,7 @@
 - [27. OpenStack Setup using Horizon-1](SDN&NFV/27_OpenStack_Setup_using_Horizon_1.md)
 - [28. OpenStack Setup using Horizon-2](SDN&NFV/28_OpenStack_Setup_using_Horizon_2.md)
 - [29. OpenStack Setup using Horizon-3](SDN&NFV/29_OpenStack_Setup_using_Horizon_3.md)
+- [30. OpenStack Additional Setup-1](SDN&NFV/30_OpenStack_Additional_Setup_1.md)
 
 
 
@@ -130,3 +131,4 @@
 
 - [12. Working with a DevOps CI/CD Pipeline in AWS](AWS_Cloud/12_Working_with_a_DevOps_CICD_Pipeline_in_AWS.md)
 - [13. AWS DynamoDB in the COnsole Creating Tables Items and Indexes](AWS_Cloud/13_AWS_DynamoDB_in_the_Console_Creating_Tables_Items_and_Indexes.md)
+
