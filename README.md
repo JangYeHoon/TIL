@@ -121,6 +121,7 @@
 - [28. OpenStack Setup using Horizon-2](SDN&NFV/28_OpenStack_Setup_using_Horizon_2.md)
 - [29. OpenStack Setup using Horizon-3](SDN&NFV/29_OpenStack_Setup_using_Horizon_3.md)
 - [30. OpenStack Additional Setup-1](SDN&NFV/30_OpenStack_Additional_Setup_1.md)
+- [31. OpenStack Additional Setup-2](SDN&NFV/31_OpenStack_Additional_Setup_2.md)
 
 
 
