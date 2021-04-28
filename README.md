@@ -15,8 +15,8 @@
 - [Git](#git)
 - [OS](#os)
 - [Naver Cloud](#naver-cloud)
-- [SDN / NFV](#sdnnfv)
 - [AWS Cloud](#aws-cloud)
+- [SDN / NFV](#sdnnfv)
 
 
 
@@ -38,34 +38,15 @@
 # OS
 
 - [01. Overview](OS/01_Overview.md)
-  - 운영체제에 대한 전반적인 내용 및 용어 정리
 - [02. System Structures](OS/02_System_Structures.md)
-  - 운영체제에서 제공하는 서비스와 System call
-  - 그리고 운영체제 시스템 구조의 종류에 대해 설명
 - [03. Process Concept](OS/03_Process_Concept.md)
-  - 프로세스 관리 기법과 프로세스와 관련된 기술
-  - 클라이언트-서버 통신 기법
 - [04. Multithreaded Programming](OS/04_Multithreaded_Programming.md)
-  - 스레드에 대한 개념과 다양한 멀티스레드 설계와 구현 방법
 - [05. CPU Scheduling](OS/05_CPU_Scheduling.md)
-  - CPU 스케줄링 기법과 다양한 알고리즘 소개
-  - FCFS, SJF, Priority Scheduling, RR, Multilevel Queue Scheduling, Multilevel Feedback Queue Scheduling
-  - Real-Time CPU Scheduling : Rate Monotonic Scheduling, Earliest Deadline First Scheduling
 - [06. Process Synchronization](OS/06_Process_Synchronization.md)
-  - 공유 데이터를 사용할때 발생하는 문제와 해결법
 - [07. Classic Problems of Synchronization](OS/07_Classic_Problems_of_Synchronization.md)
-  - Synchronization에서 예전부터 발생하는 문제와 해결법
 - [08. Deadlock](OS/08_Deadlock.md)
-  - 데드락의 발생 조건과 해결 방법
 - [09. Memory Management Strategy](OS/09_Memory_Management_Strategy.md)
-  - 다양한 메모리 관리 기법 소개와 메모리 보호, 논리적 물리적 주소 차이 설명
-  - Memory Allocation Schemes
-    - Continuous memory allocation, Paging, Segmentation
 - [10. Virtual Memory Management Strategy](OS/10_Virtual_Memory_Management_Strategy.md)
-  - Virtual Memory의 기법에 대한 소개
-    - Demand Paging
-  - Page Replacement Algorithms 소개
-  - Allocation of Frames와 Thrashing, Kernel Memory Allocation 기법들 소개
 
 
 
