@@ -4,7 +4,6 @@
 
 ## 규칙
 
-- 폴더와 파일명은 최대한 영문으로 작성
 - 매일 올리기 위해 의미없이 커밋하지 않고 일주일에 한번이여도 의미있는 글을 올리자
 - 제목과 설명은 최대한 찾기 쉽게 작성
 
@@ -47,6 +46,7 @@
 - [08. Deadlock](OS/08_Deadlock.md)
 - [09. Memory Management Strategy](OS/09_Memory_Management_Strategy.md)
 - [10. Virtual Memory Management Strategy](OS/10_Virtual_Memory_Management_Strategy.md)
+- [공룡책 정리](OS/공룡책-정리)
 
 
 
