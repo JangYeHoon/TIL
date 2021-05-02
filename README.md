@@ -46,7 +46,7 @@
 - [08. Deadlock](OS/08_Deadlock.md)
 - [09. Memory Management Strategy](OS/09_Memory_Management_Strategy.md)
 - [10. Virtual Memory Management Strategy](OS/10_Virtual_Memory_Management_Strategy.md)
-- [공룡책 정리](OS/공룡책-정리)
+- [공룡책 정리](OS/공룡책%20정리.md)
 
 
 
