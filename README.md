@@ -36,16 +36,6 @@
 
 # OS
 
-- [01. Overview](OS/01_Overview.md)
-- [02. System Structures](OS/02_System_Structures.md)
-- [03. Process Concept](OS/03_Process_Concept.md)
-- [04. Multithreaded Programming](OS/04_Multithreaded_Programming.md)
-- [05. CPU Scheduling](OS/05_CPU_Scheduling.md)
-- [06. Process Synchronization](OS/06_Process_Synchronization.md)
-- [07. Classic Problems of Synchronization](OS/07_Classic_Problems_of_Synchronization.md)
-- [08. Deadlock](OS/08_Deadlock.md)
-- [09. Memory Management Strategy](OS/09_Memory_Management_Strategy.md)
-- [10. Virtual Memory Management Strategy](OS/10_Virtual_Memory_Management_Strategy.md)
 - [공룡책 정리](OS/공룡책%20정리.md)
 
 
