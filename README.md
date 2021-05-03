@@ -56,6 +56,7 @@
 - [11. Security Service](Naver_Cloud/11_Security_Service.md)
 - [12. Media Service](Naver_Cloud/12_Media_Service.md)
 - [13. Quiz](Naver_Cloud/13_Quiz.md)
+- [공인교육 Associate 과정](Naver_Cloud/공인교육_Associate_과정.md)
 
 
 
