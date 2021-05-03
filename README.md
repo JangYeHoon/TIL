@@ -42,20 +42,6 @@
 
 ## Naver Cloud
 
-- Naver Cloud Associate 자격증을 위한 강의 정리 및 용어 정리
-- [01. Overview](Naver_Cloud/01_Overview.md)
-- [02. Compute Service](Naver_Cloud/02_Compute_Service.md)
-- [03. Network Service](Naver_Cloud/03_Network_Service.md)
-- [04. Network Service Practical](Naver_Cloud/04_Network_Service_Practical.md)
-- [05. Storage Service](Naver_Cloud/05_Storage_Service.md)
-- [06. Cloud Database](Naver_Cloud/06_Cloud_Database.md)
-- [07. AI Service](Naver_Cloud/07_AI_Service.md)
-- [08. Application Service](Naver_Cloud/08_Application_Service.md)
-- [09. Management_Service](Naver_Cloud/09_Management_Service.md)
-- [10. Analytics Service](Naver_Cloud/10_Analytics_Service.md)
-- [11. Security Service](Naver_Cloud/11_Security_Service.md)
-- [12. Media Service](Naver_Cloud/12_Media_Service.md)
-- [13. Quiz](Naver_Cloud/13_Quiz.md)
 - [공인교육 Associate 과정](Naver_Cloud/공인교육_Associate_과정.md)
 
 
