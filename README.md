@@ -99,4 +99,5 @@
 - [11. Rolling Updates to a Highly Distributed Web Application with AWS CodeDeploy](AWS_Cloud/11_Rolling_Updates_to_a_Highly_Distributed_Web_Application_with_AWS_CodeDeploy.md)
 - [12. Working with a DevOps CI/CD Pipeline in AWS](AWS_Cloud/12_Working_with_a_DevOps_CICD_Pipeline_in_AWS.md)
 - [13. AWS DynamoDB in the COnsole Creating Tables Items and Indexes](AWS_Cloud/13_AWS_DynamoDB_in_the_Console_Creating_Tables_Items_and_Indexes.md)
+- [A Cloud Guru 실습](AWS_Cloud/A_Cloud_Guru_실습)
 
