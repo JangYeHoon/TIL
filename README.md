@@ -48,38 +48,7 @@
 
 ## SDN/NFV
 
-- 2019년 들었던 포항공대 MOOC 과정 SDN & NFV 교육 재정리
-- [01. Challenges by Telcos](SDN&NFV/01_Challenges_by_Telcos.md)
-- [02. Open Networking Ecosystem 1](SDN&NFV/02_Open_Networking_Ecosystem_1.md)
-- [03. Open Networking Ecosystem 2](SDN&NFV/03_Open_Networking_Ecosystem_2.md)
-- [04. SDN/NFV Use Cases](SDN&NFV/04_SDN&NFV_Use_Cases.md)
-- [05. SDNNFV_Forums_Conferences_Journals and Summary](SDN&NFV/05_SDNNFV_Forums_Conferences_Journals_and_Summary.md)
-- [06. Introduction to SDN](SDN&NFV/06_Introduction_to_SDN.md)
-- [07. Introduction to OpenFlow](SDN&NFV/07_Introduction_to_OpenFlow.md)
-- [08. Flow Table, Group Table and Meter Table](SDN&NFV/08_Flow_Table_Group_Table_and_Meter_Table.md)
-- [09. Operations in OpenFlow](SDN&NFV/09_Operations_in_OpenFlow.md)
-- [10. SDN Applications](SDN&NFV/10_SDN_Applications.md)
-- [11. SDN Controllers 1](SDN&NFV/11_SDN_Controllers_1.md)
-- [12. SDN Controllers 2](SDN&NFV/12_SDN_Controller_2.md)
-- [13. Introduction to Open Network Operating System](13_Introduction_to_Open_Network_Operating_System(ONOS).md)
-- [14. SDN Distribute Core](14_SDN_Distributed_Core.md)
-- [15. ONOS Northbound](SDN&/NFV/15_ONOS_Northbound.md)
-- [16. ONOS Southbound & Application](SDN&NFV/16_ONOS_Southbound_and_Application.md)
-- [17. ONOS Code Walkthrough](SDN&NFV/17_ONOS_Code_Walkthrough.md)
-- [18. NFV-MANO #1](SDN&NFV/18_NFV-MANO_1.md)
-- [19. NFV-MANO #2](SDN&NFV/19_NFV-MANO_2.md)
-- [20. NFV-MANO #3](SDN&NFV/20_NFV-MANO_3.md)
-- [21. Fast Packet Processing Methods](SDN&NFV/21_Fast_Packet_Processing_Methods.md)
-- [22. Datapath Composition](SDN&NFV/22_Datapath_Composition.md)
-- [23. OpenStack Introduction](SDN&NFV/23_OpenStack_Introduction.md)
-- [24. OpenStack Networking](SDN&NFV/24_OpenStack_Networking.md)
-- [25. OpenStack_Installation-1](SDN&NFV/25_OpenStack_Installation_1.md)
-- [26. OpenStack Installation-2](SDN&NFV/26_OpenStack_Installation_2.md)
-- [27. OpenStack Setup using Horizon-1](SDN&NFV/27_OpenStack_Setup_using_Horizon_1.md)
-- [28. OpenStack Setup using Horizon-2](SDN&NFV/28_OpenStack_Setup_using_Horizon_2.md)
-- [29. OpenStack Setup using Horizon-3](SDN&NFV/29_OpenStack_Setup_using_Horizon_3.md)
-- [30. OpenStack Additional Setup-1](SDN&NFV/30_OpenStack_Additional_Setup_1.md)
-- [31. OpenStack Additional Setup-2](SDN&NFV/31_OpenStack_Additional_Setup_2.md)
+- [포항공대 MOOC SDN/NFV 정리](SDN&NFV/포항공대_MOOC_SDNNFV_정리.md)
 
 
 
