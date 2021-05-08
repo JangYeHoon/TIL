@@ -35,6 +35,7 @@
 - [29. OpenStack Setup using Horizon - 3](29-openstack-setup-using-horizon-3)
 - [30. OpenStack Additional Setup - 1](#30-openstack-additional-setup-1)
 - [31. OpenStack Additional Setup - 2](#31-openstack-additional-setup-2)
+- [32. OpenStack CLI](#32-openstack-cli)
 
 
 
@@ -3036,3 +3037,36 @@ ONOS는 서비스 요구사항을 만족시키는 SDN 컨트롤러 오픈소스 
 ## After VM Live MIgration
 
 ![image-20210409102818942](images/image-20210409102818942.png)
+
+
+
+---
+
+# 32. OpenStack CLI
+
+### OpenStack API
+
+- 오픈스택 API가 기본적으로 각각의 서비스 컴포넌트들은 각각의 API 서버를 가지고 있음
+
+- 컴포넌트들에 대해서 사용자나 관리자가 RESTful API 형태로 접근하거나 요청하거나 CLI 형택로 사용
+
+- 오픈스택의 클라이언트라 함은 tenant나 관리자가 될 수 있음
+
+  - dashboard와 CLI를 이용해 접근
+
+  ![image-20210508122619512](images/image-20210508122619512.png)
+
+### OpenStack CLI
+
+- OpenStack CLI에는 2가지 유형으로 구성
+  - Unified CLI Client
+  - Legacy CLI Clients
+- 두 CLI 클라이언트 모두 CLI command를 입력하면 API 서버에 대한 request를 생성
+  - 이때 기본적으로 서비스 컴포넌트들이 서비스를 RESTful API로 제공
+  - 컴포넌트들에 요청에 대해서 HTTP(GET/POST, URI, media type) 메시지로 변환
+  - 완료가 되면 내부적으로는 cURL을 이용해 서비스 컴포넌트에 전달
+- CLI command를 입력할 때 debug 옵션을 사용하면 command가 실행되는 과정을 debuging log를 이용해 보여줌
+  - OpenStack API call이 다수의 오픈스택 컴포넌트들을 거쳐서 순차적으로 발생하는 command의 request와 response 과정을 확인 가능
+
+#### Unified CLI client
+
