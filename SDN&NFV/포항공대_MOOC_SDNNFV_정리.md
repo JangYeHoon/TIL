@@ -36,7 +36,7 @@
 - [30. OpenStack Additional Setup - 1](#30-openstack-additional-setup-1)
 - [31. OpenStack Additional Setup - 2](#31-openstack-additional-setup-2)
 - [32. OpenStack CLI](#32-openstack-cli)
-- [33. OVS-DPDK Installation on OpenStack - 1](#33-ovsdpdk-installation-on-openstack-1)
+- [33. OVS-DPDK Installation on OpenStack - 1](#33-ovs-dpdk-installation-on-openstack-1)
 - 
 
 
