@@ -36,6 +36,8 @@
 - [30. OpenStack Additional Setup - 1](#30-openstack-additional-setup-1)
 - [31. OpenStack Additional Setup - 2](#31-openstack-additional-setup-2)
 - [32. OpenStack CLI](#32-openstack-cli)
+- [33. OVS-DPDK Installation on OpenStack - 1](#33-ovsdpdk-installation-on-openstack-1)
+- 
 
 
 
@@ -3070,3 +3072,260 @@ ONOS는 서비스 요구사항을 만족시키는 SDN 컨트롤러 오픈소스 
 
 #### Unified CLI client
 
+- 대부분의 오픈스택 서비스에서 이용가능한 방식
+  - 오픈스택의 release 버전에 따라서 지원하지 않을 수 있음
+- 특징
+  - command들이 가지는 syntax들이 일정한 form을 가짐
+    - (Take) OBJECT1 (and perform) ACTION (using) OBJECT2 (to it)
+    - 편의상 해석 - object1을 취해서 action을 수행하고 optional하게 object2라는 것을 이용
+    - `$ openstack [<global-options>] <object1> <action> [<object-2][<command-arguments>]`
+    - Objects and action : https://docs.openstacak.org/developer/python-openstackclient/
+  - 기존의 Legacy CLI와 Unified CLI를 매핑하기 위한 가이드가 존재
+    - https://docs.openstack.org/developer/python-openstackclient/decoder.html
+
+#### Legacy CLI client
+
+- Nova CLI, Neutron CLI, ... 등의 서로 다른 컴포넌트들이 별도로 자신의 API 서버에 요청받을 수 있도록 별도의 CLI를 제공하는 것
+  - syntax가 컴포넌트 별로 다 다름
+- Keyston 서비스와 관련된 CLI는 사용하지 않음
+- Command specifications
+  - https://docs.openstack.org/cli-reference/
+
+#### CLI 예제
+
+**VM Instance의 description 요청**
+
+- Legacy CLI
+  - `nova show <instance_ID>`
+- Unified CLI
+  - `openstack server show <instacnce_ID>`
+
+**floating IP의 description 요청**
+
+- Legacy CLI
+  - `neutron floatingip-show <floatingip_ID>`
+- Unified CLI
+  - `openstack floating ip show <floatingip_ID>`
+
+**특정 서비스를 CLI를 통해 실행시켰을 때 debug 옵션 사용**
+
+- `openstack server show <instance id> --debug`
+
+  1) http를 생성해 Keystone API server로  요청을 보냄. CLI를 입력한 사용자가 권한이 있는지 확인하기 위하여 Keystone에 인증 과정을 요청
+
+  2) Nova API server로 전달하여 응답으로 VM 인스턴스의 description 정보를 받아옴
+
+  3) http 메시지를 생성해 Nova API server로 전송되며 이 메시지에 대한 응답은 VM 인스턴스가 사용하는 이미지의 description을 받아옴
+
+  4) http 메시지를 생성해 Nova API server로 전달되며 응답은 VM 인스턴스에서 사용하는 flavor에 대한 description에 대한 결과를 받아옴
+
+  5) CLI Client는 각각의 서비스들의 응답을 정리하여 사용자가 보기 쉽게 user-friendly한 format으로 변환
+
+### Searching for CLI Commands
+
+- 관리자 입장에서 서비스에 대한 요구사항이 발생했을 때 오픈스택의 GUI 환경에서 제공되지 않을 수 있음
+  - 그때 그것을 대신하여 CLI command로 서비스를 실행시키는 방법을 찾는 법
+- 상황 과정 : "Demo" tenant가 생성할 수 있는 VM 인스턴스의 개수 제한을 해제하는 방법에 대한 요구사항 발생
+  - 요구되는 서비스의 키워드들을 정리하여 CLI specification에서 찾음
+    - 해당 상황에서는 restriction, resource
+    - https://docs.openstack.org/developer/python-openstackclient/commands.html
+    - "quota" object와 관련되어 있다는 힌트를 얻음
+  - quota를 이용한 명령어의 syntax들을 얻음
+    - `openstack --help | grep quota`
+    - `openstack quota set --help`
+  - 더 많은 관련 정보
+    - https://docs.openstack.org/developer/python-openstackclient/command-list.html
+  - 얻은 정보를 이용해 VM 인스턴스의 개수 제한을 늘림
+    - `openstack quota set --instances 20 "Demo"
+
+
+
+---
+
+# OVS-DPDK Installation on OpenStack 1
+
+### Open vSwitch with DPDK(OVS-DPDK)
+
+- Intel의 DPDK vSwitch 프로젝트에서 시작
+
+- OVS 프로젝트와 통합하여 2.4 버전 이상부터 지원
+
+  <img src="images/image-20210509174715068.png" alt="image-20210509174715068" style="zoom:50%;" />
+
+### Features
+
+- DPDK-based implementation
+  - Running based on EAL setups
+- vHost-user port(vSwitch<->VM NIC)
+- Multi-queue support in vHost-user
+- Tunneling support : VxLAN, GRE, Geneve
+- QoS support
+  - VLAN / MPLS
+  - Ingress / egress policing
+- DPDK statistics
+
+
+
+## Detailed Overview
+
+![image-20210509174939602](images/image-20210509174939602.png)
+
+
+
+## OpenStack 구성
+
+### Compute Node Resource
+
+- 6 vCPUs
+  - NUMA(Non-Uniform Memory Access)
+    - 각 코어별로 물리적으로 위치가 다르고 각 코어에서 물리적으로 가까운 메모리들이 존재
+    - 물리적으로 가까운 메모리를 이용해서 해당 코어가 동작하면 좀 더 빠른 처리 속도를 보임
+    - `numactl --hardware`
+- 8GB RAM
+
+### Hugepage Pool Reservation
+
+- Compute Node와 Guest VM 인스턴스들이 DPDK 기반 고속 패킷 프로세싱을 위한 공유하는 공유 메모리 풀
+
+- Allocate 2MB (page size) * 2048 = 4GB (depending on host resource)
+
+  - http://dpdk-guide.gitlab.io/dpdk-guide/setup/hugepages.html
+
+  ```bash
+  $ echo 'vm.nr_hugepages=2048' > /etc/sysctl.d/hugepages.conf
+  $ reboot now
+  $ grep Huge /proc/meminfo
+  $ mount -t hugetlbfs none /dev/hugepages
+  ```
+
+
+
+## Open vSwitch 2.6 with DPDK 16.11
+
+- Packstack for OpenStack Mitaka installs OVS 2.6.1 with DPDK 16.11 by default
+
+  - packstack을 이용해 openstack을 설치하면 ovs와 dpdk가 기본적으로 설치
+
+- OVS rpm package 체크
+
+  - Compute Node 실행
+
+    ```bash
+    $ rpm -qa | grep openvswitch
+    $ service openvswitch stop
+    $ rpm -e openvswitch-2.5.0-2.el7.x86_64 --nodeps
+    $ curl -O http://cbs.centos.org/kojifiles/packages/openvswitch/2.6.1/4.1.git20161206.el7/x86_64/openvswitch-2.6.1-4.1.git20161206.el7.x86_64.rpm
+    $ rpm -i openvswitch-2.6.1-4.1.git20161206.el7.x86_64.rpm
+    $ rpm -qa openvswitch
+    $ ovs-vsctl show
+    ```
+
+### Configuration on QEMU
+
+- QEMU는 user space에서 동작하는 하이퍼바이저
+
+- QEMU의 설정을 변경
+
+  - 하이퍼바이저에 의해 생성되는 VM 인스턴스들이 기존에 VM 네트워크 인터페이스가 아닌 DPDK 기반의 virtual interface를 생성하여 ovs-dpdk에 연결
+
+  ```bash
+  #compute node
+  $ vim /etc/libvirt/qemu.conf
+  ...
+  user = "root"
+  group = "root"
+  ...
+  hugetlbfs_mount = "/dev/hugepages"
+  ...
+  $ service libvirtd restart
+  $ service openstack-nova-compute restart
+  ```
+
+### Configuration on Neutron Open vSwitch Agent
+
+- Agent의 설정을 바꿔 컴퓨트 노드에서 동작하는 ovs가 ovs-dpdk로 동작한다고 명시
+
+- DPDK 기반의 virtual interface를 생성하는데 그때 VM에서도 생성을 하고 클라이언트 서버 형태로 인스턴스가 구성
+
+  - VM 쪽은 클라이언트 형태로 생성되고 실제 ovs-dpdk가  배치된 컴퓨트 노드는 ovs-dpdk가 서버 역할을 하면서 서버 소켓을 생성
+
+- Notify the OVS agent that the OVS will be run in DPDK mode
+
+- Define the location for server sockets of DPDK-based virtual interface that will be created  by OVS-DPDK
+
+  ```bash
+  $ vim /etc/neutron/plugins/ml2/openvswitch_agent.ini
+  ...
+  datapath_type = netdev
+  vhostuser_socket_dir = /var/run/openvswitch
+  ```
+
+#### Deployment of OVS-DPDK
+
+- OVS를 OVS-DPDK 모드로 동작하기 위해 OVS 설정을 변경
+
+```bash
+#compute node
+$ ovs-vsctl --no-wait init
+$ ovs-vsctl --no-wait set Open_vSwitch . other_config:dpdk-init=true
+$ ovs-vsctl --no-wait set Open_vSwitch . other_config:dpdk-lcore-mask=0X1
+$ ovs-vsctl --no-wait set Open_vSwitch . other_config:pmd-cpu-mask=0x6
+$ ovs-vsctl --no-wait set Open_vSwitch . other_config:dpdk-socket-mem="1024"
+$ ovs-vsctl --no-wait set Open_vSwitch . other_config:dpdk-hugepage-dir="/dev/hugepages"
+$ service neutron-openvswitch-agent stop
+$ service openvsiwthc stop
+$ service neutron-openvswitch-agent start
+```
+
+- Specifications on "other_config"
+  - If it is not set explicitly, OVS uses default values for the configuration items
+- Configuration items
+  - dpdk-init : OVS를 DPDK 모드로 동작
+  - dpdk-lcore-mask : lcore threads를 컴퓨트 노드의 특정 CPU 코어에 마스킹
+    - lcore threads - OVS-DPDK의 internal communication과 logging 역할
+    - 0x1(0000 0001) : pinning a lcore thread to the first core on each NUMA node
+  - pmd-cpu-mask : pmd threads에 대한 CPU 코어 마스킹
+    - pmd threads - Poll Mode Driver라고 해서 DPDK 성능 향상을 위해서 하드웨어 인터럽트 없이 NIC에 도착한 패킷들을 User space 메모리로 올려서 고속으로 처리
+    - 0x6(0000 0110) : pining two PMD threads to the second and third core on each NUMA node
+  - dpdk-socket-mem : hugepage allocation한 것 중에서 일부를 OVS-DPDK가 고속 패킷 프로세싱을 위해 사용
+    - 1024, 1024 : 1024MB for NUMA 0 and 1024MB for NUMA 1
+  - dpdk-hugepage-dir : 컴퓨트 노드의 호스트 서버에 할당한 hugepage가 존재하는 디렉토리를 명시함으로써 OVS-DPDK가 해당 hugepage를 활용할 수 있도록 함
+    - /dev/hugepage : the same location as QEMU setting for hugepage allocation to VMs
+  - More details : http://openvswitch.org/support/dist-docs/ovs-vswitchd.conf.db.5.html
+
+#### Confirmation
+
+- OVSDB
+
+  ```bash
+  $ ovs-vsctl get Open_vSwitch.iface_type
+  $ ovs-vsctl get Open_vSwitch.other-config
+  ```
+
+- ovs-vswitchd log
+
+  ```bash
+  $ vim /var/log/openvswitch/ovs-vswitchd.log
+  ```
+
+- Flow rules for the existing OpenStack networking
+
+  ```bash
+  root$ ovs-ofctl dump-flows br-vlan
+  root$ ovs-ofctl dump-flows br-int
+  ```
+
+- User space datapath for OVS-DPDK
+
+  - "netdev" : user space datapath
+  - "system" : kernel space datapath
+
+  ```bash
+  $ ovs-vsctl list bridge | grep -P "netdev|name"
+  datapath_type :netdev
+  name :br-int
+  datapath_type :netdev
+  name :br-vlan
+  ```
+
+  
