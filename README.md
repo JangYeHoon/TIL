@@ -31,6 +31,7 @@
 - [07. branch 사용법](git/07_branch.md)
 - [08. branch 병합 관련 자료](git/08_merge_branch.md)
 - [09. Fork & PR](git/09_fork_pr.md)
+- [10. diff 사용법](git/10_diff.md)
 
 
 
