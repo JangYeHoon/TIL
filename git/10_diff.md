@@ -49,3 +49,16 @@ git diff 명령어는 커밋하거나 추가한 파일에 대한 차이점을 �
 	
 	  ![img](https://blogfiles.pstatic.net/MjAyMTA1MTJfMjY2/MDAxNjIwNzg1ODg4MzEz.WJcrvHQ5Q-yPADenBA_2htoBjngCBk-hxFvfoZieHwcg.m6g0sorcbPqtTdSZ3LqD4fnEVkn_v9RI2y39NYK8tHog.JPEG.jkjk010jkjk/gitdiff3.PNG?type=w1)
 
+
+
+## git diff 패치 적용
+
+- **git diff를 이용한 패치 파일 생성**
+  - `git diff > patchfile`
+  - `git diff src/main.c ../../temp/src/main.c > patchfile`
+  - `--no-prefix`옵션을 주어 a/b patch prefix가 제거된 패치 파일 생성
+    - `git diff --no-prefix > patchfile`
+- **생성한 패치 파일 적용**
+  - `patch -p1 < patchfile`
+  - `--no-prefix` 옵션을 사용하여 생성한 패치 파일인 경우 적용 방법
+    - `patch -p0 < patchfile`
