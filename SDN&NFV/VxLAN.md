@@ -2,11 +2,16 @@
 
 VxLAN은 최근 클라우드의 발전과 가상화 기반 인프라의 발달로 인해 생겨나는 문제들을 해결하고 대응할 수 있어 주목받는 기술이다.
 
+> 참고 블로그
+>
+> - https://blog.naver.com/PostView.nhn?blogId=lunaeye&logNo=221160549927&parentCategoryNo=&categoryNo=1&viewDate=&isShowPopularPosts=false&from=postView
+> - https://youngmind.tistory.com/entry/Network-Overlay-VXLAN-%EB%B6%84%EC%84%9D-3?category=394664
+
 
 
 ## 목차
 
-- [VxLAN 이란?](#vxlan-이란?)
+- [VxLAN 이란?](#vxlan-이란)
   - [기본 개념](#기본-개념)
   - [L2 Network와의 차이점](#l2-network와의-차이점)
 - [VxLAN을 사용하는 이유](#vxlan을-사용하는-이유)
