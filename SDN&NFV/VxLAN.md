@@ -4,6 +4,23 @@ VxLAN은 최근 클라우드의 발전과 가상화 기반 인프라의 발달�
 
 
 
+## 목차
+
+- [VxLAN 이란?](#vxlan-이란?)
+  - [기본 개념](#기본-개념)
+  - [L2 Network와의 차이점](#l2-network와의-차이점)
+- [VxLAN을 사용하는 이유](#vxlan을-사용하는-이유)
+  - [MAC Address Table의 한계](#mac-address-table의-한계)
+  - [유연한 구성](#유연한-구성)
+- [VxLAN 용어 설명](#vxlan-용어-설명)
+- [VxLAN 네트워크 구조](#vxlan-네트워크-구조)
+  - [VxLAN 패킷 구조](#vxlan-패킷-구조)
+- [VxLAN Fabric은 Multicast 기반 Flood & Learn 방식으로 동작](#vxlan-fabric은-multicast-기반-flood-learn-방식으로-동작)
+  - [VxLAN Gateway Types](#vxlan-gateway-types)
+  - [VxLAN 동작 방식](#vxlan-동작-방식)
+
+
+
 ## VxLAN 이란?
 
 ### 기본 개념
@@ -69,6 +86,8 @@ VxLAN은 최근 클라우드의 발전과 가상화 기반 인프라의 발달�
 
 ## VxLAN 네트워크 구조
 
+<img src="images/tempsnip.png" alt="tempsnip" style="zoom:75%;" />
+
 - VxLAN에서 vSwitch는 매우 중요하다. vSwitch는 실제 MAC in IP/UDP를 관리하고 수집하는 역할을 하기 때문이다.
 - VxLAN에서 가장 특이한 포인트는 바로 VTEP
   - VTEP는 앞서 설명한 것과 같이 VxLAN Tunnel의 종단 역할을 수행한다.
@@ -103,8 +122,6 @@ VxLAN은 최근 클라우드의 발전과 가상화 기반 인프라의 발달�
 - VxLAN의 구분자는 VNI이다.
 - VTEP간에 Control Plane 통신을 위해 경로를 찾고 Underlay Network는 Data Plane의 역할을 수행한다.
 - **VxLAN의 Control-Plane은 Multicast가 반드시 필요**
-
-
 
 ### VxLAN 동작 방식![image-20210518092618157](images/image-20210518092618157.png)
 
