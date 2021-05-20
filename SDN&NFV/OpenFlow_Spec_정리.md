@@ -7,7 +7,7 @@
 - [Flow Table](#flow-table)
 - [Group Table](#group-table)
 - [Meter Table](#meter-table)
-- [Egress Table](#egress-tablev1.5)
+- [Egress Table](#egress-tablev15)
 - [Protocol Types](#protocol-types)
 - [Channel](#channel)
 - [Ports](#ports)
