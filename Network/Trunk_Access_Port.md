@@ -6,7 +6,7 @@
 
 - [Access Port](#access-port)
 - [Trunk Port](#trunk-port)
-- [DTP(Dynamic Trunk Protocol)](#dtpdynamic-trunk-protocol)
+- [DTP(Dynamic Trunk Protocol)](#dtp-dynamic-trunk-protocol)
 - [문제 및 참고자료](#참고자료)
 
 
