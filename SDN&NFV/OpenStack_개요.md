@@ -7,6 +7,7 @@
 - [오픈스택이란?](#오픈스택이란)
 - [오픈스택 프로젝트](#오픈스택-프로젝트)
 - [Logical Architecture](#logical-architecture)
+- [참고자료](#참고자료)
 
 
 
@@ -230,3 +231,34 @@
 
 ![그림7](images/%EA%B7%B8%EB%A6%BC7.png)
 
+
+
+## 참고자료
+
+- Heat
+  - https://www.slideshare.net/519199496/openstack-orchestration-heat
+  - https://naleejang.tistory.com/203
+
+- Ironic
+  - https://docs.openstack.org/ironic/pike/user/
+
+- Sahara
+  - https://docs.openstack.org/sahara/latest/intro/architecture.html 
+
+- Trove
+  - https://www.slideshare.net/arisu1000/trove-78196971
+  - https://www.admin-magazine.com/Archive/2016/35/Exploring-OpenStack-s-Trove-DBaaS 
+
+- Services
+  - [https://www.openstack.org/software/project-navigator/openstack-components#openstack-services](https://www.openstack.org/software/project-navigator/openstack-components)
+  - https://delightwook.tistory.com/16
+
+- VM Create Flow
+  - https://www.linuxtechi.com/step-by-step-instance-creation-flow-in-openstack/
+  - https://jayeshc1990.wordpress.com/2018/11/10/openstack-instance-creation-workflow/
+
+- Overview
+  - https://docs.openstack.org/ko_KR/install-guide/overview.html 
+
+- OpenStack Logical Architecture
+  - https://docs.openstack.org/ko_KR/install-guide/get-started-logical-architecture.html 
