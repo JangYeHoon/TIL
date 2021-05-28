@@ -13,6 +13,7 @@
 
 - 예제 아키텍처에서는 기본 VM 또는 인스턴스를 작동할 수 있는 최소 두 노드(호스트)가 필요합니다.
 - 추가로 블록 스토리지와 오브젝트 스토리지를 구성하기 위해선 추가 노드를 설치해야 합니다.
+- **해당 설치 예제에서는 Controller Node와 Compute Node만 사용합니다**
 
 <img src="images/hwreqs.png" alt="Hardware requirements" style="zoom:67%;" />
 
@@ -53,13 +54,13 @@
 - Controller 노드를 위한 가상 머신 생성
   - OS - CentOS 7
   - RAM - 4GB
-  -  Storage - 16GB
+  -  Storage - 10GB
   - CPU - 2
 - Compute 노드를 위한 가상 머신 생성
   - OS - CentOS 7
   - RAM - 4GB
-  - Storage - 16GB
-  - CPU - 4
+  - Storage - 20GB
+  - CPU - 2
 
 - Virtual Box NAT 설정
   - 환경 설정 - 네트워크 - 오른쪽에 NAT 추가 아이콘 클릭
