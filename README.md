@@ -56,6 +56,7 @@
 - [OpenFlow Spec 문서 정리](SDN&NFV/OpenFlow_Spec_정리.md)
 - [OpenStack 개요](SDN&NFV/OpenStack_개요.md)
 - [OpenStack Installation](SDN&NFV/OpenStack_Installation.md)
+- [OpenStack Service Installation](SDN&NFV/OpenStack_Service_Installation.md) - keystone 진행 중
 
 
 
