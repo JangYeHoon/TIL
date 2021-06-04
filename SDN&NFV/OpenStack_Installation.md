@@ -24,7 +24,6 @@
   - [다른 노드들(Compute Node)](#다른-노드들compute-node)
   - [검증](#검증)
 - [OpenStack 패키지 설치](#openstack-패키지-설치)
-
 - [SQL Database 설치](#sql-database-설치)
   - [구성요소 설치 및 구성](#구성요소-설치-및-구성)
   - [설치 마무리](#설치-마무리)
