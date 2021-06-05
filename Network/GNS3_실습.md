@@ -8,6 +8,92 @@
 
 
 
+## 스위치 기본 설정
+
+### 기본 설정
+
+- **스위치 추가**
+
+  ![image-20210605215355066](images/image-20210605215355066.png)
+
+- **스위치의 각 포트들의 현재 상황 확인**
+  - `switch# show interface status`
+  - ![image-20210605215443862](images/image-20210605215443862.png)
+
+### IP 주소 세팅
+
+- 프리빌리지드(Privileged) 모드 접속
+
+  - `enable`
+  - 처음 접속시에는 비밀번호를 묻지 않음
+  - 현재 사용하는 설정에서는 이미 프리빌리지드 모드로 접속되어 있음
+
+- 구성(configure) 모드 접속
+
+  - `configure terminal` or `conf t`
+  - ![image-20210605215937971](images/image-20210605215937971.png)
+
+- IP 주소는 vlan1 인터페이스에서 세팅하기 때문에 vlan1 인터페이스에 접속해서 IP 세팅
+
+  ```bash
+  Switch(config)# interface vlan 1
+  Switch(config-if)# ip address 192.168.100.1 255.255.255.0
+  ```
+
+  - ![image-20210605230202821](images/image-20210605230202821.png)
+
+- 설정완료 종료
+
+  ```bash
+  Switch(config-if)# exit
+  Switch(config)# exit
+  Switch#
+  ```
+
+  - ![image-20210605230323943](images/image-20210605230323943.png)
+
+- IP 구성 확인
+
+  - `Switch# show interface vlan 1`
+  - ![image-20210605230538091](images/image-20210605230538091.png)
+
+### 디폴트 게이트웨이 설정
+
+- 디폴트 게이트웨이란 라우터의 주소
+
+- 이 스위치가 붙어있는 라우터 인터페이스의 IP 주소가 바로 디폴트 게이트웨이
+
+  ```sh
+  Switch# configure terminal
+  Switch(config)# ip default-gateway 192.168.1.1
+  Switch(config)# exit
+  ```
+
+  - ![image-20210605231022231](images/image-20210605231022231.png)
+
+### 스위치  포트 속도와 Duplex 세팅
+
+- 포트 속도와 Duplex 설정
+
+  ```sh
+  Switch# configure terminal
+  Switch(config)# interface fastethernet 0/1
+  Switch(config-if)# speed ?		// speed 옵션 확인
+  Switch(config-if)# speed 10		// 10Mbps로 설정
+  Switch(config-if)# duplex ?		// duplex 옵션 확인
+  Switch(config-if)# duplex half	// half로 선택
+  Switch(config-if)# exit
+  Switch(config)# exit
+  ```
+
+  - 이유는 모르겠지만 현재 스위치에서는 speed 설정이 안되는 상태이다.
+  - 추후에 다른 스위치를 설치하여 진행
+  - ![image-20210605233454118](images/image-20210605233454118.png)
+
+- 설정 확인
+  - `Switch# show interface fastethernet 0/1`
+  - 이유는 아직 모르는데 duplex 또한 설정이 안된다
+
 ## Router와 PC ping 테스트
 
 ### 실습 구성도
@@ -55,3 +141,4 @@
 
   ![image-20210603223601183](images/image-20210603223601183.png)
 
+ 
