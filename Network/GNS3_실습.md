@@ -2,6 +2,10 @@
 
 > gns 장비를 이용하여 기본 네트워크 실습을 진행한다.
 
+## 목차
+
+- [Router와 PC ping 테스트](#router와-pc-ping-테스트)
+
 
 
 ## Router와 PC ping 테스트
