@@ -4,7 +4,16 @@
 
 ## 목차
 
+- [스위치 기본 설정](#스위치-기본-설정)
+  - [기본 설정](#기본-설정)
+  - [IP 주소 세팅](#ip-주소-세팅)
+  - [디폴트 게이트웨이 설정](#디폴트-게이트웨이-설정)
+  - [스위치 포트 속도와 Duplex 세팅](#스위치-포트-속도와-duplex-세팅)
+  - [Mac Address Table](#mac-address-table)
 - [Router와 PC ping 테스트](#router와-pc-ping-테스트)
+  - [실습 구성도](#실습-구성도)
+  - [라우터 설정](#라우터-설정)
+  - [PC 설정](#pc-설정)
 
 
 
@@ -93,6 +102,25 @@
 - 설정 확인
   - `Switch# show interface fastethernet 0/1`
   - 이유는 아직 모르는데 duplex 또한 설정이 안된다
+
+### Mac Address Table
+
+- Mac Table 확인
+  - `Switch# show mac address-table`
+  - ![image-20210607231218235](images/image-20210607231218235.png)
+
+- static mac address 설정 
+
+  ```sh
+  Switch# configure terminal
+  Switch(config)# mac address-table static aaaa.aaaa.aaaa vlan 1 interface ethernet 0/2
+  Switch(config)# exit
+  Switch# show mac address-table
+  ```
+
+  ![image-20210607231409753](images/image-20210607231409753.png)
+
+
 
 ## Router와 PC ping 테스트
 
