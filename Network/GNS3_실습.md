@@ -170,3 +170,60 @@
   ![image-20210603223601183](images/image-20210603223601183.png)
 
  
+
+## VLAN 구성
+
+### VTP 설정
+
+- VTP 도메인 이름 설정
+
+  ```sh
+  Switch# configure terminal
+  Switch(config)# vtp ?
+  Switch(config)# vtp domain cisco
+  ```
+  - ![image-20210608225759216](images/image-20210608225759216.png)
+
+- VTP 모드 설정
+  - 클라이언트는 안되고 서버 혹은 트랜스페어런트인데 서버 모드로 구성
+  - `Switch(config)# vtp mode server`
+  - ![image-20210608225948013](images/image-20210608225948013.png)
+
+- VTP 구성 확인
+  - `Switch# show vtp status`
+  - ![image-20210608230105633](images/image-20210608230105633.png)
+
+### 트렁크 포트 설정
+
+- 트렁크 포트는 IEEEE 802.1Q 방식과 ISL 방식 존재
+
+- 트렁크 포트 설정
+
+  ````bash
+  Switch# conf t
+  Switch(config)# int ethernet 0/1
+  Switch(config-if)# switchport trunk ?
+  Switch(config-if)# switchport trunk encapsulation ?
+  Switch(config-if)# switchport trunk encapsulation dot1q
+  ````
+
+  ![image-20210608230707296](images/image-20210608230707296.png)
+
+- 트렁크 포트 설정 확인
+
+  ```sh
+  Switch# show interface ethernet 0/1 switchport
+  Switch# show interface ethernet 0/1 trunk
+  ```
+
+  ![image-20210608230931193](images/image-20210608230931193.png)
+
+  ![image-20210608231030267](images/image-20210608231030267.png)
+
+### VLAN 설정
+
+- VLAN에 대해 아무 설정을 하지 않아도 디폴트 VLAN은 이미 세팅되어 있습니다.
+  - `Switch# show vlan`
+  - ![image-20210608231147132](images/image-20210608231147132.png)
+
+- 
