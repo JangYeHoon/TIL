@@ -1,5 +1,9 @@
 # OpenStack Service Installation
 
+- [Keystone Installation](#keystone-installation)
+- [Glance Installation](#glance-installation)
+- [Placement Installation](#placement-installation)
+
 
 
 ## Keystone Installation
@@ -405,4 +409,143 @@
 - 모든 프로젝트에서 접근할 수 있도록 QCOW2 디스크 형식, 베어 컨테이너 형식 및 공개 가시성을 사용하여 이미지 서비스에 이미지를 업로드
 
   - `glance image-create --name "cirros" --file cirros-0.4.0-x86-64-disk.img --disk-format qcow2 --container-format bare --visibility public`
-  - 
+  - ![image-20210608114917384](images/image-20210608114917384.png)
+  - ![image-20210608114938738](images/image-20210608114938738.png)
+
+- 업로드 이미지 확인
+  - `glance image-list`
+  - ![image-20210608115157519](images/image-20210608115157519.png)
+
+
+
+## Placement Installation
+
+### Steps Overview
+
+#### Deploy the API service
+
+- Placement는 Apache, nginx 또는 기타 WSGI 지원 웹 서버에서 서비스를 실행하기 위한 placement-api WSGI 스크립트를 제공합니다.
+- 표준 WSGI 스크립트인 placement-api는 다양한 배포 시나리오에서 유연성을 제공하여 다양한 서버에서 실행할 수 있습니다.
+  - 일반적인 시나리오
+    - apachd2 with mod_wsgi
+    - apache2 with mod_proxy_uwsgi
+    - nginx with uwsgi
+    - nginx with gunicorn
+- placement API 서비스는 자체적으로 stateless (모든 state가 데이터베이스에 저장)이고 간단한 확장을 위해 로드 밸런싱 솔루션 뒤에 원하는 만큼 서버를 배포할 수 있습니다.
+
+#### Synchronize the database
+
+- 배치 서비스는 configuration의 placement_database 섹션에 정의된 자체 데이터베이스를 사용합니다.
+  - placement_database.connection 옵션을 설정해야 하며 설정하지 않으면 서비스가 시작되지 않습니다.
+- 동기화를 위한 또 다른 옵션은 placement_database.sync_on_startup을 True로 설정하는 것입니다.
+  - 이렇게하면 배치 웹 서비스가 시작될 때 누락된 데이터베이스 마이그레이션을 수행합니다.
+
+#### Create accounts and update the service catalog
+
+- Keystone에 관리자 역할을 하는 placement service user를 생성합니다.
+- placement API는 별도의 서비스이므로 서비스 카탈로그에서 placement service 유형을 등록해야합니다.
+- Devstack은 독립 포트를 사용하는 대신 placement prefix를 사용하여 기본 HTTP port(80)에 placement service를 설정합니다.
+
+
+
+### 설치 및 구성
+
+#### 데이터베이스 생성
+
+- root 사용자로 데이터베이스 서버에 연결
+
+  - `mysql -u root -p`
+
+- placement 데이터베이스 생성
+
+  - `CREATE DATABASE placement`
+
+- 데이터베이스에 접근 권한 부여
+
+  ```sh
+  MariaDB [(none)]> GRANT ALL PRIVILEGES ON placement.* TO 'placement'@'localhost' \ IDENTIFIED BY 'PLACEMENT_DBPASS';	#PACEMENT_DBPASS 적절한 암호로 변경
+  MariaDB [(none)]> GRANT ALL PRIVILEGES ON placement.* TO 'placement'@'%' \ IDENTIFIED BY 'PLACEMENT_DBPASS';	#PACEMENT_DBPASS 적절한 암호로 변경
+  ```
+
+- 종료
+  - `exit`
+
+#### 사용자 및 Endpoint 구성
+
+- admin 자격 증명
+  - `. admin-openrc`
+- placement 사용자 생성
+  - `openstack user create --domain default --password-prompt placement`
+  - ![image-20210608142327478](images/image-20210608142327478.png)
+
+- 관리자 역할이 있는 서비스 프로젝트에 placement 사용자 추가
+  - `openstack role add --project service --user placement admin`
+- 서비스 카탈로그에서 placement API 항목 생성
+  - `openstack service create --name placement --description "Placement API" placement`
+  - ![image-20210608142539170](images/image-20210608142539170.png)
+
+- placement API 서비스 Endpoint 생성
+
+  ```sh
+  root@controller$ openstack endpoint --region RegionOne placement public http://controller:8778
+  root@controller$ openstack endpoint create --region RegionOne placement internal http://controller:8778
+  root@controller$ openstack endpoint create --region RegionOne placement admin http://controller:8778
+  ```
+
+  ![image-20210608142923551](images/image-20210608142923551.png)
+
+  ![image-20210608142940801](images/image-20210608142940801.png)
+
+#### 구성 요소 설치 및 구성
+
+- 패키지 설치
+
+  - `yum install openstack-placement-api`
+
+- `/etc/placement/placement.conf` 파일 수정
+
+  - `[placement_database]` 섹션
+
+    ```bash
+    [placement_database]
+    # ...
+    connection = mysql+pymysql://placement:PLACEMENT_DBPASS@controller/placement	# PLACEMENT_DBPASS는 placement 사용자 password
+    ```
+
+  - `[api]`와 `[keystone_authtoken]` 섹션
+
+    ```bash
+    [api]
+    # ...
+    auth_strategy = keystone
+    
+    [keystone_authtoken]
+    # ...
+    auth_url = http://controller:5000/v3
+    memcached_servers = controller:11211
+    auth_type = password
+    project_domain_name = Default
+    user_domain_name = Default
+    project_name = service
+    username = placement
+    password = PLACEMENT_PASS		// placement 사용자 password
+    ```
+
+- placement 데이터베이스 채움
+
+  - `su -s /bin/sh -c "placement-manage db sync" placement`
+
+#### 설치 완료
+
+- httpd 서비스 다시 시작
+  - `systemctl restart httpd`
+
+
+
+### 설치 확인
+
+- admin 자격 증명
+  - `. admin-openrc`
+- 상태 확인 수행
+  - `placement-status upgrade check`
+  - ![image-20210608144254311](images/image-20210608144254311.png)
