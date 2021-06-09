@@ -48,7 +48,7 @@
 
 - Keystone Database에 접근 권한 부여
 
-  ```bash
+  ```sql
   # KEYSTONE_DBPASS를 적절한 암호로 변경
   # keystone 데이터베이스의 모든 스키마에 대해 keystone 계정의 로컬 접근 권한 허용
   MariaDB [(none)]> GRANT ALL PRIVILEGES ON keystone.* TO 'keystone'@'localhost' \
@@ -290,7 +290,7 @@
 
   - glance 데이터베이스에 접근 권한 부여
 
-    ```sh
+    ```sql
     MariaDB [(none)]> GRANT ALL PRIVILEGES ON glance.* TO 'glance'@'localhost' \
     IDENTIFIED BY 'GLACE_DBPASS';
     MariaDB [(none)]> GRANT ALL PRIVILEGES ON glance.* TO 'glance'@'%' \
@@ -462,7 +462,7 @@
 
 - 데이터베이스에 접근 권한 부여
 
-  ```sh
+  ```sql
   MariaDB [(none)]> GRANT ALL PRIVILEGES ON placement.* TO 'placement'@'localhost' \ IDENTIFIED BY 'PLACEMENT_DBPASS';	#PACEMENT_DBPASS 적절한 암호로 변경
   MariaDB [(none)]> GRANT ALL PRIVILEGES ON placement.* TO 'placement'@'%' \ IDENTIFIED BY 'PLACEMENT_DBPASS';	#PACEMENT_DBPASS 적절한 암호로 변경
   ```
@@ -549,3 +549,292 @@
 - 상태 확인 수행
   - `placement-status upgrade check`
   - ![image-20210608144254311](images/image-20210608144254311.png)
+
+
+
+## Nova Installation
+
+### Compute Service 개요
+
+- 클라우드 컴퓨팅 시스템을 호스팅하고 관리합니다.
+- IaaS(Infrastructure-as-a-Service) 시스템의 주요 부분으로 주요 모듈은 Python으로 구현되어 있습니다.
+- Compute는 인증을 위한 Identity, 리소스 인벤토리 추적 및 선택을 위한 Placement, 디스크 및 서버 이미지를 위한 Image, 사용자 및 관리 인터페이스를 위한 Dashboard와 상호 작용합니다.
+
+#### 구성 요소
+
+- **nova-api**
+  - 사용자 컴퓨팅 API 호출을 수락하고 이에 응답합니다.
+- **nova-api-metadata service**
+  - 인스턴스의 메타 데이터 요청을 수락합니다.
+  - nova-api-metadata 서비스는 일반적으로 nova-network 설치와 함께 다중 호스트 모드에서 실행할 때 사용됩니다.
+- **nova-compute service**
+  - 하이퍼 바이저 API를 통해 가상 머신 인스턴스를 생성하고 종료하는 작업자 데몬입니다.
+    - XenServer / XCP 용 XenAPI
+    - KVM / QEMU 용 libvirt
+    - VMware 용 VMwareAPI
+- **nova-scheduler service**
+  - 대기열에서 가상 머신 인스턴스 요청을 받아 실행할 컴퓨팅 서버 호스트를 결정합니다.
+
+- **nova-conductor-module**
+  - nova-compute 서비스와 데이터베이스 간의 상호 작용을 조정합니다.
+  - nova-compute service에서 만든 클라우드 데이터베이스에 대한 직접 접근을 제거합니다.
+- **nova-novncproxy daemon**
+  - VNC 연결을 통해 실행 중인 인스턴스에 접근하는 프록시를 제공합니다.
+  - 브라우저 기반 novnc 클라이언트를 지원합니다.
+- **nova-spicehtml5proxy daemon**
+  - SPICE 연결을 통해 실행 중인 인스턴스에 접근하는 프록시를 제공합니다.
+  - 브라우저 기반 HTML5 클라이언트를 지원합니다.
+- **nova-xvpvncproxy daemon**
+  - VNC 연결을 통해 실행 중인 인스턴스에 접근하는 프록시를 제공합니다.
+  - OpenStack-specific Java 클라이언트를 지원합니다.
+  - *버전 19.0.0(Stein) 이후 더 이상 사용하지 않음*
+- **The queue**
+  - 데몬 간의 메시지를 전달하는 중앙 허브입니다.
+  - 일반적으로 RabbitMQ로 구현되지만 다른 옵션을 사용할 수 있습니다.
+- **SQL Database**
+  - 다음을 포함하여 클라우드 인프라의 대부분의 빌드 시간 및 런타임 상태를 저장합니다.
+    - 사용 가능한 인스턴스 유형
+    - 사용 중인 인스턴스
+    - 사용 가능한 네트워크
+    - 프로젝트
+  - 이론적으로 OpenStack Compute는 SQLAlchemy에서 지원하는 모든 데이터베이스를 지원합니다.
+    - 공통 데이터베이스는 테스트 및 개발 작업을 위한 SQLite3, MySQL, MariaDB 및 PostgreSQL 입니다.
+
+
+
+### 설치 및 구성(Controller Node)
+
+- 컨트롤러 노드에서 nova를 설치하고 구성하는 방법을 설명합니다.
+
+#### 전제 조건
+
+- Compute 노드를 설치 및 구성하기 전에 데이터베이스, 서비스 자격 증명 및 API 엔드 포인트를 생성해야 합니다.
+
+- 데이터베이스 생성
+
+  - 데이터베이스 액세스 클라이언트를 사용하여 root 사용자로 데이터베이스 서버에 연결
+
+    - `mysql -u root -p`
+
+  - nova, nova_api 및 nova_cell0 데이터 베이스 생성
+
+    ```sql
+    MariaDB [(none)]> CREATE DATABASE nova_api;
+    MariaDB [(none)]> CREATE DATABASE nova;
+    MariaDB [(none)]> CREATE DATABASE nova_cell0;
+    ```
+
+  - 데이터베이스에 접근 권한 부여
+
+    ```sql
+    MariaDB [(none)]> GRANT ALL PRIVILEGES ON nova_api.* TO 'nova'@'localhost' \
+      IDENTIFIED BY 'NOVA_DBPASS';
+    MariaDB [(none)]> GRANT ALL PRIVILEGES ON nova_api.* TO 'nova'@'%' \
+      IDENTIFIED BY 'NOVA_DBPASS';
+    
+    MariaDB [(none)]> GRANT ALL PRIVILEGES ON nova.* TO 'nova'@'localhost' \
+      IDENTIFIED BY 'NOVA_DBPASS';
+    MariaDB [(none)]> GRANT ALL PRIVILEGES ON nova.* TO 'nova'@'%' \
+      IDENTIFIED BY 'NOVA_DBPASS';
+    
+    MariaDB [(none)]> GRANT ALL PRIVILEGES ON nova_cell0.* TO 'nova'@'localhost' \
+      IDENTIFIED BY 'NOVA_DBPASS';
+    MariaDB [(none)]> GRANT ALL PRIVILEGES ON nova_cell0.* TO 'nova'@'%' \
+      IDENTIFIED BY 'NOVA_DBPASS';
+    ```
+
+  - 데이터베이스 액세스 클라이언트 종료
+    - `exit`
+
+- admin 자격 증명 관리자
+
+  - `. admin-openrc`
+
+- Compute 서비스 자격 증명 생성
+
+  - nova 사용자 생성
+
+    - `openstack user create --domain default --password-prompt nova`
+    - ![image-20210609161049354](images/image-20210609161049354.png)
+
+  - nova 사용자에게 admin role 추가
+
+    - `openstack role add --project service --user nova admin`
+
+      > 출력 결과 없음
+
+  - nova service entity 생성
+
+    - `openstack service create --name nova --description "OpenStack Compute" compute`
+    - ![image-20210609161630845](images/image-20210609161630845.png)
+
+- Compute API 서비스 엔드 포인트 생성
+
+  ```sh
+  root@controller$ openstack endpoint create --region RegionOne compute public http://controller:8774/v2.1
+  root@controller$ openstack endpoint create --region RegionOne compute internal http://controller:8774/v2.1
+  root@controller$ openstack endpoint create --region RegionOne compute admin http://controller:8774/v2.1
+  ```
+
+  ![image-20210609161947788](images/image-20210609161947788.png)
+
+  ![image-20210609162006951](images/image-20210609162006951.png)
+
+#### 구성 요소 설치 및 구성
+
+- 패키지 설치
+
+  - `yum install openstack-nova-api openstack-nova-conductor openstack-nova-novncproxy openstack-nova-scheduler`
+
+- `/etc/nova/nova.conf` 수정
+
+  - [DEFAULT] 섹션에 컴퓨팅 및 메타데이터 API를 활성화
+
+    ```bash
+    [DEFAULT]
+    # ...
+    enabled_apis = osapi_compute,metadata
+    ```
+
+  - [api_database]와 [database] 섹션에 데이터베이스 액세스 구성
+
+    ```bash
+    [api_database]
+    # ...
+    connection = mysql+pymysql://nova:NOVA_DBPASS@controller/nova_api
+    
+    [database]
+    # ...
+    connection = mysql+pymysql://nova:NOVA_DBPASS@controller/nova
+    ```
+
+    > NOVA_DBPASS는 Compute 데이터베이스 암호로 변경
+
+  - [DEFAULT] 섹션에 RabbitMQ 메시지 큐 구성
+
+    ```bash
+    [DEFAULT]
+    # ...
+    transport_url = rabbit://openstack:RABBIT_PASS@controller:5672/
+    ```
+
+    > RABBIT_PASS는 openstack 계정 암호로 변경
+
+  - [api]와 [keystone_authtoken] 섹션에 Identity 서비스 접근 구성
+
+    ```bash
+    [api]
+    # ...
+    auth_strategy = keystone
+    
+    [keystone_authtoken]
+    # ...
+    www_authenticate_uri = http://controller:5000/
+    auth_url = http://controller:5000/
+    memcached_servers = controller:11211
+    auth_type = password
+    project_domain_name = Default
+    user_domain_name = Default
+    project_name = service
+    username = nova
+    password = NOVA_PASS
+    ```
+
+    > NOVA_PASS를 Identity 서비스에서 사용자의 비밀번호로 변경
+
+  - [DEFAULT] 섹션에 my_ip 구성
+
+    ```bash
+    [DEFAULT]
+    # ...
+    my_ip = 10.0.0.11
+    ```
+
+  - [DEFAULT] 섹션에 네트워킹 서비스에 대한 지원을 활성화
+
+    ```bash
+    [DEFAULT]
+    # ...
+    use_neutron = true
+    firewall_driver = nova.virt.firewall.NoopFirewallDriver
+    ```
+
+    > 기본적으로 Compute는 내부 방화벽 드라이버를 사용합니다. 네트워킹 서비스에 방화벽 드라이버가 포함되어 있으므로 Compute 방화벽 드라이버를 비활성화합니다.
+
+  - [vnc] 섹션에 컨트롤러 노드의 IP 주소 인터페이스 관리를 사용하도록 VNC 프록시를 구성
+
+    ```bash
+    [vnc]
+    enabled = true
+    # ...
+    server_listen = $my_ip
+    server_proxyclient_address = $my_ip
+    ```
+
+  - [glance] 섹션에 이미지 서비스 API의 위치를 구성
+
+    ```bash
+    [glance]
+    # ...
+    api_servers = http://controller:9292
+    ```
+
+  - [oslo_concurrency] 섹션에 잠금 경로를 구성
+
+    ```bash
+    [oslo_concurrency]
+    # ...
+    lock_path = /var/lib/nova/tmp
+    ```
+
+  - [placement] 섹션에 배치 서비스에 대한 접근 구성
+
+    ```bash
+    [placement]
+    # ...
+    region_name = RegionOne
+    project_domain_name = Default
+    project_name = service
+    auth_type = password
+    user_domain_name = Default
+    auth_url = http://controller:5000/v3
+    username = placement
+    password = PLACEMENT_PASS	# placement 서비스 사용자의 비밀번호
+    ```
+
+- nova-api 데이터베이스 채움
+  - `su -s /bin/sh -c "nova-manage api_db sync" nova`
+- cell0 데이터베이스 등록
+  - `su -s /bin/sh -c "nova-manage cell_v2 map_cell0" nova`
+- cell1 셀 만들기
+  - `su -s /bin/sh -c "nova-manage cell_v2 create_cell --name=cell1 --verbose" nova`
+- nova 데이터베이스 채움
+  - `su -s /bin/sh -c "nova-manage db sync" nova`
+- nova cell0 및 cell1이 올바르게 등록되었는지 확인
+  - `su -s /bin/sh -c "nova-manage cell_v2 list_cells" nova`
+  - ![image-20210609164946421](images/image-20210609164946421.png)
+
+#### 설치 완료
+
+- Compute 서비스를 시작하고 시스템이 부팅될 떄 시작되도록 구성
+
+  ```sh
+  root@controller$ systemctl enable \
+      openstack-nova-api.service \
+      openstack-nova-scheduler.service \
+      openstack-nova-conductor.service \
+      openstack-nova-novncproxy.service
+  root@controller$ systemctl start \
+      openstack-nova-api.service \
+      openstack-nova-scheduler.service \
+      openstack-nova-conductor.service \
+      openstack-nova-novncproxy.service
+  ```
+
+
+
+### 설치 및 구성(Compute Node)
+
+- 이 서비스는 인스턴스 또는 가상 머신을 배포하기 위해 여러 하이퍼 바이저를 지원합니다.
+- 이 구성에서는 단순화를 위해 가상 머신에 대한 하드웨어 가속을 지원하는 **커널 기반 VM(KVM)**과 **QEMU(Quick EMUlator)** 하이퍼 바이저를 사용합니다.
+
