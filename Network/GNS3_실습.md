@@ -14,6 +14,14 @@
   - [실습 구성도](#실습-구성도)
   - [라우터 설정](#라우터-설정)
   - [PC 설정](#pc-설정)
+- [VLAN 기본 구성](#vlan-기본-구성)
+  - [VTP 설정](#vtp-설정)
+  - [트렁크 포트 설정](#트렁크-포트-설정)
+  - [VLAN  설정](#vlan-설정)
+  - [VLAN 생성](#vlan-생성)
+    - [config-vlan 모드](#config-vlan-모드)
+    - [vlan configuration 모드](#vlan-configuration-모드)
+  - [VLAN에 포트 배정](#vlan에-포트-배정)
 
 
 
@@ -171,7 +179,7 @@
 
  
 
-## VLAN 구성
+## VLAN 기본 구성
 
 ### VTP 설정
 
@@ -225,5 +233,88 @@
 - VLAN에 대해 아무 설정을 하지 않아도 디폴트 VLAN은 이미 세팅되어 있습니다.
   - `Switch# show vlan`
   - ![image-20210608231147132](images/image-20210608231147132.png)
+- 스위치의 만들 수 있는 VLAN 개수 확인
+  - `show vtp status`
+  - ![image-20210609230000507](images/image-20210609230000507.png)
 
-- 
+### VLAN 생성
+
+#### config-vlan 모드
+
+- vlan 2 생성하고 이름 설정
+
+  ```sh
+  Switch# configure terminal
+  Switch(config)# vlan 2		// VLAN 2생성
+  Switch(config-vlan)# name CCNA	// CCNA 이름
+  ```
+
+  ![image-20210609230305884](images/image-20210609230305884.png)
+
+- vlan 구성 확인
+  - `show vlan`
+  - ![image-20210609230343167](images/image-20210609230343167.png)
+
+- vlan 삭제
+  - `no vlan 2`
+  - ![image-20210609230430649](images/image-20210609230430649.png)
+
+#### vlan configuration 모드
+
+- vlan 생성
+
+  ```sh
+  Switch# vlan database
+  Switch(vlan)# vlan 2 name CCNA
+  Switch(vlan)# exit
+  ```
+
+  ![image-20210609230747576](images/image-20210609230747576.png)
+
+- vlan 삭제
+
+  ```sh
+  Switch# vlan database
+  Switch(vlan)# no vlan 2
+  Switch(vlan)# exit
+  ```
+
+  ![image-20210609230900931](images/image-20210609230900931.png)
+
+- VTP Revision 넘버 확인
+  - `show vtp status`
+  - ![image-20210609230941345](images/image-20210609230941345.png)
+    - VLAN이 추가, 삭제될 때마다 하나 씩 증가하기 때문에 4
+    - VTP 모드가 Transparent 모드라면 0
+    - 트랜스페어런트 모드에서는 증가하지 않음
+
+### VLAN에 포트 배정
+
+- ethernet 0/2에 vlan 2 설정
+
+  ```sh
+  Switch# configure terminal
+  Switch(config)# interface Ethernet 0/2
+  Switch(config-if)# switchport access vlan 2
+  ```
+
+  ![image-20210609231351680](images/image-20210609231351680.png)
+
+- 구성 확인
+
+  - `show vlan`
+  - ![image-20210609231420210](images/image-20210609231420210.png)
+  - vlan 2에 대한 정보 확인
+    - `show vlan id 2`
+    - ![image-20210609231512361](images/image-20210609231512361.png)
+
+- vlan 설정 취소
+
+  ```
+  Switch# configure terminal
+  Switch(config)# interface Ethernet 0/2
+  Switch(config-if)# no switchport access vlan 2
+  ```
+
+  ![image-20210609231640016](images/image-20210609231640016.png)
+
