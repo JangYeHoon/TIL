@@ -3,6 +3,7 @@
 - [Keystone Installation](#keystone-installation)
 - [Glance Installation](#glance-installation)
 - [Placement Installation](#placement-installation)
+- [Nova Installation](#nova-installation)
 
 
 
@@ -838,3 +839,250 @@
 - 이 서비스는 인스턴스 또는 가상 머신을 배포하기 위해 여러 하이퍼 바이저를 지원합니다.
 - 이 구성에서는 단순화를 위해 가상 머신에 대한 하드웨어 가속을 지원하는 **커널 기반 VM(KVM)**과 **QEMU(Quick EMUlator)** 하이퍼 바이저를 사용합니다.
 
+#### 구성 요소 설치 및 구성
+
+- 패키지 설치
+
+  - `yum install openstack-nova-compute`
+
+- `/etc/nova/nova.conf` 파일 수정
+
+  - [DEFAULT] 섹션에서 컴퓨팅 및 메타 데이터 API 활성화
+
+    ```bash
+    [DEFAULT]
+    # ...
+    enabled_apis = osapi_compute,metadata
+    ```
+
+  - [DEFAULT] 섹션에서 RabbitMQ 구성
+
+    ```bash
+    [DEFAULT]
+    # ...
+    transport_url = rabbit://openstack:RABBIT_PASS@controller	// openstack 계정 암호
+    ```
+
+  - [api]와 [keystone_authtoken] 섹션에 아이덴티티 서비스 액세스 구성
+
+    ```bash
+    [api]
+    # ...
+    auth_strategy = keystone
+    
+    [keystone_authtoken]
+    # ...
+    www_authenticate_uri = http://controller:5000/
+    auth_url = http://controller:5000/
+    memcached_servers = controller:11211
+    auth_type = password
+    project_domain_name = Default
+    user_domain_name = Default
+    project_name = service
+    username = nova
+    password = NOVA_PASS	// NOVA 사용자 암호
+    ```
+
+  - [DEFAULT] 섹션 my_ip 옵션 구성
+
+    ```bash
+    [DEFAULT]
+    # ...
+    my_ip = MANAGEMENT_INTERFACE_IP_ADDRESS	// 컴퓨팅 노드에 있는 관리 네트워크 인터페이스의 IP 주소(예제 아키텍처는 10.0.0.31)
+    ```
+
+  - [DEFAULT] 섹션에 네트워킹 서비스에 대한 지원을 활성화
+
+    ```bash
+    [DEFAULT]
+    # ...
+    use_neutron = true
+    firewall_driver = nova.virt.firewall.NoopFirewallDriver
+    ```
+
+  - [vnc] 섹션에 원격 콘솔 액세스를 활성화
+
+    ```bash
+    [vnc]
+    # ...
+    enabled = true
+    server_listen = 0.0.0.0
+    server_proxyclient_address = $my_ip
+    novncproxy_base_url = http://controller:6080/vnc_auto.html
+    ```
+
+    - 서버는 모든 IP 주소를 수신하고 프록시는 compute 노드의 관리 인터페이스 IP 주소만 수신
+    - 기본 URL은 웹 브라우저를 사용하여 이 컴퓨팅 노드에 있는 인스턴스의 원격 콘솔에 액세스할 수 있는 위치를 나타냄
+
+  - [glance] 섹션에 이미지 서비스 API의 위치를 구성
+
+    ```bash
+    [glance]
+    # ...
+    api_servers = http://controller:9292
+    ```
+
+  - [oslo_concurrency] 섹션에 잠금 경로를 구성
+
+    ```bash
+    [oslo_concurrency]
+    # ...
+    lock_path = /var/lib/nova/tmp
+    ```
+
+  - [placement] 섹션에 placement API를 구성
+
+    ```bash
+    [placement]
+    # ...
+    region_name = RegionOne
+    project_domain_name = Default
+    project_name = service
+    auth_type = password
+    user_domain_name = Default
+    auth_url = http://controller:5000/v3
+    username = placement
+    password = PLACEMENT_PASS	// placement 암호로 변경
+    ```
+
+#### 설치 완료
+
+- 컴퓨팅 노드가 가상 머신에 대한 하드웨어 가속을 지원하는지 확인
+
+  - `egrep -c '(vmx|svm)' /proc/cpuinfo`
+
+  - ![image-20210610172215701](images/image-20210610172215701.png)
+
+  - `one or greater`를 리턴하면 하드웨어 가속을 지원, 추가 설정 필요 없음
+
+  - `zero`를 리턴하면 하드웨어 가속을 지원하지 않으므로  KVM 대신 QEMU를 사용하도록 `libvirt` 구성
+
+    - `/etc/nova/nova.conf` 수정
+
+      ```bash
+      [libvirt]
+      # ...
+      virt_type = qemu
+      ```
+
+- compute 서비스를 시작하고 시스템이 부팅될 때 자동으로 시작되도록 구성
+
+  ```sh
+  root@controller$ systemctl enable libvirtd.service openstack-nova-compute.service
+  root@controller$ systemctl start libvirtd.service openstack-nova-compute.service
+  ```
+
+#### 셀 데이터베이스에 컴퓨팅 노드 추가
+
+- **Controller Node에서 명령 실행**
+
+- 관리자 자격 증명
+
+  - `. admin-openrc`
+
+- 데이터베이스에 컴퓨팅 호스트가 있는지 확인
+
+  - `openstack compute service list --service nova-compute`
+  - ![image-20210610172956757](images/image-20210610172956757.png)
+
+-  Discover compute hosts
+
+  - `su -s /bin/sh -c "nova-manage cell_v2 discover_hosts --verbose" nova`
+
+  - ![image-20210610173143843](images/image-20210610173143843.png)
+
+    > 새 compute 노드를 추가 할 때 컨트롤러 노드에서 `nova-manage cell_v2 discover_hosts`를 실행하여 새 compute 노드를 등록해야합니다.
+
+
+
+### 작동 확인
+
+- compute 서비스의 작동 확인
+
+- **Controller Node에서 수행**
+
+  - admin 자격 증명
+
+    - `. admin-openrc`
+
+  - 서비스 구성 요소를 출력하여 등록이 잘 되어 있는지 확인
+
+    - `openstack compute service list`
+
+    - ![image-20210610173709679](images/image-20210610173709679.png)
+
+      > 위 그림처럼 3개의 서비스가 활성화되어 있어야 합니다.
+
+  - Identity 서비스에 API end-point를 나열하여 Identity 서비스와의 연결 확인
+
+    - `openstack catalog list`
+    - ![image-20210610173759217](images/image-20210610173759217.png)
+
+  - 이미지 서비스에 이미지를 나열하여 이미지 서비스와의 연결 확인
+
+    - `openstack image list`
+    - ![image-20210610173818591](images/image-20210610173818591.png)
+
+  - cell 및 placement API가 성공적으로 작동하고 다른 필수 전제 조건이 있는지 확인
+
+    - `nova-status upgrade check`
+
+    - `nova-status upgrade check forbidden (HTTP 403)` 에러 발생
+
+      - 해결방법
+
+      - `vi /etc/httpd/conf.d/00-placement-api.conf`
+
+        ```bash
+        <Directory /usr/bin>
+            <IfVersion >= 2.4>
+                Require all granted
+            </IfVersion>
+            <IfVersion < 2.4>
+                Order allow,deny
+                Allow from all
+            </IfVersion>
+        </Directory>
+        ```
+
+      - ![image-20210610174513558](images/image-20210610174513558.png)
+
+      - `systemctl restart httpd`
+
+      - 해결 완료
+
+    - ![image-20210610174756036](images/image-20210610174756036.png)
+
+
+
+## Neutron Installation
+
+### 네트워킹 서비스 개요
+
+- OpenStack Networking(Neutron)을 사용하면 다른 OpenStack 서비스에서 관리하는 인터페이스 장치를 생성하고 네트워크에 연결할 수 있습니다.
+- 플러그인을 구현하면 다양한 네트워킹 장비 및 소프트웨어를 수용할 수 있습니다.
+
+#### 구성 요소
+
+- **neutron-server**
+  - API를 수신하고 OpenStack Networking 플러그인으로 라우팅합니다.
+- **OpenStack Networking plug-ins and agents**
+  - 포트 추가/삭제, 네트워크 또는 서브넷을 만들고 IP 주소를 제공합니다.
+  - 플러그인 및 에이전트는 특정 클라우드에서 사용되는 공급 업체 및 기술에 따라 다릅니다.
+    - OpenStack Networking
+      - Cisco virtual and physicla switches
+      - NEC OpenFLow products
+      - Open vSwitch
+      - Linux bridging
+      - VMware NSX product
+  - 공통 에이전트는 L3, DHCP, plug-in agent 입니다.
+- **Messaging Queue**
+  - neutron-server와 다양한 에이전트간에 정보를 라우팅하는데 사용합니다.
+  - 또한 특정 플러그인에 대한 네트워킹 상태를 저장하는 데이터베이스 역할을 합니다.
+
+
+
+### 네트워킹(Neutron) 개념
+
+- OpenStack Networking(Neutron)은 OpenStack 환경에서 VNI(가상 네트워킹 인프라) 및 PNI(물리적 네트워킹 인프라)의 액세스 계층 측면에 대한 모든 네트워킹 패싱을 관리합니다.
+- 
