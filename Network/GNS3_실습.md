@@ -22,8 +22,14 @@
     - [config-vlan 모드](#config-vlan-모드)
     - [vlan configuration 모드](#vlan-configuration-모드)
   - [VLAN에 포트 배정](#vlan에-포트-배정)
-
 - [VLAN 실습-1](#vlan-실습-1)
+  - [스위치 VLAN 설정](#스위치-vlan-설정)
+  - [Host IP 설정](#host-ip-설정)
+  - [VLAN과 Host 연결](#vlan과-host-연결)
+  - [VLAN Interface 설정](#vlan-interface-설정)
+  - [연결 확인](#연결-확인)
+
+- [VLAN 실습-2](#vlan-실습-2)
 
 
 
@@ -374,7 +380,7 @@
 - PC6
   - `ip 20.20.20.3/24`
 
-### VLAN과 Host 연결
+### VLAN Interface 설정
 
 - SW1
 
@@ -423,4 +429,30 @@
 
   - `SW1# show interface e1/0 trunk`
   - ![image-20210612120315607](images/image-20210612120315607.png)
+
+### 연결 확인
+
+- 같은 스위치와 같은 VLAN을 가진 PC끼리 확인
+  - PC1(VLAN 10) -> PC2(VLAN 10)
+  - ![image-20210613175134556](images/image-20210613175134556.png)
+
+- 같은 스위치에 다른 VLAN을 가진 PC끼리 확인
+  - PC1(VLAN 10) -> PC3(VLAN 20)
+  - ![image-20210613175235027](images/image-20210613175235027.png)
+
+- 다른 스위치에 같은 VLAN을 가진 PC끼리 확인
+  - PC1(VLAN 10) -> PC5(VLAN 10)
+  - ![image-20210613175331162](images/image-20210613175331162.png)
+
+- 다른 스위치에 다른 VLAN을 가진 PC끼리 확인
+  - PC1(VLAN 10) -> PC6(VLAN 20)
+  - ![image-20210613175404013](images/image-20210613175404013.png)
+
+
+
+## VLAN 실습-2
+
+- 실습 구성도
+
+  ![image-20210613180522099](images/image-20210613180522099.png)
 
