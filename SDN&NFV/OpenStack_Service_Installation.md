@@ -4,6 +4,7 @@
 - [Glance Installation](#glance-installation)
 - [Placement Installation](#placement-installation)
 - [Nova Installation](#nova-installation)
+- [Neutron Installation](#neutron-installation)
 
 
 
@@ -1085,4 +1086,91 @@
 ### 네트워킹(Neutron) 개념
 
 - OpenStack Networking(Neutron)은 OpenStack 환경에서 VNI(가상 네트워킹 인프라) 및 PNI(물리적 네트워킹 인프라)의 액세스 계층 측면에 대한 모든 네트워킹 패싱을 관리합니다.
-- 
+- OpenStack Networking을 사용하면 프로젝트에서 방화벽 및 VPN 등을 만들 수 있습니다.
+- 네트워킹 설정에는 하나 이상의 외부 네트워크가 있습니다.
+  - 외부 네트워크는 단순히 가상으로 정의된 네트워크가 아닌 OpenStack 외부에서 접근할 수 있는 물리적 외부 네트워크입니다.
+  - 외부 네트워크의 IP 주소는 외부의 모든 사람이 물리적으로 접근할 수 있습니다.
+- 외부 네트워크 외에도 하나 이상의 내부 네트워크가 존재합니다.
+  - 이러한 소프트웨어 정의 네트워크(내부 네트워크)는 VM에 직접 연결됩니다.
+  - 같은 내부 네트워크의 VM 또는 라우터에 연결된 서브넷의 VM만 해당 네트워크에 연결된 VM에 직접 접근할 수 있습니다.
+- 외부 네트워크에서 내부 네트워크에 연결된 VM에 액세스하거나 그 반대의 경우 네트워크 간 라우터가 필요합니다.
+  - 각 라우터에는 외부 네트워크에 연결된 게이트웨이 하나와 내부 네트워크에 연결된 인터페이스가 하나 이상 있습니다.
+  - 물리적 라우터와 마찬가지로 라우터에 연결된 다른 서브넷의 시스템에 접근할 수 있으며, 시스템은 라우터의 게이트웨이를 통해 외부 네트워크에 접근할 수 있습니다.
+- 외부 네트워크의 IP 주소를 내부 네트워크나 VM의 포트에 연결할 수 있습니다.
+  - 이렇게 하면 외부 네트워크의 entity가 VM에 접근할 수 있습니다.
+- 네트워킹은 보안 그룹을 지원합니다.
+  - 관리자는 Security Group을 사용하여 방화벽 규칙을 그룹으로 정의할 수 있습니다.
+  - VM은 하나 이상의 Security Group에 속할 수 있으며, Neutron은 이러한 Security Group의 규칙을 적용하여 해당 VM의 포트, 포트 범위 또는 트래픽 유형을 차단하거나 허용합니다.
+- 네트워킹에서 사용하는 플러그인
+  - 코어 플러그인, 보안 그룹 플러그인, FWaaS(Firewall-as-a-Service)
+
+
+
+### 설치 및 구성(Controller Node)
+
+#### 전제 조건
+
+- OpenStack Networking(Neutron) 서비스를 구성하기 전에 데이터베이스, 서비스 자격 증명 및 API 엔드 포인트를 생성해야 합니다.
+
+1. 데이터베이스 작성
+
+   - root 사용자로 데이터베이스 서버 연결
+
+     - `mysql -u root -p`
+
+   - neutron 데이터베이스 생성
+
+     - `CREATE DATABASE neutron;`
+
+   - neutron 데이터베이스에 대한 접근 권한을 부여하고 `NEUTRON_DBPASS`를 적절한 암호로 변경
+
+     ```mariadb
+     MariaDB [(none)]> GRANT ALL PRIVILEGES ON neutron.* TO 'neutron'@'localhost' \
+       IDENTIFIED BY 'NEUTRON_DBPASS';
+     MariaDB [(none)]> GRANT ALL PRIVILEGES ON neutron.* TO 'neutron'@'%' \
+       IDENTIFIED BY 'NEUTRON_DBPASS';
+     ```
+
+2. 관리자 자격 증명을 등록하여 관리자 전용 CLI 명령에 액세스
+
+   - `. admin-openrc`
+
+3. 서비스 자격 증명 생성
+
+   - neutron 유저 생성
+
+     - `openstack user create --domain default --password-prompt neutron`
+     - ![image-20210614150202993](images/image-20210614150202993.png)
+
+   - neutron 유저에 admin role 추가
+
+     - `openstack role add --project service --user neutron admin`
+
+       > 이 명령은 출력이 없습니다.
+
+   - neutron 서비스 엔터티 생성
+
+     - `openstack service create --name neutron --description "OpenStack Networking" network`
+     - ![image-20210614150322610](images/image-20210614150322610.png)
+
+4. 네트워킹 서비스 API 앤드 포인트 생성
+
+   ```sh
+   root@controller$ openstack endpoint create --region RegionOne \
+     network public http://controller:9696
+   root@controller$ openstack endpoint create --region RegionOne \
+     network internal http://controller:9696
+   root@controller$ openstack endpoint create --region RegionOne \
+     network admin http://controller:9696
+   ```
+
+   ![image-20210614150621212](images/image-20210614150621212.png)
+
+   ![image-20210614150656690](images/image-20210614150656690.png)
+
+#### 네트워킹 옵션 구성
+
+- 네트워킹 서비스를 배포할 때 2가지 옵션이 존재합니다.
+- 옵션 1은 외부 네트워크에 인스턴스 연결만을 지원하는 가장 간단한 아키텍처를 배포합니다.
+  - 셀프 서비스(사설) 네트워크, 라우터 또는 Floating IP 주소가 없습니다.
+  - 
