@@ -456,3 +456,98 @@
 
   ![image-20210613180522099](images/image-20210613180522099.png)
 
+### 스위치 설정
+
+- 스위치 관리를 위해 VLAN 1에 IP 주소를 주고 디폴트 게이트웨이 설정
+
+  ```sh
+  SW1# configure terminal
+  SW1(config)# interface vlan 1
+  SW1(config-if)# ip address 10.10.10.2 255.255.255.0
+  SW1(config-if)# no shutdown
+  SW1(config-if)# exit
+  SW1(config)# ip default-gateway 10.10.10.1
+  ```
+
+  ![image-20210614231105253](images/image-20210614231105253.png)
+
+- VTP 모드 트랜스페어런트로 설정
+
+  ```sh
+  SW1# configure terminal
+  SW1(config)# vtp mode transparent
+  SW1(config)# vtp domain cisco
+  SW1(config)# exit
+  SW1# show vtp status
+  ```
+
+  ![image-20210614231146964](images/image-20210614231146964.png)
+
+- vlan 2 생성
+
+  ```sh
+  SW1# configure terminal
+  SW1(config)# vlan 2
+  SW1(config-vlan)# name CCNA
+  ```
+
+  ![image-20210614231217796](images/image-20210614231217796.png)
+
+- e0/2 트렁크 포트 설정
+
+  ```sh
+  SW1# configure terminal
+  SW1(config)# interface e0/2
+  SW1(config-if)# switchport trunk encapsulation dot1q
+  ```
+
+  ![image-20210614231344333](images/image-20210614231344333.png)
+
+- e0/1에 VLAN 2 설정
+
+  ```sh
+  SW1# configure terminal
+  SW1(config)# interface e0/1
+  SW1(config-if)# switchport access vlan 2
+  ```
+
+  ![image-20210614231600900](images/image-20210614231600900.png)
+
+### 라우터 설정
+
+- 하나의 인터페이스에서 두 개의 인터페이스가 필요하지만 현재 1개이기 때문에 서브 인터페이스 구성
+
+  - VLAN이 2개이기 때문
+
+- 서브 인터페이스 설정
+
+  ```sh
+  Router# conf t
+  Router(config)# interface e0/0
+  Router(config-if)# no shutdown
+  Router(config-if)# exit
+  Router(config)# interface Ethernet 0/0.1
+  Router(config-subif)# encapsulation dot1Q 1 native
+  Router(config-subif)# ip address 10.10.10.1 255.255.255.0
+  Router(config-subif)# exit
+  Router(config)# interface Ethernet 0/0.2
+  Router(config-subif)# encapsulation dot1Q 2
+  Router(config-subif)# ip address 10.10.11.1 255.255.255.0
+  ```
+
+  ![image-20210614232223814](images/image-20210614232223814.png)
+
+### Host IP 설정
+
+- PC1
+  - `ip 10.10.10.5 255.255.255.0`
+  - ![image-20210614232326751](images/image-20210614232326751.png)
+- PC2
+  - `ip 10.10.11.5 255.255.255.0`
+  - ![image-20210614232404025](images/image-20210614232404025.png)
+
+### 연결 확인
+
+- PC1에서 PC2
+  - `ping 10.10.11.5`
+  - 통신안됨 - **확인 필요**
