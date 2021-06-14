@@ -22,6 +22,14 @@
     - [config-vlan 모드](#config-vlan-모드)
     - [vlan configuration 모드](#vlan-configuration-모드)
   - [VLAN에 포트 배정](#vlan에-포트-배정)
+- [VLAN 실습-1](#vlan-실습-1)
+  - [스위치 VLAN 설정](#스위치-vlan-설정)
+  - [Host IP 설정](#host-ip-설정)
+  - [VLAN과 Host 연결](#vlan과-host-연결)
+  - [VLAN Interface 설정](#vlan-interface-설정)
+  - [연결 확인](#연결-확인)
+
+- [VLAN 실습-2](#vlan-실습-2)
 
 
 
@@ -317,4 +325,134 @@
   ```
 
   ![image-20210609231640016](images/image-20210609231640016.png)
+
+
+
+## VLAN 실습-1
+
+- 실습 구성도
+
+  ![image-20210612114259224](images/image-20210612114259224.png)
+
+### 스위치 VLAN 설정
+
+- SW1
+
+  - VLAN 10과 VLAN 20 생성
+
+    ```sh
+    SW1# conf t
+    SW1(config)# vlan 10
+    SW1(config-vlan)# name ENG
+    SW1(config-vlan)# exit
+    SW1(config)# vlan 20
+    SW1(config-vlan)# name SALES
+    ```
+
+    ![image-20210612114413820](images/image-20210612114413820.png)
+
+- SW2
+
+  ```sh
+  SW1# conf t
+  SW1(config)# vlan 10
+  SW1(config-vlan)# name ENG
+  SW1(config-vlan)# exit
+  SW1(config)# vlan 20
+  SW1(config-vlan)# name SALES
+  ```
+
+  ![image-20210612114449037](images/image-20210612114449037.png)
+
+### Host IP 설정
+
+- PC1
+  - `ip 10.10.10.1/24`
+- PC2
+  - `ip 10.10.10.2/24`
+- PC3
+  - `ip 20.20.20.1/24`
+- PC4
+  - `ip 20.20.20.2/24`
+
+- PC5
+  - `ip 10.10.10.3/24`
+- PC6
+  - `ip 20.20.20.3/24`
+
+### VLAN Interface 설정
+
+- SW1
+
+  ```sh
+  SW1# conf t
+  SW1(config)# int e0/0
+  SW1(config-if)# switchport access vlan 10
+  SW1(config-if)# exit
+  SW1(config)# int e0/1
+  SW1(config-if)# switchport access vlan 10
+  SW1(config-if)# exit
+  SW1(config)# int e0/2
+  SW1(config-if)# switchport access vlan 20
+  SW1(config-if)# exit
+  SW1(config)# int e0/3
+  SW1(config-if)# switchport access vlan 20
+  SW1(config-if)# exit
+  SW1(config)# exit
+  SW1# show vlan
+  ```
+
+  ![image-20210612115333115](images/image-20210612115333115.png)
+
+- SW2도 동일하게 구성
+
+  - ![image-20210612115603395](images/image-20210612115603395.png)
+
+- SW1과 SW2 트렁크 포트 설정
+
+  ```sh
+  SW1# conf t
+  SW1(config)# vtp domain cisco
+  SW1(config)# int e1/0
+  SW1(config-if)# switchport trunk encapsulation dot1q
+  SW2# conf t
+  SW1(config)# vtp domain cisco
+  SW2(config)# int e0/2
+  SW2(config-if)# switchport trunk encapsulation dot1q
+  ```
+
+  ![image-20210612120024890](images/image-20210612120024890.png)
+
+  ![image-20210612120131639](images/image-20210612120131639.png)
+
+- 트렁크 포트 설정 확인
+
+  - `SW1# show interface e1/0 trunk`
+  - ![image-20210612120315607](images/image-20210612120315607.png)
+
+### 연결 확인
+
+- 같은 스위치와 같은 VLAN을 가진 PC끼리 확인
+  - PC1(VLAN 10) -> PC2(VLAN 10)
+  - ![image-20210613175134556](images/image-20210613175134556.png)
+
+- 같은 스위치에 다른 VLAN을 가진 PC끼리 확인
+  - PC1(VLAN 10) -> PC3(VLAN 20)
+  - ![image-20210613175235027](images/image-20210613175235027.png)
+
+- 다른 스위치에 같은 VLAN을 가진 PC끼리 확인
+  - PC1(VLAN 10) -> PC5(VLAN 10)
+  - ![image-20210613175331162](images/image-20210613175331162.png)
+
+- 다른 스위치에 다른 VLAN을 가진 PC끼리 확인
+  - PC1(VLAN 10) -> PC6(VLAN 20)
+  - ![image-20210613175404013](images/image-20210613175404013.png)
+
+
+
+## VLAN 실습-2
+
+- 실습 구성도
+
+  ![image-20210613180522099](images/image-20210613180522099.png)
 
