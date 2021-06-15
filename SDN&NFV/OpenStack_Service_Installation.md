@@ -1178,17 +1178,15 @@
   - Floating IP는 인터넷과 같은 외부 네트워크의 셀프 서비스 네트워크를 사용하여 인스턴스에 대해 외부 네트워크와의 연결을 제공합니다.
   - 일반적으로 오버레이 네트워크를 사용하는데 이때 VXLAN을 사용합니다.
 
-
-
-### 셀프 서비스 네트워크 구성
+#### 셀프 서비스 네트워크 구성
 
 - **컨트롤러 노드에서 진행합니다.**
 
-#### 구성 요소 설치
+##### 구성 요소 설치
 
 - `yum install openstack-neutron openstack-neutron-ml2 openstack-neutron-linuxbridge ebtables`
 
-#### 서버 구성 요소 구성
+##### 서버 구성 요소 구성
 
 - `/etc/neutron/neutron.conf` 수정
 
@@ -1274,7 +1272,7 @@
     lock_path = /var/lib/neutron/tmp
     ```
 
-#### ML2 플러그인 구성
+##### ML2 플러그인 구성
 
 - ML2 플러그인은 Linux 브리지 메커니즘을 사용하여 인스턴스 용 레이어 2 (브리징 및 스위칭) 가상 네트워킹 인프라를 구축합니다.
 
@@ -1340,7 +1338,7 @@
     enable_ipset = true
     ```
 
-#### Linux bridge agent 구성
+##### Linux bridge agent 구성
 
 - 리눅스 브리지 에이전트는 인스턴스를 위한 L2(브릿지 및 스위칭) 가상 네트워킹 인프라를 구축하고 보안 그룹을 처리합니다.
 
@@ -1387,4 +1385,79 @@
     ```
 
     ![image-20210615110816520](images/image-20210615110816520.png)
+
+##### L3 Agent 구성
+
+- L3 에이전트는 self-service 가상 네트워크에 라우팅과 NAT 서비스를 제공합니다.
+
+- `/etc/neutron/l3_agent.ini` 수정
+
+  - [DEFAULT] 섹션에서 Linux 브리지 인터페이스 드라이버를 구성합니다.
+
+    ```bash
+    [DEFAULT]
+    # ...
+    interface_driver = linuxbridge
+    ```
+
+##### DHCP Agent 구성
+
+- DHCP 에이전트는 가상 네트워크에 DHCP 서비스를 제공합니다.
+
+- `/etc/neutron/dhcp_agent.ini` 수정
+
+  - [DEFAULT] 섹션에서 Linux 브리지 인터페이스 드라이버, DNSmasq DHCP 드라이버를 구성하고 provider 네트워크의 인스턴스가 네트워크를 통해 메타데이터에 액세스할 수 있도록 격리된 메타데이터를 사용하도록 설정합니다.
+
+    ```bash
+    [DEFAULT]
+    # ...
+    interface_driver = linuxbridge
+    dhcp_driver = neutron.agent.linux.dhcp.Dnsmasq
+    enable_isolated_metadata = true
+    ```
+
+#### Metadata Agent 구성
+
+- Metadata 에이전트는 자격 증명과 같은 구성 정보를 인스턴스에 제공합니다.
+
+- `/etc/neutron/metadata_agent.ini` 수정
+
+  - [DEFAULT] 섹션에서 메타 데이터 호스트를 구성하고 데이터 프록시 암호 공유
+
+    ```bash
+    [DEFAULT]
+    # ...
+    nova_metadata_host = controller
+    metadata_proxy_shared_secret = METADATA_SECRET
+    ```
+
+    - METADATA_SECRET을 메타 데이터 프록시에 대한 적절한 암호로 변경
+
+#### 네트워킹 서비스를 사용하기 위한 Compute Service 구성
+
+- 해당 과정을 수행하기 위해서는 Nova가 필수로 설치되어 있어야 합니다.
+
+- `/etc/nova/nova.conf` 파일 수정
+
+  - [neutron] 섹션에서 액세스 매개 변수를 구성하고 메타데이터 프록시를 사용하도록 설정한 다음 암호를 구성합니다.
+
+    ```bash
+    [neutron]
+    # ...
+    auth_url = http://controller:5000
+    auth_type = password
+    project_domain_name = default
+    user_domain_name = default
+    region_name = RegionOne
+    project_name = service
+    username = neutron
+    password = NEUTRON_PASS
+    service_metadata_proxy = true
+    metadata_proxy_shared_secret = METADATA_SECRET
+    ```
+
+    - NEUTRON_PASS는 neutron 사용자의 암호
+    - METADAT_SECRET은 metadata proxy의 암호
+
+
 
