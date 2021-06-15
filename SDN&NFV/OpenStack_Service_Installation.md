@@ -1173,4 +1173,218 @@
 - 네트워킹 서비스를 배포할 때 2가지 옵션이 존재합니다.
 - 옵션 1은 외부 네트워크에 인스턴스 연결만을 지원하는 가장 간단한 아키텍처를 배포합니다.
   - 셀프 서비스(사설) 네트워크, 라우터 또는 Floating IP 주소가 없습니다.
-  - 
+- 옵션 2는 셀프 서비스 네트워크에 인스턴스 연결을 지원하는 L3 서비스로 옵션 1을 보강합니다.
+  - 사용자는 셀프 서비스 및 provider 네트워크 사이의 연결을 제공하는 라우터를 포함하여 셀프 서비스 네트워크를 관리할 수 있습니다.
+  - Floating IP는 인터넷과 같은 외부 네트워크의 셀프 서비스 네트워크를 사용하여 인스턴스에 대해 외부 네트워크와의 연결을 제공합니다.
+  - 일반적으로 오버레이 네트워크를 사용하는데 이때 VXLAN을 사용합니다.
+
+
+
+### 셀프 서비스 네트워크 구성
+
+- **컨트롤러 노드에서 진행합니다.**
+
+#### 구성 요소 설치
+
+- `yum install openstack-neutron openstack-neutron-ml2 openstack-neutron-linuxbridge ebtables`
+
+#### 서버 구성 요소 구성
+
+- `/etc/neutron/neutron.conf` 수정
+
+  - [database] 섹션에 데이터베이스 액세스 구성
+
+    ```bash
+    [database]
+    # ...
+    connection = mysql+pymysql://neutron:NEUTRON_DBPASS@controller/neutron
+    ```
+
+    - `NEUTRON_DBPASS`는 데이터베이스에 대해 선택한 암호로 바꿉니다 .
+
+  - [DEFAULT] 섹션에 ml2 플러그인, 라우터 서비스 및 겹치는 IP 주소를 사용하도록 설정
+
+    ```bash
+    [DEFAULT]
+    # ...
+    core_plugin = ml2
+    service_plugins = router
+    allow_overlapping_ips = true
+    ```
+
+  - [DEFAULT] 섹션에서 Rabbit MQ을 구성
+
+    ```bash
+    [DEFAULT]
+    # ...
+    transport_url = rabbit://openstack:RABBIT_PASS@controller
+    ```
+
+    - RABBIT_PASS는 RabbitMQ의 openstack 계정에 대한 암호로 변경
+
+  - [DEFAULT]와 [keystone_authtoken]에 Identity 서비스 접근 구성
+
+    ```bash
+    [DEFAULT]
+    # ...
+    auth_strategy = keystone
+    
+    [keystone_authtoken]
+    # ...
+    www_authenticate_uri = http://controller:5000
+    auth_url = http://controller:5000
+    memcached_servers = controller:11211
+    auth_type = password
+    project_domain_name = default
+    user_domain_name = default
+    project_name = service
+    username = neutron
+    password = NEUTRON_PASS
+    ```
+
+    - NEUTRON_PASS는 Identity service에서 neutron 사용자에 대한 암호로 변경
+
+  - [DEFAULT] 및 [nova] 섹션에서 네트워크 토폴로지 변경 사항을 컴퓨팅에 알리도록 네트워킹을 구성합니다.
+
+    ```bash
+    [DEFAULT]
+    # ...
+    notify_nova_on_port_status_changes = true
+    notify_nova_on_port_data_changes = true
+    
+    [nova]
+    # ...
+    auth_url = http://controller:5000
+    auth_type = password
+    project_domain_name = default
+    user_domain_name = default
+    region_name = RegionOne
+    project_name = service
+    username = nova
+    password = NOVA_PASS
+    ```
+
+    - NOVA_PASS는 nova 사용자 암호로 변경
+
+  - [oslo_concurrency] 섹션에서 잠금 경로를 구성합니다.
+
+    ```bash
+    [oslo_concurrency]
+    # ...
+    lock_path = /var/lib/neutron/tmp
+    ```
+
+#### ML2 플러그인 구성
+
+- ML2 플러그인은 Linux 브리지 메커니즘을 사용하여 인스턴스 용 레이어 2 (브리징 및 스위칭) 가상 네트워킹 인프라를 구축합니다.
+
+- `/etc/neutron/plugins/ml2/ml2_conf.ini` 수정
+
+  - [ml2] 섹션에서 flat, vlan, vxlan 네트워크 활성화
+
+    ```bash
+    [ml2]
+    # ...
+    type_drivers = flat,vlan,vxlan
+    ```
+
+  - [ml2] 섹션에서 VXLAN self-service networks 활성화
+
+    ```bash
+    [ml2]
+    # ...
+    tenant_network_types = vxlan
+    ```
+
+  - [ml2] 섹션에서 Linux bridge와 L2 population mechanism 활성화
+
+    ```bash
+    [ml2]
+    # ...
+    mechanism_drivers = linuxbridge,l2population
+    ```
+
+    - ML2 플러그인을 구성한 후 type_drivers 옵션의 값을 제거하면 데이터베이스 불일치가 발생할 수 있습니다.
+
+    > Linux bridge agent는 오직 VXLAN overlay network만 지원합니다.
+
+  - [ml2] 섹션에서 port security extension driver 활성화
+
+    ```bash
+    [ml2]
+    # ...
+    extension_drivers = port_security
+    ```
+
+  - [ml2_type_flat] 섹션에서 provider 가상 네트워크를 flat네트워크로 구성합니다.
+
+    ```bash
+    [ml2_type_flat]
+    # ...
+    flat_networks = provider
+    ```
+
+  - [ml2_type_vxlan] 섹션에서 셀프 서비스 네트워크의 VXLAN 네트워크 식별자 범위를 구성합니다.
+
+    ```bash
+    [ml2_type_vxlan]
+    # ...
+    vni_ranges = 1:1000
+    ```
+
+  - [security group] 섹션에서 ipset을 활성화하여 Security group 규칙의 효율성을 높입니다.
+
+    ```bash
+    [securitygroup]
+    # ...
+    enable_ipset = true
+    ```
+
+#### Linux bridge agent 구성
+
+- 리눅스 브리지 에이전트는 인스턴스를 위한 L2(브릿지 및 스위칭) 가상 네트워킹 인프라를 구축하고 보안 그룹을 처리합니다.
+
+- `/etc/neutron/plugins/ml2/linuxbridge_agent.ini` 수정
+
+  - [linux_bridge] 섹션에서 provider 가상 네트워크를 provider 물리적 네트워크 인터페이스에 매핑합니다.
+
+    ```bash
+    [linux_bridge]
+    physical_interface_mappings = provider:PROVIDER_INTERFACE_NAME
+    ```
+
+    - PROVIDER_INTERFACE_NAME은 기본 provider 물리 네트워크 인터페이스로 수정
+
+  - [vxlan] 섹션에서 VXLAN 오버레이 네트워크를 사용하도록 설정하고 오버레이 네트워크를 처리하는 물리적 네트워크 인터페이스의 IP 주소를 구성하고 L2 population를 사용하도록 설정합니다.
+
+    ```bash
+    [vxlan]
+    enable_vxlan = true
+    local_ip = OVERLAY_INTERFACE_IP_ADDRESS
+    l2_population = true
+    ```
+    - OVERLAY_INTERFACE_IP_ADDRESS를 오버레이 네트워크를 처리하는 기본 물리적 네트워크 인터페이스의 IP 주소로 변경
+    - 예제 아키텍처는 관리 인터페이스를 사용하여 트래픽을 다른 노드로 터널링합니다. 따라서 OVERLAY_INTERFACE_IP_ADDRESS를 컨트롤러 노드의 관리 IP 주소로 교체
+
+  - [security group] 섹션에서 Security group을 사용하도록 설정하고 Linux bridge iptables 방화벽 드라이버를 구성합니다.
+
+    ```bash
+    [securitygroup]
+    # ...
+    enable_security_group = true
+    firewall_driver = neutron.agent.linux.iptables_firewall.IptablesFirewallDriver
+    ```
+
+  - `/usr/sbin/modprobe br_netfilter` 명령을 통해 bridge 모듈 로딩
+
+    - `/usr/sbin/modprobe br_netfilter`
+
+  - 다음 sysctl 값이 모두 1로 설정되어 있는지 확인하여 Linux 운영 체제 커널이 네트워크 브리지 필터를 지원하는지 확인합니다.
+
+    ```sh
+    root@controller$ sysctl -a | grep net.bridge.bridge-nf-call-ip6tables
+    root@controller$ sysctl -a | grep net.bridge.bridge-nf-call-iptables
+    ```
+
+    ![image-20210615110816520](images/image-20210615110816520.png)
+
