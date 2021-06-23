@@ -5,6 +5,7 @@
 - [Placement Installation](#placement-installation)
 - [Nova Installation](#nova-installation)
 - [Neutron Installation](#neutron-installation)
+- [Horizon Installation](#horizon-installation)
 
 
 
@@ -1639,4 +1640,96 @@
   ```
 
 
+
+## Horizon Installation
+
+- **Controller Node**에 대시보드를 설치하고 구성합니다.
+- 대시보드에 필요한 핵심 서비스는 ID 서비스가 유일합니다.
+
+
+
+### 설치 및 구성
+
+- 패키지 설치
+
+  - `yum install openstack-dashboard`
+
+- `/etc/openstack-dashboard/local_settings` 파일 편집
+
+  - Controller Node에서 OpenStack 서비스를 사용하도록 구성
+
+    - `OPENSTACK_HOST = "controller"`
+
+  - 호스트가 대시 보드에 액세스를 할 수 있도록 허용
+
+    - `ALLOWED_HOSTS = ['*']`
+    - `*`는 모든 호스트에 대해 허용, 여러 호스트는 `,`를 이용해 구분
+
+  - memcached 세션 저장소 구성
+
+    ```bash
+    SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
+    
+    CACHES = {
+        'default': {
+             'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
+             'LOCATION': 'controller:11211',
+        }
+    }
+    ```
+
+  - Identity API 버전 3 활성화
+
+    - `OPENSTACK_KEYSTONE_URL = "http://%s:5000/v3" % OPENSTACK_HOST`
+
+  - 도메인 지원 활성화
+
+    - `OPENSTACK_KEYSTONE_MULTIDOMAIN_SUPPORT = True`
+
+  - API 버전 명시
+
+    ```bash
+    OPENSTACK_API_VERSIONS = {
+        "identity": 3,
+        "image": 2,
+        "volume": 3,
+    }
+    ```
+
+  - 대시보드를 통해 생성하는 사용자의 기본 도메인을 기본값으로 구성
+
+    - `OPENSTACK_KEYSTONE_DEFAULT_DOMAIN = "Default"`
+
+  - 대시보드를 통해 생성한 사용자에 대한 기본 역할로 `user` 구성
+
+    - `OPENSTACK_KEYSTONE_DEFAULT_ROLE = "user"`
+
+  - 네트워킹 옵션 1을 선택한 경우 L3 네트워킹 서비스에 대한 지원을 사용하지 않도록 설정
+
+    ```bash
+    OPENSTACK_NEUTRON_NETWORK = {
+        ...
+        'enable_router': False,
+        'enable_quotas': False,
+        'enable_distributed_router': False,
+        'enable_ha_router': False,
+        'enable_lb': False,
+        'enable_firewall': False,
+        'enable_vpn': False,
+        'enable_fip_topology_check': False,
+    }
+    ```
+
+- `/etc/httpd/conf.d/openstack-dashboard.conf`에 다음 구문이 빠져있으면 추가
+
+  - `WSGIApplicationGroup %{GLOBAL}`
+
+### 설치 완료
+
+- 웹 서버 및 세션 저장소를 다시 시작
+  - `systemctl restart httpd.service memcached.service`
+
+### 작동 확인
+
+- `http://controller/dashboard` 접속
 
