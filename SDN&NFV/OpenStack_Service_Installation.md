@@ -6,6 +6,7 @@
 - [Nova Installation](#nova-installation)
 - [Neutron Installation](#neutron-installation)
 - [Horizon Installation](#horizon-installation)
+- [Cinder Installation](#cinder-installation)
 
 
 
@@ -1733,3 +1734,397 @@
 
 - `http://controller/dashboard` 접속
 
+
+
+## Cinder Installation
+
+- 블록 스토리지 서비스(Cinder)는 인스턴스에 블록 스토리지 장치를 제공합니다.
+- NAS/SAN, NFS, iSCSI, Ceph등 다양한 드라이버를 제공합니다.
+- 블록 스토리지 API 및 스케줄러 서비스는 일반적으로 컨트롤러 노드에서 실행됩니다.
+  - 드라이버에 따라 볼륨 서비스는 컨트롤러 노드, 컴퓨팅 노드 또는 독립 실행형 스토리지 노드에서 실행될 수 있습니다.
+
+### 서비스 개요
+
+- Block Storage는 볼륨 관리를 위한 인프라를 제공하고 Compute와 상호 작용하여 인스턴스 용 볼륨을 제공합니다.
+- 또한 이 서비스를 통해 볼륨 스냅 샷 및 볼륨 유형을 관리할 수 있습니다.
+
+#### 구성 요소
+
+- **cinder-api**
+
+  - API 요청을 수락하고 작업을 위해 `cinder-volume`으로 라우팅
+
+- **cinder-volume**
+
+  - 블록 스토리지 서비스 및 `cinder-scheduler`와 같은 프로세스와 직접 상호 작용
+    - 메시지 대기열을 통해 이러한 프로세스와 상호 작용
+
+  - `cinder-volume` 서비스는 상태를 유지하기 위해 블록 스토리지 서비스로 전송된 읽기 및 쓰기 요청에 응답
+  - 드라이버 아키텍처를 통해 다양한 스토리지 공급자와 상호 작용
+
+- **cinder-scheduler daemon**
+
+  - 볼륨을 생성할 최적의 스토리지 제공자 노드를 선택
+  - `nova-scheduler`와 유사한 구성 요소
+
+- **cinder-backup daemon**
+  - `cinder-backup` 서비스는 모든 유형의 볼륨을 백업 스토리지에 백업
+
+  - cinder-volume 서비스와 마찬가지로 드라이버 아키텍처를 통해 다양한 스토리지 공급자와 상호 작용
+
+- **Messaging queue**
+  - 블록 스토리지 프로세스 간에 정보를 라우팅
+
+
+
+### 설치 및 구성(Controller Node)
+
+#### 스토리지 추가
+
+- 컨트롤러 노드에 Storage Node의 기능도 하기 위해 스토리지를 추가한다.
+
+  - ![image-20210624134243007](images/image-20210624134243007.png)
+  - ![image-20210624134305153](images/image-20210624134305153.png)
+
+  - ![image-20210624134327258](images/image-20210624134327258.png)
+
+- 10GB 하드 추가
+
+#### 전제 조건
+
+- 데이터베이스 설정
+  - root 계정으로 db 연결
+
+    - `mysql -u root -p`
+
+  - cinder 데이터베이스 생성
+
+    - `MariaDB [(none)]> CREATE DATABASE cinder;`
+
+  - cinder 데이터베이스에 접근 권환 부여
+
+    ```mariadb
+    MariaDB [(none)]> GRANT ALL PRIVILEGES ON cinder.* TO 'cinder'@'localhost' IDENTIFIED BY 'CINDER_DBPASS';
+    MariaDB [(none)]> GRANT ALL PRIVILEGES ON cinder.* TO 'cinder'@'%' IDENTIFIED BY 'CINDER_DBPASS';
+    ```
+
+    - CINDER_DBPASS를 적절한 암호로 변경
+
+  - 데이터 베이스 연결 종료
+
+- admin 권한으로 cli 명령을 쓰기 위해 admin 인증
+
+  - `. admin-openrc`
+
+- 서비스 자격 증명 생성
+
+  - cinder 사용자 생성
+
+    - `openstack user create --domain default --password-prompt cinder`
+    - ![image-20210624135908866](images/image-20210624135908866.png)
+
+  - cinder 사용자에 admin role 추가
+
+    - `openstack role add --project service --user cinder admin`
+
+  - cinder 라는 이름의 volumeV2, volumeV3 타입 service를 서비스 카탈로그에 등록
+
+    ```sh
+    root@controller$ openstack service create --name cinderv2 --description "OpenStack Block Storage" volumev2
+    root@controller$ openstack service create --name cinderv3 --description "OpenStack Block Storage" volumev3
+    ```
+
+    ![image-20210624140201506](images/image-20210624140201506.png)
+
+- Block Storage service API 엔드포인트 생성
+
+  ````sh
+  root@controller$ openstack endpoint create --region RegionOne volumev2 public http://controller:8776/v2/%\(project_id\)s
+  root@controller$ openstack endpoint create --region RegionOne volumev2 internal http://controller:8776/v2/%\(project_id\)s
+  root@controller$ openstack endpoint create --region RegionOne volumev2 admin http://controller:8776/v2/%\(project_id\)s
+  root@controller$ openstack endpoint create --region RegionOne volumev3 public http://controller:8776/v3/%\(project_id\)s
+  root@controller$ openstack endpoint create --region RegionOne volumev3 internal http://controller:8776/v3/%\(project_id\)s
+  root@controller$ openstack endpoint create --region RegionOne volumev3 admin http://controller:8776/v3/%\(project_id\)s
+  ````
+
+  ![image-20210624140607757](images/image-20210624140607757.png)
+
+  ![image-20210624140655807](images/image-20210624140655807.png)
+
+  ![image-20210624140730520](images/image-20210624140730520.png)
+
+  ![image-20210624140802936](images/image-20210624140802936.png)
+
+#### 구성 요소 설치 및 구성
+
+- 패키지 설치
+
+  - `yum install openstack-cinder`
+
+- `/etc/cinder/cinder.conf`
+
+  - [database] 섹션에서 데이터베이스 액세스 구성
+
+    ```bash
+    [database]
+    # ...
+    connection = mysql+pymysql://cinder:CINDER_DBPASS@controller/cinder
+    ```
+
+  - [DEFAULT] 섹션에서 RabiitMQ 메시지 큐 액세스 구성
+
+    ```bash
+    [DEFAULT]
+    # ...
+    transport_url = rabbit://openstack:RABBIT_PASS@controller
+    ```
+
+  - [DEFAULT]와 [keystone_authtoken] 섹션에서 아이덴티티 서비스 액세스 구성
+
+    ```bash
+    [DEFAULT]
+    # ...
+    auth_strategy = keystone
+    
+    [keystone_authtoken]
+    # ...
+    www_authenticate_uri = http://controller:5000
+    auth_url = http://controller:5000
+    memcached_servers = controller:11211
+    auth_type = password
+    project_domain_name = default
+    user_domain_name = default
+    project_name = service
+    username = cinder
+    password = CINDER_PASS
+    ```
+
+  - [DEFAULT] 섹션에서 controller node의 관리용 IP 구성
+
+    ```bash
+    [DEFAULT]
+    # ...
+    my_ip = 10.0.0.11
+    ```
+
+  - [oslo_concurrency] 섹션에서 잠금 경로 구성
+
+    ```bash
+    [oslo_concurrency]
+    # ...
+    lock_path = /var/lib/cinder/tmp
+    ```
+
+- Block Storage 데이터베이스 내용 채우기
+  - `su -s /bin/sh -c "cinder-manage db sync" cinder`
+
+#### Block Storage를 사용하도록 Compute 구성
+
+- `/etc/nova/nova.conf` 파일을 편집
+
+  ```bash
+  [cinder]
+  os_region_name = RegionOne
+  ```
+
+#### 설치 완료
+
+- Compute API 서비스 재시작
+
+  - `systemctl restart openstack-nova-api.service`
+
+- Block Storage 서비스를 시작하고 시스템이 부팅 될 때 시작되도록 구성
+
+  ```sh
+  root@controller$ systemctl enable openstack-cinder-api.service openstack-cinder-scheduler.service
+  root@controller$ systemctl start openstack-cinder-api.service openstack-cinder-scheduler.service
+  ```
+
+
+
+### 설치 및 구성(Storage Node)
+
+- **Controller Node에서 진행합니다.**
+
+#### 전제 조건
+
+- 유틸리티 패키지 설치
+
+  - `yum install lvm2 device-mapper-persistent-data`
+
+- LVM 메타 데이터 서비스를 시작하고 시스템이 부팅 될 때 시작되도록 구성
+
+  ```sh
+  root@controller$ systemctl enable lvm2-lvmetad.service
+  root@controller$ systemctl start lvm2-lvmetad.service
+  ```
+
+- LVM 물리 볼륨 생성
+
+  - `pvcreate /dev/sdb`
+  - ![image-20210624144636869](images/image-20210624144636869.png)
+
+- LVM 볼륨 그룹 생성
+
+  - `vgcreate cinder-volumes /dev/sdb`
+  - ![image-20210624144712801](images/image-20210624144712801.png)
+
+- `cinder-volumes`볼륨 그룹 을 포함하는 장치 만 스캔하도록 LVM을 재구성
+
+  - `/etc/lvm/lvm.conf` 파일 수정
+
+    - 장치 섹션에서 /dev/sdb 디바이스를 수락하고 다른 모든 디바이스를 거부하는 필터를 추가
+
+      ```bash
+      devices {
+      ...
+      filter = [ "a/sdb/", "r/.*/"]
+      ```
+
+      >스토리지 노드에서 운영 체제 디스크의 LVM을 사용하는 경우 필터에 연결된 디바이스도 추가해야 합니다. 예를 들어 /dev/sda 디바이스에 운영 체제가 포함되어 있는 경우
+      >
+      >`filter = [ "a/sda/", "a/sdb/", "r/.*/"]`
+      >
+      >마찬가지로 컴퓨팅 노드에서 운영 체제 디스크의 LVM을 사용하는 경우 해당 노드의 /etc/lvm/lvm.conf 파일에 있는 필터도 운영 체제 디스크만 포함하도록 수정해야 합니다. 예를 들어 /dev/sda 디바이스에 운영 체제가 포함되어 있는 경우
+      >
+      >`filter = [ "a/sda/", "r/.*/"]`
+
+#### 구성 요소 설치 및 구성
+
+- 패키지 설치
+
+  - `yum install openstack-cinder targetcli python-keystone`
+
+- `/etc/cinder/cinder.conf` 파일 수정
+
+  - [database] 섹션에서 데이터베이스 액세스 구성
+
+    ```bash
+    [database]
+    # ...
+    connection = mysql+pymysql://cinder:CINDER_DBPASS@controller/cinder
+    ```
+
+  - [DEFAULT] 섹션에서 RabbitMQ 메시지 큐 액세스 구성
+
+    ```bash
+    [DEFAULT]
+    # ...
+    transport_url = rabbit://openstack:RABBIT_PASS@controller
+    ```
+
+  - [DEFAULT]와 [keystone_authtoken] 섹션에서 Identity 서비스 액세스 구성
+
+    ```bash
+    [DEFAULT]
+    # ...
+    auth_strategy = keystone
+    
+    [keystone_authtoken]
+    # ...
+    www_authenticate_uri = http://controller:5000
+    auth_url = http://controller:5000
+    memcached_servers = controller:11211
+    auth_type = password
+    project_domain_name = default
+    user_domain_name = default
+    project_name = service
+    username = cinder
+    password = CINDER_PASS
+    ```
+
+  - [DEFAULT]에서 storage node의 관리용 IP 입력
+
+    ```bash
+    [DEFAULT]
+    # ...
+    my_ip = MANAGEMENT_INTERFACE_IP_ADDRESS
+    ```
+
+  - [lvm] 섹션에서 LVM 드라이버, cinder-volume 볼륨 그룹, iSCSI 프로토콜 및 적절한 iSCSI 서비스를 사용하여 LVM 백엔드를 구성
+
+    ```bash
+    [lvm]
+    volume_driver = cinder.volume.drivers.lvm.LVMVolumeDriver
+    volume_group = cinder-volumes
+    target_protocol = iscsi
+    target_helper = lioadm
+    ```
+
+  - [DEFAULT] 섹션에서 LVM 백엔드를 활성화
+
+    ```bash
+    [DEFAULT]
+    # ...
+    enabled_backends = lvm
+    ```
+
+  - [DEFAULT] 섹션에서 Image Service API의 위치를 구성
+
+    ```bash
+    [DEFAULT]
+    # ...
+    glance_api_servers = http://controller:9292
+    ```
+
+  - [osl_concurrency] 섹션에서 잠금 경로를 구성
+
+    ```bash
+    [oslo_concurrency]
+    # ...
+    lock_path = /var/lib/cinder/tmp
+    ```
+
+#### 설치 완료
+
+- 종속성을 포함하여 Block Storage 볼륨 서비스를 시작하고 시스템이 부팅 될 때 시작되도록 구성
+
+  ```sh
+  root@controller$ systemctl enable openstack-cinder-volume.service target.service
+  root@controller$ systemctl start openstack-cinder-volume.service target.service
+  ```
+
+  
+
+### 백업 서비스 설치 및 구성
+
+- Block Storage 노드에서 진행하지만 현재 Controller Node가 Block Storage이기 때문에 Controller Node에서 진행
+- **Swift가 필요하여 현재 환경에서는 넘어감**
+
+#### 구성 요소 설치 및 구성
+
+- 패키지 설치
+
+  - `yum install openstack-cinder`
+
+- `/etc/cinder/cinder.conf`
+
+  - [DEFAULT] 섹션에서 백업 옵션 구성
+
+    ```bash
+    [DEFAULT]
+    # ...
+    backup_driver = cinder.backup.drivers.swift.SwiftBackupDriver
+    backup_swift_url = SWIFT_URL
+    ```
+
+    - SWIFT_URL을 Object Storage 서비스의 URL로 바꿉니다. URL은 개체 저장소 API 끝점을 표시하여 확인
+    - `openstack catalog show object-store`
+
+#### 설최 완료
+
+- Block Storage 백업 서비스를 시작하고 시스템이 부팅 될 때 시작되도록 구성
+
+  ```sh
+  root@controller$ systemctl enable openstack-cinder-backup.service
+  root@controller$ systemctl start openstack-cinder-backup.service
+  ```
+
+
+
+### Cinder 작동 확인
+
+- admin 권한으로 cli 명령을 쓰기 위해 admin 인증
+  - `. admin-openrc`
+- 서비스 구성 요소를 나열하여 각 프로세스가 성공적으로 시작되었는지 확인
+  - `openstack volume service list`
