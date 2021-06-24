@@ -2128,3 +2128,5 @@
   - `. admin-openrc`
 - 서비스 구성 요소를 나열하여 각 프로세스가 성공적으로 시작되었는지 확인
   - `openstack volume service list`
+  - ![image-20210624161556533](images/image-20210624161556533.png)
+
