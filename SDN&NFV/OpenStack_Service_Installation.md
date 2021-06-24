@@ -1,8 +1,36 @@
 # OpenStack Service Installation
 
 - [Keystone Installation](#keystone-installation)
+  - [Identity Service 개요](#identity-service-개요)
+    - [Identity 서비스 구성 요소](#identity-서비스-구성-요소)
+  - [설치 및 구성](#설치-및-구성)
+    - [전제 조건](#전제-조건)
+    - [구성 요소 설치 및 구성](#구성-요소-설치-및-구성)
+    - [apache http 서버 구성](#apache-http-서버-구성)
+    - [설치 완료](#설치-완료)
+  - [도메인 프로젝트 사용자 및 역할 생성](#도메인-프로젝트-사용자-및-역할-생성)
+  - [작동 확인](#작동-확인)
+  - [OpenStack 클라이언트 환경 스크립트 생성](#openstack-클라이언트-환경-스크립트-생성)
+    - [스크립트 사용](#스크립트-사용)
 - [Glance Installation](#glance-installation)
+  - [Image Service 개요](#image-service-개요)
+    - [구성 요소](#구성-요소)
+  - [설치 및 구성](#설치-및-구성-1)
+    - [전제 조건](#전제-조건-1)
+    - [구성 요소 설치 및 구성](#구성-요소-설치-및-구성-1)
+    - [설치 완료](#설치-완료-1)
+  - [작동 확인](#작동-확인-1)
 - [Placement Installation](#placement-installation)
+  - [Steps Overview](#steps-overview)
+    - [Deploy the API Service](#deploy-the-api-service)
+    - [Synchronize the Database](#synchronize-the-database)
+    - [#Create Accounts and Update the Service Catalog](#create-accounts-and-update-the-service-catalog)
+  - [설치 및 구성](#설치-및-구성-2)
+    - [데이터베이스 생성](#데이터베이스-생성)
+    - [사용자 및 endpoint 구성](#사용자-및-endpoint-구성)
+    - [구성 요소 설치 및 구성](#구성-요소-설치-및-구성-2)
+    - [설치 완료](#설치-완료-2)
+  - [작동 확인](#작동-확인-2)
 - [Nova Installation](#nova-installation)
 - [Neutron Installation](#neutron-installation)
 - [Horizon Installation](#horizon-installation)
@@ -66,7 +94,7 @@
 
   `exit`
 
-#### 구성요소 설치 및 구성
+#### 구성 요소 설치 및 구성
 
 - 필요한 패키지 설치
 
@@ -546,7 +574,7 @@
 
 
 
-### 설치 확인
+### 작동 확인
 
 - admin 자격 증명
   - `. admin-openrc`
@@ -1743,7 +1771,7 @@
 - 블록 스토리지 API 및 스케줄러 서비스는 일반적으로 컨트롤러 노드에서 실행됩니다.
   - 드라이버에 따라 볼륨 서비스는 컨트롤러 노드, 컴퓨팅 노드 또는 독립 실행형 스토리지 노드에서 실행될 수 있습니다.
 
-### 서비스 개요
+### Block Storage 서비스 개요
 
 - Block Storage는 볼륨 관리를 위한 인프라를 제공하고 Compute와 상호 작용하여 인스턴스 용 볼륨을 제공합니다.
 - 또한 이 서비스를 통해 볼륨 스냅 샷 및 볼륨 유형을 관리할 수 있습니다.
@@ -2111,7 +2139,7 @@
     - SWIFT_URL을 Object Storage 서비스의 URL로 바꿉니다. URL은 개체 저장소 API 끝점을 표시하여 확인
     - `openstack catalog show object-store`
 
-#### 설최 완료
+#### 설치 완료
 
 - Block Storage 백업 서비스를 시작하고 시스템이 부팅 될 때 시작되도록 구성
 
