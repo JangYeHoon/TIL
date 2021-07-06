@@ -455,6 +455,8 @@
 ## VLAN 실습-2
 
 > 후니의 쉽게 쓴 시스코 네트워킹 책 VLAN 실습
+>
+> 참고 블로그 : https://pfe2000.tistory.com/m/206?category=757141
 
 - 실습 구성도
 
@@ -472,8 +474,6 @@
   SW1(config-if)# exit
   SW1(config)# ip default-gateway 10.10.10.1
   ```
-
-  ![image-20210614231105253](images/image-20210614231105253.png)
 
 - VTP 모드 트랜스페어런트로 설정
 
@@ -503,9 +503,10 @@
   SW1# configure terminal
   SW1(config)# interface e0/2
   SW1(config-if)# switchport trunk encapsulation dot1q
+  SW1(config-if)# switchport mode trunk
   ```
 
-  ![image-20210614231344333](images/image-20210614231344333.png)
+  ![image-20210706223113622](images/image-20210706223113622.png)
 
 - e0/1에 VLAN 2 설정
 
@@ -536,10 +537,10 @@
   Router(config-subif)# exit
   Router(config)# interface Ethernet 0/0.2
   Router(config-subif)# encapsulation dot1Q 2
-  Router(config-subif)# ip address 10.10.11.1 255.255.255.0
+  Router(config-subif)# ip address 10.10.20.1 255.255.255.0
   ```
 
-  ![image-20210614232223814](images/image-20210614232223814.png)
+  ![image-20210706223358875](images/image-20210706223358875.png)
 
 ### Host IP 설정
 
@@ -547,16 +548,18 @@
   - `ip 10.10.10.5 255.255.255.0`
   - ![image-20210614232326751](images/image-20210614232326751.png)
 - PC2
-  - `ip 10.10.10.6 255.255.255.0`
-  - ![image-20210614232404025](images/image-20210614232404025.png)
+  - `ip 10.10.20.5 255.255.255.0`
+  - ![image-20210706223638138](images/image-20210706223638138.png)
 
 ### 연결 확인
 
 - PC1에서 PC2
-  - `ping 10.10.10.6`
-- **설정을 제대로 못 했는지 아니면 원래 안되는 건지 모르겠지만 현재 통신이 안되어 추후에 수정**
+  - `ping 10.10.20.5`
+  - ![image-20210706225708540](images/image-20210706225708540.png)
 
-
+- PC1에서 PC2
+  - `ping 10.10.10.5`
+  - ![image-20210706225741521](images/image-20210706225741521.png)
 
 
 
