@@ -28,7 +28,6 @@
   - [VLAN과 Host 연결](#vlan과-host-연결)
   - [VLAN Interface 설정](#vlan-interface-설정)
   - [연결 확인](#연결-확인)
-
 - [VLAN 실습-2](#vlan-실습-2)
 
 
