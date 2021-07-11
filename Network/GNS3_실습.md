@@ -33,7 +33,10 @@
   - [라우터 설정](#라우터-설정-1)
   - [Host IP 설정](#host-ip-설정-1)
   - [연결 확인](#연결-확인-1)
-- [라우터 설정 확인 명령어](#라우터-설정-확인-명령어)
+- [라우터 기본 명령어](#라우터-기본-명령어)
+  - [라우터 설정 확인 명령어](#라우터-설정-확인-명령어)
+  - [라우터 구성 명령어](#라우터-구성-명령어)
+- [라우팅 프로토콜](#라우팅-프로토콜)
 
 ---
 
@@ -617,9 +620,129 @@
   ```sh
   Router# conf t
   Router(config)# hostname Cisco-R
-  Cisco(config)# enable secret korea
-  Cisco(config)# enable password cisco
+  Cisco-R(config)# enable secret korea
+  Cisco-R(config)# enable password cisco
   ```
   ![image-20210708224724790](images/image-20210708224724790.png)
 
-- 
+- 텔넷 라인에 대한 패스워드 세팅
+
+  ```sh
+  Cisco-R(config)# line vty 0 4	# vty는 버추얼 라인을 0번부터 4번까지 총 5개의 텔넷이 동시에 가능
+  Cisco-R(config-line)# password korea	# password 설정
+  Cisco-R(config-line)# login		# 로그인시 패스워드를 체크
+  ```
+
+- 인터페이스에 IP주소 설정
+
+  ```sh
+  Cisco-R(config)# interface ethernet 0/0 or int e 0/0
+  Cisco-R(config-if)# no shutdown
+  Cisco-R(config-if)# ip addr 172.16.92.1 255.255.0.0
+  ```
+
+  ![image-20210711162730631](images/image-20210711162730631.png)
+
+- 인터페이스에 IPX 네트워크 번호 설정
+
+  ```sh
+  Cisco-R(config)# ipx routing
+  Cisco-R(config)# int e 0/0
+  Cisco-R(config-if)# ipx network 1
+  ```
+
+  ![image-20210711163223459](images/image-20210711163223459.png)
+
+- 시리얼 인터페이스 설정
+
+  ```sh
+  Cisco-R(config)# interface serial 2/0 or int s 2/0
+  Cisco-R(config-if)# no shut or no shutdown
+  Cisco-R(config-if)# ip addr 152.100.10.67 255.255.0.0
+  ```
+
+  ![image-20210711163604382](images/image-20210711163604382.png)
+
+- 라우팅 프로토콜 설정
+
+  ```sh
+  Cisco-R(config)# router eigrp 200	# IP 라우팅 프로토콜 : EIGRP, AS 번호 : 200
+  Cisco-R(config-router)# network 172.16.0.0
+  Cisco-R(config-router)# network 150.100.0.0
+  Cisco-R(config-router)# no network 150.100.0.0		# 네트워크 설정 취소
+  Cisco-R(config-router)# network 152.100.0.0
+  ```
+
+  ![image-20210711163958137](images/image-20210711163958137.png)
+
+- 구성 파일 확인
+  - `sh run`
+
+- RAM에 있는 구성 파일 NVRAM으로 전송
+
+  ```sh
+  Cisco-R# copy running-config startup-config
+  or
+  Cisco-R# write memory
+  ```
+
+---
+
+
+
+## 라우팅 프로토콜
+
+### 스태틱 라우팅 프로토콜
+
+- 스태틱 라우팅 프로토콜은 라우터 운영자가 직접 경로를 입력한 라우팅 프로토콜입니다.
+- 운영자가 입력해준 경로에 문제가 생겨도 다른 길을 자동으로 찾아내지 못하고 다시 운영자가 수정해줄 때까지 기다리는 단점이 존재합니다.
+  - 따라서 스태틱 라우텅 프로토콜은 갈 수 있는 경로가 하나밖에 없는 Stub 라우터용으로 많이 사용합니다.
+
+- 스태틱 라우팅 프로토콜 명령어
+  - `Router(config)# ip route network [mask] {address | interface} [distance]`
+  - 지정하는 방법은 두 가지로 address를 주는 방법과 interface를 주는 방법이 있다.
+    - address : 목적지 네트워크를 가기 위해서는 여기 나오는 address로 전송(1홉을 건너뛴 상대방 라우터의 주소)
+    - interface : 목적지 네트워크를 가기 위해서는 여기 나오는 interface로 전송(자기 라우터의 인터페이스)
+
+#### 스태틱 라우팅 개념 예제
+
+> 출처 : 후니의 쉽게 쓴 Cisco 네트워킹 385p 예제
+
+- 예제 구성도
+
+  ![image-20210711172627487](images/image-20210711172627487.png)
+
+- 지방 사무소의 라우터에 대한 스태틱 라우팅 구성
+  - 지방 사무실 라우터는 경로가 하나만 존재하는데 무조건 본사 네트워크에 접속해야 한다.
+  - 따라서 라우터 A에 대한 스태틱 라우팅을 구성한다.
+
+- 인터페이스 IP 설정
+
+  ```sh
+  Router-A# conf t
+  Router-A(config)# int e 0/0
+  Router-A(config-if)# no shutdwon
+  Router-A(config-if)# ip addr 210.240.10.1 255.255.255.0
+  Router-A(config-if)# exit
+  Router-A(config)# int s 2/0
+  Router-A(config-if)# ip addr 203.210.100.2 255.255.255.0
+  ```
+
+  ![image-20210711172037372](images/image-20210711172037372.png)
+
+- 스태틱 라우팅 설정
+
+  ```sh
+  Router-A(config)# ip route 150.150.0.0 255.255.0.0 203.210.100.1
+  or
+  Router-A(config)# ip route 150.150.0.0 255.255.0.0 serial 2/0
+  ```
+
+  ![image-20210711172305147](images/image-20210711172305147.png)
+
+- 설정 확인 및 저장
+
+  - `sh run`
+  - `write memory`
+
+  > 현재 실습에서는 라우터 A만 설정했기 때문에 라우터 B에도 라우팅 프로토콜을 구성해야 두 라우터간 통신이 가능하고 해당 실습에서는 **어떻게 스태틱 라우팅을 설정하는지에 대한 간단한 실습**이다.
