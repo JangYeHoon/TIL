@@ -38,6 +38,16 @@
   - [라우터 구성 명령어](#라우터-구성-명령어)
 - [스태틱 라우팅 프로토콜](#스태틱-라우팅-프로토콜)
   - [스태틱 라우팅 개념 예제](#스태틱-라우팅-개념-예제)
+- [디폴트와 스태틱 라우팅 예제](#디폴트와-스태틱-라우팅-예제)
+  - [예제 구성도 및 구성](#예제-구성도-및-구성)
+  - [Router B 구성](#router-b-구성)
+  - [Router C 구성](#router-c-구성)
+  - [Router A 구성](#router-a-구성)
+  - [스태틱 라우팅 설정](#스태틱-라우팅-설정)
+  - [연결 확인](#연결-확인-2)
+- [Cisco Discovery Protocol](#cisco-discovery-protocol)
+  - [예제 구성도](#예제-구성도)
+  - [CDP 명령어](#cdp-명령어)
 
 ---
 
@@ -774,7 +784,7 @@
 - Router-A에 RIP 라우팅 프로토콜 설정
 
   ```sh
-  Router-A(config)# router-ip
+  Router-A(config)# router rip
   Router-A(config-router)# network 150.150.0.0
   Router-A(config-router)# network 203.240.10.0
   ```
@@ -807,3 +817,148 @@
   - 라우터 B로는 시리얼 2/0 인터페이스(203.210.100.1 255.255.255.0)을 사용하고 라우터 C로는 시리얼 2/1 인터페이스(203.210.200.1 255.255.255.0)을 사용
   - 모두 스태틱 라우팅만을 사용
   - 나머지 모든 트래픽은 디폴트로 인터넷 쪽으로 나갈 수 있도록 구성
+
+### Router B 구성
+
+```sh
+Router-B(config)# int s 2/0
+Router-B(config-if)# no shutdown
+Router-B(config-if)# ip addr 203.210.100.2 255.255.255.0
+```
+
+![image-20210714103915176](images/image-20210714103915176.png)
+
+### Router C 구성
+
+```sh
+Router-C(config)# int e 0/0
+Router-C(config-if)# no shutdown
+Router-C(config-if)# ip addr 150.150.1.1 255.255.0.0
+Router-C(config-if)# exit
+Router-C(config)# int s 2/0
+Router-C(config-if)# no shutdown
+Router-C(config-if)# ip addr 203.210.200.2 255.255.255.0
+```
+
+### Router A 구성
+
+- 호스트 네임과 패스워드 설정
+
+  ```sh
+  Router-A(config)# hostname Router_A
+  Router_A(config)# enable password cisco
+  ```
+
+  ![image-20210714104326503](images/image-20210714104326503.png)
+
+- 이더넷 인터페이스 설정
+
+  ```sh
+  Router_A(config)# int e 0/0
+  Router_A(config-if)# no shutdown
+  Router_A(config-if)# ip addr 210.240.10.1 255.255.255.0
+  ```
+
+  ![image-20210714104454700](images/image-20210714104454700.png)
+
+- 시리얼 인터페이스 설정
+
+  ```sh
+  Router_A(config)# int s 2/0
+  Router_A(config-if)# no shutdown
+  Router_A(config-if)# ip addr 203.210.100.1 255.255.255.0
+  Router_A(config-if)# exit
+  Router_A(config)# int s 2/1
+  Router_A(config-if)# no shutdown
+  Router_A(config-if)# ip addr 203.210.200.1 255.255.255.0
+  ```
+
+  ![image-20210714104618478](images/image-20210714104618478.png)
+
+### 스태틱 라우팅 설정
+
+- RIP 라우팅 프로토콜 설정
+
+  ```sh
+  Router_A(config)# router rip
+  Router_A(config-router)# network 203.210.100.0
+  Router_A(config-router)# network 203.210.200.0
+  ```
+
+  ![image-20210714104955252](images/image-20210714104955252.png)
+
+- 스태틱 라우팅 설정
+
+  ```sh
+  Router_A(config)# ip route 150.150.0.0 255.255.0.0 203.210.200.2
+  Router_A(config)# ip route 203.210.100.0 255.255.255.0 203.210.100.2
+  ```
+
+  ![image-20210714105422940](images/image-20210714105422940.png)
+
+- 디폴트 라우팅 설정
+  - `Router_A(config)# ip route 0.0.0.0 0.0.0.0 203.210.100.2`
+
+### 연결 확인
+
+- Router A와 Router C 확인
+
+  ```sh
+  Router_A# ping 150.150.1.1
+  Router_A# ping 203.210.200.2
+  ```
+
+  ![image-20210714105647901](images/image-20210714105647901.png)
+  ![image-20210714105656750](images/image-20210714105656750.png)
+
+- Router A와 Router B 확인
+
+  ![image-20210714105711334](images/image-20210714105711334.png)
+
+---
+
+
+
+## Cisco Discovery Protocol
+
+- CDP는 시스코 라우터와 스위치에서 직접 연결된 시스코 장비를 찾아내는 기능입니다.
+- CDP는 Data Link 계층에 올라가는 프로토콜이기 때문에 상위 네트워크 계층에 어떤 프로토콜이 올라가던 상관없이 실행이 가능합니다.
+- CDP는 멀티캐스트를 이용해서 시스코 장비를 찾아냅니다.
+
+### 예제 구성도
+
+<img src="images/image-20210714113246933.png" alt="image-20210714113246933" style="zoom:67%;" />
+
+- 라우터 A에서 CDP 진행
+
+### CDP 명령어
+
+- `show cdp`
+  - cdp 관련 설정 확인 
+  - ![image-20210714113653944](images/image-20210714113653944.png)
+
+- `show cdp neighbors`
+
+  - 현재 자기 라우터와 연결된 시스코 장비들의 정보 확인
+
+  - ![image-20210714114011648](images/image-20210714114011648.png)
+
+    > Router D는 직접적으로 연결되지 않고 스위치를 통해 연결되어 있어 나오지 않음
+
+- `show cdp entry *` or `show cdp neighbors details`
+
+  - `show cdp neighbors`보다 많은 정보 확인 가능
+  - ![image-20210714114247013](images/image-20210714114247013.png)
+  - ![image-20210714114310848](images/image-20210714114310848.png)
+
+- `no cdp run`
+  - 라우터 전체에 cdp를 disable하는 명령어
+  - 다시 CDP를 살리고 싶으면 `cdp run`
+  - ![image-20210714114507701](images/image-20210714114507701.png)
+  - Router B에 대한 Holdtime이 계속 줄어들다가 사라짐
+  - ![image-20210714114609433](images/image-20210714114609433.png)
+  - ![image-20210714114707392](images/image-20210714114707392.png)
+
+- `no cdp enable`
+  - 특정 인터페이스에서만 CDP를 Disable
+  - ![image-20210714114828133](images/image-20210714114828133.png)
