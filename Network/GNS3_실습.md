@@ -48,6 +48,11 @@
 - [Cisco Discovery Protocol](#cisco-discovery-protocol)
   - [예제 구성도](#예제-구성도)
   - [CDP 명령어](#cdp-명령어)
+- [Routing Information Protocol(RIP)](#routing-information-protocol-rip)
+  - [RIP 설정 명령어](#rip-설정-명령어)
+  - [RouterA 구성](#routera-구성)
+  - [RouterB 구성](#routerb-구성)
+  - [구성 확인](#구성-확인)
 
 ---
 
@@ -962,3 +967,121 @@ Router-C(config-if)# ip addr 203.210.200.2 255.255.255.0
 - `no cdp enable`
   - 특정 인터페이스에서만 CDP를 Disable
   - ![image-20210714114828133](images/image-20210714114828133.png)
+
+---
+
+
+
+## Routing Information Protocol(RIP)
+
+- RIP는 OSI 7계층 중 Network 레이어에서 동작하는 라우팅(Routing Protocol)로 다이나믹 프로토콜입니다.
+- 내부용 라우팅 프로토콜(IGP)로 디스턴스 벡터(Distance Vector) 라우팅 프로토콜입니다.
+- RIP는 경로를 설정할 때 홉 카운트를 사용하고 최대 15 개이고 갱신 주기는 30초입니다.
+
+#### RIP 설정 명령어
+
+```sh
+Router(config)# router rip
+Router(config-router)# network 150.150.100.0
+```
+
+- ![image-20210815170831638](images/image-20210815170831638.png)
+- `router rip`는 현재 라우터에서 RIP 라우팅을 사용하겠다는 명령어입니다.
+- `network 150.150.100.0`은 라우팅을 사용할 네트워크를 지정하는 명령어로 서브넷 마스크를 입력하지 않고 Classful하게 모든 네트워크를 인식합니다.
+  - 그렇기 때문에`show running-config`를 수행하면 네트워크가 `150.150.0.0`으로 설정되어 있는 것을 확인할 수 있습니다.
+  - ![image-20210815170801907](images/image-20210815170801907.png)
+
+### RIP 예제-1
+
+> 후니의 쉽게 쓴 CISCO 네트워킹 Vol.2 16p 예제
+
+#### 예제 구성도
+
+![image-20210815171716250](images/image-20210815171716250.png)
+
+#### RouterA 구성
+
+- 서울 리전에 있는 RouterA에 이더넷 및 라우팅 구성입니다.
+
+- 이더넷 설정
+
+  ```sh
+  RouterA# configure terminal
+  RouterA(config)# interface ethernet 0/0
+  RouterA(config-if)# ip address 203.240.100.1 255.255.255.0
+  ```
+
+  ![image-20210815172509829](images/image-20210815172509829.png)
+
+- 시리얼 인터페이스 설정
+
+  ```sh
+  RouterA# configure terminal
+  RouterA(config)# interface serial 2/0
+  RouterA(config-if)# ip address 203.240.150.1
+  ```
+
+  ![image-20210815172748124](images/image-20210815172748124.png)
+
+- RIP 구성
+
+  ```sh
+  RouterA# configure terminal
+  RouterA(config)# router rip
+  RouterA(config-router)# network 203.240.100.0
+  RouterA(config-router)# network 203.240.150.0
+  ```
+
+  ![image-20210815172754817](images/image-20210815172754817.png)
+
+#### RouterB 구성
+
+- 이더넷 설정
+
+  ```sh
+  RouterA# configure terminal
+  RouterA(config)# interface ethernet 0/0
+  RouterA(config-if)# ip address 203.240.200.1 255.255.255.0
+  ```
+
+  ![image-20210815173939490](images/image-20210815173939490.png)
+
+- 시리얼 인터페이스 설정
+
+  ```sh
+  RouterA# configure terminal
+  RouterA(config)# interface serial 2/0
+  RouterA(config-if)# ip address 203.240.150.2 255.255.255.0
+  ```
+
+  ![image-20210815174012790](images/image-20210815174012790.png)
+
+- rip 설정
+
+  ```sh
+  RouterA# configure terminal
+  RouterA(config)# router rip
+  RouterA(config-router)# network 203.240.100.0
+  RouterA(config-router)# network 203.240.150.0
+  ```
+
+  ![image-20210815174036249](images/image-20210815174036249.png)
+
+#### 구성 확인
+
+- RouterA
+  - `show running-config`
+  - ![image-20210815173009535](images/image-20210815173009535.png)![image-20210815173015051](images/image-20210815173015051.png)![image-20210815173020630](images/image-20210815173020630.png)
+  - `show ip protocol`
+    - ![image-20210815173524827](images/image-20210815173524827.png)
+  - `show ip route`
+  - ![image-20210815174243536](images/image-20210815174243536.png)
+
+- RouterB
+  - `show running-config`
+  - ![image-20210815174516634](images/image-20210815174516634.png)![image-20210815174528610](images/image-20210815174528610.png)![image-20210815174550361](images/image-20210815174550361.png)
+  - `show ip protocol`
+    - ![image-20210815174625631](images/image-20210815174625631.png)
+  - `show ip route`
+    - ![image-20210815174650298](images/image-20210815174650298.png)
+
