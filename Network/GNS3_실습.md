@@ -48,7 +48,7 @@
 - [Cisco Discovery Protocol](#cisco-discovery-protocol)
   - [예제 구성도](#예제-구성도)
   - [CDP 명령어](#cdp-명령어)
-- [Routing Information Protocol(RIP)](#routing-information-protocol-rip)
+- [Routing Information Protocol(RIP)](#routing-information-protocolrip)
   - [RIP 설정 명령어](#rip-설정-명령어)
   - [RouterA 구성](#routera-구성)
   - [RouterB 구성](#routerb-구성)
