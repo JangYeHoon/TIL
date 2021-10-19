@@ -1085,3 +1085,33 @@ Router(config-router)# network 150.150.100.0
   - `show ip route`
     - ![image-20210815174650298](images/image-20210815174650298.png)
 
+### RIP 예제-2
+
+> 후니의 쉽게 쓴 CISCO 네트워킹 Vol.2 26p 예제
+
+#### 예제 구성
+
+![image-20211019224947040](images/image-20211019224947040.png)
+
+- PC1에서 PC2로 통신이 가능하도록 설정
+
+#### PC 설정
+
+- PC 1 ip 설정
+  - `ip 150.150.1.10 /16 150.150.1.1`
+- PC 2 ip 설정
+  - `ip 172.20.100.10 /24 172.70.100.1`
+
+#### RouterC 구성
+
+```sh
+RouterC# conf t
+RouterC(config)# interface eth0/0
+RouterC(config-if)# ip address 150.150.1.1 255.255.0.0
+RouterC(config)# interface Serial 2/0
+RouterC(config-if)# ip address 203.210.200.2 255.255.255.0
+RouterC(config)# router rip
+RouterC(config-router)# network 150.150.0.0
+RouterC(config-router)# network 203.210.200.0
+```
+
