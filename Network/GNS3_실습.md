@@ -5,54 +5,15 @@
 ## 목차
 
 - [스위치 기본 설정](#스위치-기본-설정)
-  - [기본 설정](#기본-설정)
-  - [IP 주소 세팅](#ip-주소-세팅)
-  - [디폴트 게이트웨이 설정](#디폴트-게이트웨이-설정)
-  - [스위치 포트 속도와 Duplex 세팅](#스위치-포트-속도와-duplex-세팅)
-  - [Mac Address Table](#mac-address-table)
 - [Router와 PC ping 테스트](#router와-pc-ping-테스트)
-  - [실습 구성도](#실습-구성도)
-  - [라우터 설정](#라우터-설정)
-  - [PC 설정](#pc-설정)
 - [VLAN 기본 구성](#vlan-기본-구성)
-  - [VTP 설정](#vtp-설정)
-  - [트렁크 포트 설정](#트렁크-포트-설정)
-  - [VLAN  설정](#vlan-설정)
-  - [VLAN 생성](#vlan-생성)
-    - [config-vlan 모드](#config-vlan-모드)
-    - [vlan configuration 모드](#vlan-configuration-모드)
-  - [VLAN에 포트 배정](#vlan에-포트-배정)
 - [VLAN 실습-1](#vlan-실습-1)
-  - [스위치 VLAN 설정](#스위치-vlan-설정)
-  - [Host IP 설정](#host-ip-설정)
-  - [VLAN과 Host 연결](#vlan과-host-연결)
-  - [VLAN Interface 설정](#vlan-interface-설정)
-  - [연결 확인](#연결-확인)
 - [VLAN 실습-2](#vlan-실습-2)
-  - [스위치 설정](#스위치-설정)
-  - [라우터 설정](#라우터-설정-1)
-  - [Host IP 설정](#host-ip-설정-1)
-  - [연결 확인](#연결-확인-1)
 - [라우터 기본 명령어](#라우터-기본-명령어)
-  - [라우터 설정 확인 명령어](#라우터-설정-확인-명령어)
-  - [라우터 구성 명령어](#라우터-구성-명령어)
 - [스태틱 라우팅 프로토콜](#스태틱-라우팅-프로토콜)
-  - [스태틱 라우팅 개념 예제](#스태틱-라우팅-개념-예제)
 - [디폴트와 스태틱 라우팅 예제](#디폴트와-스태틱-라우팅-예제)
-  - [예제 구성도 및 구성](#예제-구성도-및-구성)
-  - [Router B 구성](#router-b-구성)
-  - [Router C 구성](#router-c-구성)
-  - [Router A 구성](#router-a-구성)
-  - [스태틱 라우팅 설정](#스태틱-라우팅-설정)
-  - [연결 확인](#연결-확인-2)
 - [Cisco Discovery Protocol](#cisco-discovery-protocol)
-  - [예제 구성도](#예제-구성도)
-  - [CDP 명령어](#cdp-명령어)
 - [Routing Information Protocol(RIP)](#routing-information-protocolrip)
-  - [RIP 설정 명령어](#rip-설정-명령어)
-  - [RouterA 구성](#routera-구성)
-  - [RouterB 구성](#routerb-구성)
-  - [구성 확인](#구성-확인)
 
 ---
 
@@ -1091,7 +1052,7 @@ Router(config-router)# network 150.150.100.0
 
 #### 예제 구성
 
-![image-20211019224947040](images/image-20211019224947040.png)
+![image-20211020221226727](images/image-20211020221226727.png)
 
 - PC1에서 PC2로 통신이 가능하도록 설정
 
@@ -1100,18 +1061,60 @@ Router(config-router)# network 150.150.100.0
 - PC 1 ip 설정
   - `ip 150.150.1.10 /16 150.150.1.1`
 - PC 2 ip 설정
-  - `ip 172.20.100.10 /24 172.70.100.1`
+  - `ip 172.70.100.10 /24 172.70.100.1`
 
 #### RouterC 구성
 
 ```sh
-RouterC# conf t
-RouterC(config)# interface eth0/0
-RouterC(config-if)# ip address 150.150.1.1 255.255.0.0
-RouterC(config)# interface Serial 2/0
-RouterC(config-if)# ip address 203.210.200.2 255.255.255.0
-RouterC(config)# router rip
-RouterC(config-router)# network 150.150.0.0
-RouterC(config-router)# network 203.210.200.0
+# conf t
+# interface eth0/0
+# ip address 150.150.1.1 255.255.0.0
+# interface Serial 2/0
+# ip address 203.210.200.2 255.255.255.0
+# router rip
+# network 150.150.0.0
+# network 203.210.200.0
 ```
+
+#### RouterA 구성
+
+```sh
+# conf t
+# interface serial 2/1
+# no shutdown
+# ip address 203.210.200.1 255.255.255.0
+# clockrate 128000    # 백투백 구성을 위한 설정
+# interface serial 2/0
+# no shutodnw
+# ip address 203.210.100.1 255.255.255.0
+# clockrate 1007616
+# router rip
+# network 203.210.200.0
+# network 203.210.100.0
+```
+
+#### Router C 구성
+
+```sh
+# conf t
+# interface serial 2/0
+# no shutdown
+# ip address 203.210.100.2 255.255.255.0
+# interface eth 0/0
+# no shutdown
+# ip address 172.70.100.1 255.255.255.0
+# router rip
+# network 203.210.100.0
+# network 172.70.100.0
+```
+
+#### 연결 확인
+
+- PC1에서 PC2로 핑
+  - `ping 172.70.100.10`
+  - ![image-20211020221811587](images/image-20211020221811587.png)
+
+- RouterC에서 RouterB로 핑
+  - `ping 172.70.100.1`
+  - ![image-20211020221924468](images/image-20211020221924468.png)
 
