@@ -1068,8 +1068,10 @@ Router(config-router)# network 150.150.100.0
 ```sh
 # conf t
 # interface eth0/0
+# no shutdown
 # ip address 150.150.1.1 255.255.0.0
 # interface Serial 2/0
+# no shutdown
 # ip address 203.210.200.2 255.255.255.0
 # router rip
 # network 150.150.0.0
@@ -1085,7 +1087,7 @@ Router(config-router)# network 150.150.100.0
 # ip address 203.210.200.1 255.255.255.0
 # clockrate 128000    # 백투백 구성을 위한 설정
 # interface serial 2/0
-# no shutodnw
+# no shutdown
 # ip address 203.210.100.1 255.255.255.0
 # clockrate 1007616
 # router rip
@@ -1117,4 +1119,84 @@ Router(config-router)# network 150.150.100.0
 - RouterC에서 RouterB로 핑
   - `ping 172.70.100.1`
   - ![image-20211020221924468](images/image-20211020221924468.png)
+
+---
+
+
+
+## IGRP 라우팅 프로토콜
+
+- IGRP 라우팅 프로토콜 특성
+  - 라우팅 프로토콜
+  - 다이나믹 프로토콜
+  - 내부용 라우팅 프로토콜(IGP)
+  - 디스턴스 벡터 라우팅 프로토콜
+  - 시스코라우터에서만 사용 가능
+  - VLSM을 지원하지 못함
+- IGRP 라우팅 프로토콜에서 경로 결정 요소
+  - 대역폭
+  - Delay
+  - Reliability - 목적지까지 제대로 도착한 패킷과 에러가 발생한 패킷의 비율
+  - Load(부하)
+  - MTU(Maximum Transmission Unit)
+
+- IGRP 구성 명령어
+  - `router igrp <autonomous system number(AS번호)>`
+  - `network network-number`
+
+### IGRP 예제
+
+> 후니의 쉽게 쓴 CISCO 네트워킹 Vol.2 49p
+>
+> 현재 설치한 버전에서는 igrp를 지원하지 않는 것으로 보여 igrp를 완전히 대체하는 eigrp로 실습을 진행하기 때문에 만약 igrp가 가능한 라우터에서는 eigrp 대신 igrp로 변경하여 입력하시면 됩니다.
+
+#### 예제 구성
+
+- AS 번호는 200
+- ![image-20211026225452117](images/image-20211026225452117.png)
+
+#### host 설정
+
+```sh
+// PC 1
+# ip 203.240.100.10 /24 203.240.100.1
+
+// PC 2
+# ip 203.240.200.10 /24 203.240.200.1
+```
+
+#### RouterA 설정
+
+```sh
+# conf t
+# interface eth0/0
+# no shutdown
+# ip address 203.210.100.1 255.255.255.0
+# interface serial 2/0
+# no shutdown
+# ip address 203.210.150.1 255.255.255.0
+# router eigrp 200
+# network 203.210.100.0
+# network 203.210.150.0
+```
+
+#### RouterB 설정
+
+```sh
+# conf t
+# interface eth0/0
+# no shutdown
+# ip address 203.210.200.1 255.255.255.0
+# interface serial 2/0
+# no shutdown
+# ip address 203.210.150.1 255.255.255.0
+# router eigrp 200
+# network 203.210.200.0
+# network 203.210.150.0
+```
+
+#### 연결 확인
+
+- PC1에서 PC2로 핑
+  - ![image-20211026225442415](images/image-20211026225442415.png)
 
