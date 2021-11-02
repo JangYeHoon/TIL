@@ -1110,6 +1110,12 @@ Router(config-router)# network 150.150.100.0
 # network 172.70.100.0
 ```
 
+#### 디버그
+
+- `debug ip rip`
+- 디버그는 반드시 꺼야됨
+  - `u all`
+
 #### 연결 확인
 
 - PC1에서 PC2로 핑
@@ -1139,10 +1145,11 @@ Router(config-router)# network 150.150.100.0
   - Reliability - 목적지까지 제대로 도착한 패킷과 에러가 발생한 패킷의 비율
   - Load(부하)
   - MTU(Maximum Transmission Unit)
-
 - IGRP 구성 명령어
   - `router igrp <autonomous system number(AS번호)>`
   - `network network-number`
+- 해당 인터페이스로는 igrp를 제외하는 명령어
+  - `passive-interface Ethernet 0/0`
 
 ### IGRP 예제
 
@@ -1200,3 +1207,107 @@ Router(config-router)# network 150.150.100.0
 - PC1에서 PC2로 핑
   - ![image-20211026225442415](images/image-20211026225442415.png)
 
+### IGRP 예제-2
+
+>  후니의 쉽게 쓴 CISCO 네트워킹 Vol.2 55p
+
+#### 예제 구성
+
+- AS 200
+- ![image-20211102221142324](images/image-20211102221142324.png)
+
+#### host 설정
+
+```sh
+// PC1
+# ip 150.150.1.10 /16 150.150.1.1
+// PC2
+# ip 210.240.10.10 /24 210.240.10.1
+// PC3
+# ip 172.70.100.10 /24 172.70.100.1
+```
+
+#### RouterC 설정
+
+```sh
+# conf t
+# interface eth 0/0
+# no shutdown
+# ip address 150.150.1.1 255.255.0.0
+# interface serial 2/0
+# no shutdown
+# ip address 203.210.200.2 255.255.255.0
+# router eigrp 200
+# network 150.150.0.0
+# network 203.210.200.0
+```
+
+#### RouterA 설정
+
+```sh
+# conf t
+# interface eth 0/0
+# no shutdown
+# ip address 210.240.10.1 255.255.255.0
+# interface serial 2/0
+# no shutdown
+# ip address 203.210.100.1 255.255.255.0
+# interface serial 2/1
+# no shutdown
+# ip address 203.210.200.1 255.255.255.0
+# router eigrp 200
+# network 210.240.10.0
+# network 203.210.100.0
+# network 203.210.200.0
+```
+
+#### RouterB 설정
+
+```sh
+# conf t
+# interface eth 0/0
+# no shutdown
+# ip address 172.70.100.1 255.255.255.0
+# interface serial 2/0
+# no shutdown
+# ip address 203.210.100.2 255.255.255.0
+# router eigrp 200
+# network 203.210.100.0
+# network 172.70.100.0
+```
+
+#### 설정 확인
+
+- `show ip route`
+
+- `show running-config`
+
+- `show interface`
+
+- `show ip protocol`
+
+- `show ip interface`
+
+- 최대 홉 카운트 변경
+
+  ```
+  # conf t
+  # router eigrp 200
+  # metric maximum-hops 255
+  #
+  ```
+
+#### 디버그
+
+- `debug ip igrp`
+- 마지막에는 항상 디버그 명령을 꺼야됨
+  - `u all`
+
+#### 연결 확인
+
+- PC1에서 PC2
+  - `ping 210.240.10.10`
+  - ![image-20211102222903856](images/image-20211102222903856.png)
+- PC1에서 PC3
+  - `ping 172.70.100.10`
+  - ![image-20211102222921838](images/image-20211102222921838.png)
