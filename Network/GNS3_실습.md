@@ -5,49 +5,15 @@
 ## 목차
 
 - [스위치 기본 설정](#스위치-기본-설정)
-  - [기본 설정](#기본-설정)
-  - [IP 주소 세팅](#ip-주소-세팅)
-  - [디폴트 게이트웨이 설정](#디폴트-게이트웨이-설정)
-  - [스위치 포트 속도와 Duplex 세팅](#스위치-포트-속도와-duplex-세팅)
-  - [Mac Address Table](#mac-address-table)
 - [Router와 PC ping 테스트](#router와-pc-ping-테스트)
-  - [실습 구성도](#실습-구성도)
-  - [라우터 설정](#라우터-설정)
-  - [PC 설정](#pc-설정)
 - [VLAN 기본 구성](#vlan-기본-구성)
-  - [VTP 설정](#vtp-설정)
-  - [트렁크 포트 설정](#트렁크-포트-설정)
-  - [VLAN  설정](#vlan-설정)
-  - [VLAN 생성](#vlan-생성)
-    - [config-vlan 모드](#config-vlan-모드)
-    - [vlan configuration 모드](#vlan-configuration-모드)
-  - [VLAN에 포트 배정](#vlan에-포트-배정)
 - [VLAN 실습-1](#vlan-실습-1)
-  - [스위치 VLAN 설정](#스위치-vlan-설정)
-  - [Host IP 설정](#host-ip-설정)
-  - [VLAN과 Host 연결](#vlan과-host-연결)
-  - [VLAN Interface 설정](#vlan-interface-설정)
-  - [연결 확인](#연결-확인)
 - [VLAN 실습-2](#vlan-실습-2)
-  - [스위치 설정](#스위치-설정)
-  - [라우터 설정](#라우터-설정-1)
-  - [Host IP 설정](#host-ip-설정-1)
-  - [연결 확인](#연결-확인-1)
 - [라우터 기본 명령어](#라우터-기본-명령어)
-  - [라우터 설정 확인 명령어](#라우터-설정-확인-명령어)
-  - [라우터 구성 명령어](#라우터-구성-명령어)
 - [스태틱 라우팅 프로토콜](#스태틱-라우팅-프로토콜)
-  - [스태틱 라우팅 개념 예제](#스태틱-라우팅-개념-예제)
 - [디폴트와 스태틱 라우팅 예제](#디폴트와-스태틱-라우팅-예제)
-  - [예제 구성도 및 구성](#예제-구성도-및-구성)
-  - [Router B 구성](#router-b-구성)
-  - [Router C 구성](#router-c-구성)
-  - [Router A 구성](#router-a-구성)
-  - [스태틱 라우팅 설정](#스태틱-라우팅-설정)
-  - [연결 확인](#연결-확인-2)
 - [Cisco Discovery Protocol](#cisco-discovery-protocol)
-  - [예제 구성도](#예제-구성도)
-  - [CDP 명령어](#cdp-명령어)
+- [Routing Information Protocol(RIP)](#routing-information-protocolrip)
 
 ---
 
@@ -962,3 +928,275 @@ Router-C(config-if)# ip addr 203.210.200.2 255.255.255.0
 - `no cdp enable`
   - 특정 인터페이스에서만 CDP를 Disable
   - ![image-20210714114828133](images/image-20210714114828133.png)
+
+---
+
+
+
+## Routing Information Protocol(RIP)
+
+- RIP는 OSI 7계층 중 Network 레이어에서 동작하는 라우팅(Routing Protocol)로 다이나믹 프로토콜입니다.
+- 내부용 라우팅 프로토콜(IGP)로 디스턴스 벡터(Distance Vector) 라우팅 프로토콜입니다.
+- RIP는 경로를 설정할 때 홉 카운트를 사용하고 최대 15 개이고 갱신 주기는 30초입니다.
+
+#### RIP 설정 명령어
+
+```sh
+Router(config)# router rip
+Router(config-router)# network 150.150.100.0
+```
+
+- ![image-20210815170831638](images/image-20210815170831638.png)
+- `router rip`는 현재 라우터에서 RIP 라우팅을 사용하겠다는 명령어입니다.
+- `network 150.150.100.0`은 라우팅을 사용할 네트워크를 지정하는 명령어로 서브넷 마스크를 입력하지 않고 Classful하게 모든 네트워크를 인식합니다.
+  - 그렇기 때문에`show running-config`를 수행하면 네트워크가 `150.150.0.0`으로 설정되어 있는 것을 확인할 수 있습니다.
+  - ![image-20210815170801907](images/image-20210815170801907.png)
+
+### RIP 예제-1
+
+> 후니의 쉽게 쓴 CISCO 네트워킹 Vol.2 16p 예제
+
+#### 예제 구성도
+
+![image-20210815171716250](images/image-20210815171716250.png)
+
+#### RouterA 구성
+
+- 서울 리전에 있는 RouterA에 이더넷 및 라우팅 구성입니다.
+
+- 이더넷 설정
+
+  ```sh
+  RouterA# configure terminal
+  RouterA(config)# interface ethernet 0/0
+  RouterA(config-if)# ip address 203.240.100.1 255.255.255.0
+  ```
+
+  ![image-20210815172509829](images/image-20210815172509829.png)
+
+- 시리얼 인터페이스 설정
+
+  ```sh
+  RouterA# configure terminal
+  RouterA(config)# interface serial 2/0
+  RouterA(config-if)# ip address 203.240.150.1
+  ```
+
+  ![image-20210815172748124](images/image-20210815172748124.png)
+
+- RIP 구성
+
+  ```sh
+  RouterA# configure terminal
+  RouterA(config)# router rip
+  RouterA(config-router)# network 203.240.100.0
+  RouterA(config-router)# network 203.240.150.0
+  ```
+
+  ![image-20210815172754817](images/image-20210815172754817.png)
+
+#### RouterB 구성
+
+- 이더넷 설정
+
+  ```sh
+  RouterA# configure terminal
+  RouterA(config)# interface ethernet 0/0
+  RouterA(config-if)# ip address 203.240.200.1 255.255.255.0
+  ```
+
+  ![image-20210815173939490](images/image-20210815173939490.png)
+
+- 시리얼 인터페이스 설정
+
+  ```sh
+  RouterA# configure terminal
+  RouterA(config)# interface serial 2/0
+  RouterA(config-if)# ip address 203.240.150.2 255.255.255.0
+  ```
+
+  ![image-20210815174012790](images/image-20210815174012790.png)
+
+- rip 설정
+
+  ```sh
+  RouterA# configure terminal
+  RouterA(config)# router rip
+  RouterA(config-router)# network 203.240.100.0
+  RouterA(config-router)# network 203.240.150.0
+  ```
+
+  ![image-20210815174036249](images/image-20210815174036249.png)
+
+#### 구성 확인
+
+- RouterA
+  - `show running-config`
+  - ![image-20210815173009535](images/image-20210815173009535.png)![image-20210815173015051](images/image-20210815173015051.png)![image-20210815173020630](images/image-20210815173020630.png)
+  - `show ip protocol`
+    - ![image-20210815173524827](images/image-20210815173524827.png)
+  - `show ip route`
+  - ![image-20210815174243536](images/image-20210815174243536.png)
+
+- RouterB
+  - `show running-config`
+  - ![image-20210815174516634](images/image-20210815174516634.png)![image-20210815174528610](images/image-20210815174528610.png)![image-20210815174550361](images/image-20210815174550361.png)
+  - `show ip protocol`
+    - ![image-20210815174625631](images/image-20210815174625631.png)
+  - `show ip route`
+    - ![image-20210815174650298](images/image-20210815174650298.png)
+
+### RIP 예제-2
+
+> 후니의 쉽게 쓴 CISCO 네트워킹 Vol.2 26p 예제
+
+#### 예제 구성
+
+![image-20211020221226727](images/image-20211020221226727.png)
+
+- PC1에서 PC2로 통신이 가능하도록 설정
+
+#### PC 설정
+
+- PC 1 ip 설정
+  - `ip 150.150.1.10 /16 150.150.1.1`
+- PC 2 ip 설정
+  - `ip 172.70.100.10 /24 172.70.100.1`
+
+#### RouterC 구성
+
+```sh
+# conf t
+# interface eth0/0
+# no shutdown
+# ip address 150.150.1.1 255.255.0.0
+# interface Serial 2/0
+# no shutdown
+# ip address 203.210.200.2 255.255.255.0
+# router rip
+# network 150.150.0.0
+# network 203.210.200.0
+```
+
+#### RouterA 구성
+
+```sh
+# conf t
+# interface serial 2/1
+# no shutdown
+# ip address 203.210.200.1 255.255.255.0
+# clockrate 128000    # 백투백 구성을 위한 설정
+# interface serial 2/0
+# no shutdown
+# ip address 203.210.100.1 255.255.255.0
+# clockrate 1007616
+# router rip
+# network 203.210.200.0
+# network 203.210.100.0
+```
+
+#### Router C 구성
+
+```sh
+# conf t
+# interface serial 2/0
+# no shutdown
+# ip address 203.210.100.2 255.255.255.0
+# interface eth 0/0
+# no shutdown
+# ip address 172.70.100.1 255.255.255.0
+# router rip
+# network 203.210.100.0
+# network 172.70.100.0
+```
+
+#### 연결 확인
+
+- PC1에서 PC2로 핑
+  - `ping 172.70.100.10`
+  - ![image-20211020221811587](images/image-20211020221811587.png)
+
+- RouterC에서 RouterB로 핑
+  - `ping 172.70.100.1`
+  - ![image-20211020221924468](images/image-20211020221924468.png)
+
+---
+
+
+
+## IGRP 라우팅 프로토콜
+
+- IGRP 라우팅 프로토콜 특성
+  - 라우팅 프로토콜
+  - 다이나믹 프로토콜
+  - 내부용 라우팅 프로토콜(IGP)
+  - 디스턴스 벡터 라우팅 프로토콜
+  - 시스코라우터에서만 사용 가능
+  - VLSM을 지원하지 못함
+- IGRP 라우팅 프로토콜에서 경로 결정 요소
+  - 대역폭
+  - Delay
+  - Reliability - 목적지까지 제대로 도착한 패킷과 에러가 발생한 패킷의 비율
+  - Load(부하)
+  - MTU(Maximum Transmission Unit)
+
+- IGRP 구성 명령어
+  - `router igrp <autonomous system number(AS번호)>`
+  - `network network-number`
+
+### IGRP 예제
+
+> 후니의 쉽게 쓴 CISCO 네트워킹 Vol.2 49p
+>
+> 현재 설치한 버전에서는 igrp를 지원하지 않는 것으로 보여 igrp를 완전히 대체하는 eigrp로 실습을 진행하기 때문에 만약 igrp가 가능한 라우터에서는 eigrp 대신 igrp로 변경하여 입력하시면 됩니다.
+
+#### 예제 구성
+
+- AS 번호는 200
+- ![image-20211026225452117](images/image-20211026225452117.png)
+
+#### host 설정
+
+```sh
+// PC 1
+# ip 203.240.100.10 /24 203.240.100.1
+
+// PC 2
+# ip 203.240.200.10 /24 203.240.200.1
+```
+
+#### RouterA 설정
+
+```sh
+# conf t
+# interface eth0/0
+# no shutdown
+# ip address 203.210.100.1 255.255.255.0
+# interface serial 2/0
+# no shutdown
+# ip address 203.210.150.1 255.255.255.0
+# router eigrp 200
+# network 203.210.100.0
+# network 203.210.150.0
+```
+
+#### RouterB 설정
+
+```sh
+# conf t
+# interface eth0/0
+# no shutdown
+# ip address 203.210.200.1 255.255.255.0
+# interface serial 2/0
+# no shutdown
+# ip address 203.210.150.1 255.255.255.0
+# router eigrp 200
+# network 203.210.200.0
+# network 203.210.150.0
+```
+
+#### 연결 확인
+
+- PC1에서 PC2로 핑
+  - ![image-20211026225442415](images/image-20211026225442415.png)
+
