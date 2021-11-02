@@ -4,8 +4,9 @@
 
 ## 규칙
 
-- 매일 올리기 위해 의미없이 커밋하지 않고 일주일에 한번이여도 의미있는 글을 올리자
+- 매일 올리기 위해 의미없이 커밋하지 않고 일주일에 한번이여도 제대로 공부한 내용을 올린다.
 - 제목과 설명은 최대한 찾기 쉽게 작성
+- 관련된 주제는 하나의 파일로 묶고 파일 안에 목차를 이용하여 나눈다.
 
 
 
@@ -17,6 +18,7 @@
 - [AWS Cloud](#aws-cloud)
 - [SDN / NFV](#sdnnfv)
 - [Network](#network)
+- [자격증](#자격증)
 
 
 
@@ -71,3 +73,9 @@
 
 - [Trunk / Access Port](Network/Trunk_Access_Port.md)
 - [GNS3 실습](Network/GNS3_실습.md)
+
+
+
+## 자격증
+
+- [rhcsa](자격증/rhcsa.md)
