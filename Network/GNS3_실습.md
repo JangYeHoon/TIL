@@ -14,6 +14,9 @@
 - [디폴트와 스태틱 라우팅 예제](#디폴트와-스태틱-라우팅-예제)
 - [Cisco Discovery Protocol](#cisco-discovery-protocol)
 - [Routing Information Protocol(RIP)](#routing-information-protocolrip)
+- [IGRP 라우팅 프로토콜](#igrp-라우팅-프로토콜)
+- [DHCP 구성](#dhcp-구성)
+- [OSPF 라우팅 프로토콜](#ospf-라우팅-프로토콜)
 
 ---
 
@@ -1311,3 +1314,66 @@ Router(config-router)# network 150.150.100.0
 - PC1에서 PC3
   - `ping 172.70.100.10`
   - ![image-20211102222921838](images/image-20211102222921838.png)
+
+---
+
+
+
+## DHCP 구성
+
+- 라우터 DHCP 구성
+
+  ```
+  Router# conf t
+  Router(config)# service dhcp
+  ```
+
+- DHCP Pool, default router 설정
+
+  ```
+  Router(config)# ip dhcp pool ccna   // pool 이름 ccna로 설정
+  Router(dhcp-config)# network 210.240.10.0 255.255.255.0
+  // IP Pool 지정 210.240.10.1 ~ 210.240.10.254
+  Router(dhcp-config)# default-router 210.240.10.1
+  // 자기 네트워크에 붙어있는 라우터의 주소
+  ```
+
+- 이미 사용하고 있는 주소 제외
+
+  ```
+  Router(config)# ip dhcp excluded-address 210.240.10.1
+  Router(config)# ip dhcp excluded-address 210.240.10.100
+  ```
+
+- 현재 배정해준 IP 주소 확인 및 DHCP 상태 확인
+
+  ```
+  Router# show ip dhcp binding   // 현재 배정된 IP 주소 확인
+  Router# show ip dhcp server statistics    // DHCP 서버 상태 확인
+  ```
+
+---
+
+
+
+## OSPF 라우팅 프로토콜
+
+- OSPF 라우팅 프로토콜의 장점
+  - 빠른 업데이트
+  - Area라는 개념을 사용해 전체 네트워크를 분리하여 효율적인 관리
+  - VLSM 지원
+  - 홉 카운트 제한 없음
+  - 변화가 있을 때만 정보를 교환하고 멀티캐스트를 사용해 실용적
+- OSPF의 특징
+  - 표준 라우팅 프로토콜
+  - 링크스테이트 라우팅 알고리즘
+  - DR(Designated Router)과 BDR(Backup Designated Router)
+    - DR은 Link State 정보를 관리하여 Sync를 일치시킴
+    - BDR은 DR이 다운되면 DR의 역할을 수행
+    - DR과 BDR의 Link State를 Sync(일치)해야 함(Adjacency)
+    - DR과 BDR은 라우터의 ID와 Priority를 가지고 선출(Priority가 높은 라우터가 DR, 만약 Priority가 같으면 라우터 ID가 높은 라우터가 DR)
+    - default priority는 1, DR, BDR 선거에서 제외시킬려면 0으로 설정
+- OSPF 구성할 때 주의사항
+  - Hello/dead intervals, Area-ID, password, Stub area flag 가 라우터들끼리 모두 동일해야 함
+  - 라우터 ID로 사용할 인터페이스는 보통 Loopback 인터페이스를 사용
+
