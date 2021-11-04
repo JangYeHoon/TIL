@@ -143,6 +143,110 @@
 
 - ACL은 파일과 디렉토리의 확장 속성 중 하나로 `chmod` 보다 다양한 권한을 부여할 수 있음
   - ACL은 특정 사용자에게만 권한 부여가 가능
-- `setfacl -m u: <user_name>:<부여할 권한> <file_name>`
-
+- `setfacl -m u:<user_name>:<부여할 권한> <file_name>`
 - `getfacl <file_name>`을 통해 정보 확인
+
+### SElinux
+
+- Security Enhanced Linux의 약자로 커널을 보호하기 위한 도구
+- 3가지 상태 존제
+  - enforcing : 강제
+  - permissive : 허용
+  - disabled : 비활성화
+- 현재 상태 확인 명령어 : `getenforce`
+- 상태 변경 명령어 : `setenforce <상태값>`(상태값 0 : Permissive, 1 : Enforcing)
+- 영구적인 변경
+  - `/etc/selinux/config` 혹은 `/etc/sysconfig/selinux`에서 변경
+
+### Firewall
+
+- 사용 가능한 모든 서비스/포트 목록 출력
+  - `firewall-cmd --list-all`
+- 서비스나 포트 추가
+  - `firewall-cmd --add-service=ftp`
+  - `firewall-cmd --add-port=21/tcp`
+- 서비스나 포트 제거
+  - `firewall-cmd --remove-service=ftp`
+  - `firewall-cmd --remove-port=21/tcp`
+
+### 아파치 설치
+
+- `yum -y install httpd`
+- `systemctl restart httpd`
+- `systemctl enable httpd`
+- `firewall-cmd --permanent --add-service=http`
+- `/var/www/html`로 이동해서 `index.html` 파일 변경
+
+### ps 명령어
+
+- 현재 실행중인 프로세스 목록 출력
+- 옵션
+  - `-e` : 모든 프로세스 출력
+  - `-f` : UID, PID 출력
+  - `-l` : 긴 포맷으로 출력
+  - `-p` : 특정 PID 프로세스 출력
+  - `-u` : 특정 사용자의 프로세스 출력
+
+- 프로세스를 죽이는 명령어 : `kill [options] <pid>`
+
+### SSH 접속
+
+- sshd 설치 확인
+
+  - `ps -ef | grep openssh-server`
+
+- ssh 설치
+
+  - ```sh
+    $ yum install -y openssh-server
+    $ systemctl restart sshd
+    $ systemctl enable sshd
+    ```
+
+- `vi /etc/ssh/sshd_config`
+
+  - Port 22 주석 제거
+
+- 방화벽 해제
+
+  - `firewall-cmd --zone=public --add-port=22/tcp --permanent`
+
+- ssh 재시작
+
+  - `systemctl restart sshd`
+
+### 런레벨 변경
+
+- 현재 런레벨 확인
+  - `who -r`
+- 런레벨 변경
+  - `systemctl isolate runlevel4`
+- 런레벨
+  - 0 runlevel0.target poweroff.target : 시스템 셧다운
+  - 1 runlevel1.target rescue.target : 복구 쉘
+  - 2 runlevel2.target multi-user.target 커맨드 환경의 다중 사용자모드 CLI
+  - 3 runlevel3.target multi-user.target 커맨드 환경의 다중 사용자모드 CLI
+  - 4 runlevel4.target multi-user.target 커맨드 환경의 다중 사용자모드 CLI
+  - 5 runlevel5.target graphical.target : 그래픽 환경의 다중 사용자모드
+  - 6 runlevel6.target reboot.target : 재부팅
+
+### rpm, yum, repository
+
+- RPM(Redhat Package Manager)
+  - 레드햇에서 만든 프로그램 설치 패키지
+  - 자동으로 업그레이드
+  - 설치 : `rpm -Uvh <패키지>`
+  - 삭제 : `rpm -e <패키지>`
+  - 설치확인 : `rpm -qa <패키지>`
+  - 상세정보 : `rpm -qi <패키지>`
+  - 의존성 문제가 존재
+- YUM(Yellodog Updater Modified)
+  - RPM 기반의 시스템을 위한 자동 업데이터 및 패키지 설치/제거 프로그램
+  - RPM과 달리 인터넷 사용이 필수여서 패키지간 의존성 문제 해결 가능
+  - 설치 : `yum install <패키지>`
+  - 삭제 : `yum remove <패키지>`
+  - 업그레이드 : `yum update <패키지>`
+  - 목록 : `yum list <패키지>`
+- Yum Repository
+  - 패키지를 모아놓은 저장소
+  - yum을 통해 패키지를 설치할때 활성화된 Yum Repository에 패키지가 없으면 설치 불가
