@@ -250,3 +250,65 @@
 - Yum Repository
   - 패키지를 모아놓은 저장소
   - yum을 통해 패키지를 설치할때 활성화된 Yum Repository에 패키지가 없으면 설치 불가
+
+### Root 계정 비밀번호 복구
+
+- 부팅시 OS 버전 선택하는 곳에서 `e` 입력
+
+- `linux 16`으로 시작하는 줄을 찾아`UTF-8` 뒤에 `rd.brak` 입력
+
+- `ctrl + x`로 저장
+
+- 부팅이 되면 다음 입력
+
+- ```shell
+  $ mount | grep -w '/sysroot'
+  $ mount -o remount, rw /sysroot
+  $ chroot /sysroot
+  ```
+
+- `passwd` 입력하고 설정할 비밀번호 입력
+
+  ```sh
+  $ touch / .autorelabel
+  $ exit
+  $ exit
+  ```
+
+### 스케줄링 명령어
+
+- `at`, `crontab`
+
+#### at
+
+- 1회성 예약 작업
+
+- `at <설정 시간>`
+
+  - 3분 뒤에 ls 명령어 실행
+
+  - ```sh
+    $ at now +3min
+    at> ls
+    at> <EOT>
+    ```
+
+- 예약 작업 목록 출력
+
+  - `at -l`
+  - `atq`
+
+#### crontab
+
+- 작업 리스트 확인
+  - `crontab -l`
+- 작업 수정
+  - `crontab -e`
+- 작업 삭제
+  - `crontab -r`
+- 작업을 지정하는 사용자
+  - `crontab -u 사용자명`
+- `* * * * * /bin/echo "hello"` 입력하면 매 분마다 echo “hello” 명령어 출력
+  - `* * * * *`는 각각 분, 시간, 일, 월, 요일을 나타냄
+    - 요일에서 0과 7은 일요일 1~6은 월요일~토요일
+
