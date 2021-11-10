@@ -144,6 +144,7 @@
 - ACL은 파일과 디렉토리의 확장 속성 중 하나로 `chmod` 보다 다양한 권한을 부여할 수 있음
   - ACL은 특정 사용자에게만 권한 부여가 가능
 - `setfacl -m u:<user_name>:<부여할 권한> <file_name>`
+  - `setfacl -m u:user:rw <file_name>`
 - `getfacl <file_name>`을 통해 정보 확인
 
 ### SElinux
@@ -230,6 +231,15 @@
   - 5 runlevel5.target graphical.target : 그래픽 환경의 다중 사용자모드
   - 6 runlevel6.target reboot.target : 재부팅
 
+### SSH 공용키 생성 및 접속
+
+- `ssh-keygen`
+- `scp <public_key> <user>@<ip>`
+
+### systemctl
+
+- `systemctl <status/start/stop> <service_name>`
+
 ### rpm, yum, repository
 
 - RPM(Redhat Package Manager)
@@ -311,4 +321,66 @@
 - `* * * * * /bin/echo "hello"` 입력하면 매 분마다 echo “hello” 명령어 출력
   - `* * * * *`는 각각 분, 시간, 일, 월, 요일을 나타냄
     - 요일에서 0과 7은 일요일 1~6은 월요일~토요일
+
+### Disk 관련 명령어
+
+- 디스크 확인 : `fdisk -l`
+- 파티션 생성
+  - `fdisk /dev/<디스크>`
+  - `Command(m for help) : n` 새로운 파티션 추가 의미인 n 입력
+  - partition type을 `p`(primary 기본값) 입력
+  - partition number `1` 입력
+  - sector에 설정할 크기 입력, ex) `4G`
+- 스왑 메모리 생성하고 마운트
+  - ext4파일로 포맷을 먼저 실행 : `mkfs.ext4 /dev/sdb1`
+  - mount 실행 : `mount /dev/sdb1 /disk1`
+  - 마운트되었는지 확인 : `df -Th`, `lsblk`
+  - `mount` 명령어로 마운트를 하면 재부팅시 마운트가 **해제**됨
+- 영구적으로 마운트 하는 방법
+  - `vi /etc/fstab`
+  - `/dev/sdb1 /disk1 ext4 defaults 1 1` 양식에 맞게 편집
+  - 오타가 발생하면 부팅이 되지 않기 때문에 주의 필요
+
+- PVS - VGS - LVM 실습
+
+  - 디스크의 파티션을 나누고 LVM으로 설정
+
+  - pvcreate 명령어를 통해 물리 볼륨 생성
+
+    - `pvcreate /dev/sdb{1..4}`
+
+  - 물리 볼륨 생성 확인 : `pvscan`
+
+  - 볼륨 그룹 생성
+
+    - `vgcreate <group_name> <partition_name>`
+    - `vgcreate vg0 /dev/sdb2 /dev/sdb4`
+
+  - 볼륨 그룹 확인 : `vgdisplay`
+
+  - 논리 볼륨 생성
+
+    - `lvcreate <vg_name> -n <lv_name> -L <size>`
+    - `lvcreate vg0 -n lv01 -L 2G`
+    - `lvcreate vg0 -l 100%FREE -n lv03`
+
+  - 논리 볼륨 확인 : `lvscan`
+
+  - 포맷과 마운트 실행
+
+    ```sh
+    $ mkfs.xfs /dev/vg0/lv02
+    $ mount /dev/vg0/lv01 /mnt/disk2
+    ```
+
+  - 설정 확인 : `lsblk`
+
+- PVS - VGS - LVM 볼륨값 수정
+
+  - `pvcreate /dev/sdb3`
+  - `vgextend vg0 /dev/sdb3` : sdb3을 vg0 볼륨그룹에 새로 추가
+  - 논리 볼륨 확장
+    - `lvextend <lv_경로> -L <size>`
+    - `lvextend -L 5G /dev/vg0/lv01`
+  - 설정 확인 : `lsblk`
 
