@@ -1377,3 +1377,84 @@ Router(config-router)# network 150.150.100.0
   - Hello/dead intervals, Area-ID, password, Stub area flag 가 라우터들끼리 모두 동일해야 함
   - 라우터 ID로 사용할 인터페이스는 보통 Loopback 인터페이스를 사용
 
+### OSPF 구성
+
+- OSPF Enable
+  - `Router(config)# router ospf <process-id>`
+- 네트워크 설정
+  - `Router(config-router)# network <wildcard-mask> area <area-id>`
+  - `network 150.100.1.0 0.0.0255 area 0`
+
+### OSPF 예제
+
+> 후니의 쉽게 쓴 CISCO 네트워킹 Vol.2 86p
+
+#### 예제 구성
+
+- ![image-20211110221151839](images/image-20211110221151839.png)
+
+- area 0
+- process-id 100
+
+#### 호스트 설정
+
+```
+PC1> ip 172.16.10.100 /24 172.16.10.1
+PC2> ip 172.16.30.100 /24 172.16.30.1
+```
+
+#### RouterA 구성
+
+```
+RouterA# conf t
+RouterA(config)# inter eth 0/0
+RouterA(config-if)# no shutdown
+RouterA(config-if)# ip address 172.16.10.1 255.255.255.0
+RouterA(config)# inter serial 2/0
+RouterA(config-if)# no shutdown
+RouterA(config-if)# ip address 192.168.12.1 255.255.255.240
+RouterA(config)# router ospf 100
+RouterA(config-router)# network 192.168.12.0 0.0.0.15
+RouterA(config-router)# network 172.16.10.0 0.0.0.255
+```
+
+#### RouterB 구성
+
+```
+RouterB# conf t
+RouterB(config)# inter serial 2/0
+RouterB(config-if)# no shutdown
+RouterB(config-if)# ip address 192.168.12.2 255.255.255.240
+RouterB(config)# inter serial 2/1
+RouterB(config-if)# no shutdown
+RouterB(config-if)# ip address 192.168.23.2 255.255.255.240
+RouterB(config)# router ospf 100
+RouterB(config-router)# network 192.168.12.0 0.0.0.15 area 0
+RouterB(config-router)# network 192.168.23.0 0.0.0.15 area 0
+```
+
+#### RouterC 구성
+
+```
+RouterC# conf t
+RouterC(config)# inter serial 2/0
+RouterC(config-if)# no shutdown
+RouterC(config-if)# ip address 192.168.23.3 255.255.255.240
+RouterC(config)# inter eth 0/0
+RouterC(config-if)# no shutdown
+RouterC(config-if)# ip address 172.16.30.1 255.255.255.0
+RouterC(config)# router ospf 100
+RouterC(config-router)# network 192.168.23.0 0.0.0.15 area 0
+RouterC(config-router)# network 172.16.30.1 0.0.0.255 area 0
+```
+
+#### 연결 확인
+
+- PC1 -> PC2
+  - `ping 172.16.10.100`
+  - ![image-20211110223805092](images/image-20211110223805092.png)
+
+#### OSPF 구성 확인
+
+- `show ip ospf interface`
+- `show ip ospf neighbor`
