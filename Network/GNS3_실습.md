@@ -1458,3 +1458,52 @@ RouterC(config-router)# network 172.16.30.1 0.0.0.255 area 0
 
 - `show ip ospf interface`
 - `show ip ospf neighbor`
+
+---
+
+
+
+## Access List
+
+- 접근을 허용할지 말지 미리 정해놓은 리스트
+
+- 스탠더드 액세스 리스트(Standard Access List)
+
+  - 출발지 주소만을 이용해 접근을 통제
+
+- 익스텐디드 액세스 리스트(Extended Access List)
+
+  - 출발지 주소, 목적지 주소, 프로토콜, 포트 번호 등을 이용해 접근을 통제
+
+- 규칙
+
+  - 액세스 리스트는 윗줄부터 하나씩 차례로 수행
+  - 맨 마지막에 `permit any`를 넣지 않으면 default로 액세스 리스트와 매칭되지 않는 모든 address는 deny
+  - 새로 추가하는 라인은 맨 마지막에 추가되므로 access-list line의 선택적 추가(selective add)나 제거(remove)가 불가능
+  - interface에 대한 엑시스 리스트가 정의 되지 않은 경우 결과는 `permit any`
+
+- 주의사항
+
+  ```
+  // 익스텐디드 엑세스 리스트 추가
+  Router(config)# access-list 105 permit tcp any host 201.222.11.7 eq domain
+  Router(config)# access-list 105 permit tcp any host 201.222.11.7 eq ftp
+  
+  // eq ftp에 대한 ip를 수정하기 위해 삭제하고 다시 추가
+  Router(config)# no access-list 105 permit tcp any host 201.222.11.7 eq ftp // no를 이용해 삭제
+  Router(config)# access-list 105 permit tcp any host 101.222.11.7 eq ftp
+  ```
+
+  - 만약 `no` 명령어를 이용해 삭제를 하면 정의되어 있는 모든 액세스 리스트가 삭제
+  - 따라서 위에는 `domain`에 대한 리스트도 삭제되고 맨 마지막에 입력한 리스트만 남음
+
+### Standard Access List
+
+- 기본 설정 명령어
+
+  ```
+  Router(config)# access-list access-list-number(1~99) {permit | deny} {source-address [source-wildcard]} | any}   // wildcard는 생략 가능, 생략하면 0.0.0.0
+  Router(config-if)# ip access-group access-list-number {in | out}   // 설정할 인터페이스에서 실행
+  ```
+
+  
