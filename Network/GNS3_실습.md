@@ -17,6 +17,7 @@
 - [IGRP 라우팅 프로토콜](#igrp-라우팅-프로토콜)
 - [DHCP 구성](#dhcp-구성)
 - [OSPF 라우팅 프로토콜](#ospf-라우팅-프로토콜)
+- [Access List](#access-list)
 
 ---
 
@@ -1506,4 +1507,65 @@ RouterC(config-router)# network 172.16.30.1 0.0.0.255 area 0
   Router(config-if)# ip access-group access-list-number {in | out}   // 설정할 인터페이스에서 실행
   ```
 
-  
+
+#### Standard Access List 예제
+
+> 후니의 쉽게 쓴 CISCO 네트워킹 Vol.2 110p
+
+##### 예제 구성
+
+
+
+- PC 2를 제외한 210.240.100.0 네트워크의 모든 PC는 PC1에 접속할 수 있다.
+- 210.240.150.0 네트워크에서는 PC 4를 포함해서 나머지 모든 PC들이 PC A를 접속할 수 있다.
+- 이 외의 모든 PC는 PC A를 접속할 수 없다.
+
+##### 호스트 설정
+
+```
+PC1> ip 203.210.100.15 /24 203.210.100.1
+PC2> ip 210.240.100.5 /24 210.240.100.1
+PC3> ip 210.240.100.10 /24 210.240.100.2
+PC4> ip 210.240.150.100 /24 210.240.15.1
+```
+
+##### RouterA IP 설정
+
+```
+RouterA# conf t 
+RouterA(conf)# inter eth 0/0
+RouterA(conf-if)# no shutdown
+RouterA(conf-if)# ip address 203.210.100.1 255.255.255.0
+RouterA(conf)# inter serial 2/0
+RouterA(conf-if)# no shutdown
+RouterA(conf-if)# ip address 150.100.100.1 255.255.0.0
+RouterA(conf)# inter serial 2/1
+RouterA(conf-if)# no shutdown
+RouterA(conf-if)# ip address 150.200.100.1 255.255.0.0
+RouterA(conf)# router rip
+RouterA(conf-router)# network 203.210.100.0
+RouterA(conf-router)# network 150.100.0.0
+RouterA(conf-router)# network 150.200.0.0
+```
+
+##### RouterB 설정
+
+```
+RouterB# conf t
+RouterB(conf)# inter eth 0/0
+RouterB(conf-if)# no shutdown
+RouterB(conf-if)# ip address 210.240.150.1 255.255.255.0
+RouterB(conf)# inter serial 2/0
+RouterB(conf-if)# no shutdown
+RouterB(conf-if)# ip address 150.200.100.2 255.255.0.0
+RouterB(conf)# router rip
+RouterB(conf-router)# network 210.240.150.0
+RouterB(conf-router)# network 150.200.0.0
+```
+
+##### RouterC 설정
+
+```
+RouterC# conf t
+```
+
