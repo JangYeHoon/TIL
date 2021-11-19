@@ -1514,8 +1514,9 @@ RouterC(config-router)# network 172.16.30.1 0.0.0.255 area 0
 
 ##### 예제 구성
 
+![image-20211119212318994](images/image-20211119212318994.png)
 
-
+- access list의 number는 2
 - PC 2를 제외한 210.240.100.0 네트워크의 모든 PC는 PC1에 접속할 수 있다.
 - 210.240.150.0 네트워크에서는 PC 4를 포함해서 나머지 모든 PC들이 PC A를 접속할 수 있다.
 - 이 외의 모든 PC는 PC A를 접속할 수 없다.
@@ -1567,5 +1568,50 @@ RouterB(conf-router)# network 150.200.0.0
 
 ```
 RouterC# conf t
+RouterC(conf)# inter eth 0/0
+RouterC(conf-if)# no shutdwon
+RouterC(conf-if)# ip address 210.240.100.1 255.255.255.0
+RouterC(conf)# inter serial 2/0
+RouterC(conf-if)# ip address150.100.100.2 255.255.0.0
+RouterC(conf)# router rip
+RouterC(conf-router)# network 150.100.0.0
+RouterC(conf-router)# network 210.240.100.0
 ```
 
+##### 연결 확인
+
+- PC2 -> PC1
+  - `ping 203.210.100.15`
+  - ![image-20211119212904829](images/image-20211119212904829.png)
+
+- PC3 -> PC1
+  - ![image-20211119212942692](images/image-20211119212942692.png)
+
+- PC4 -> PC1
+  - ![image-20211119213022148](images/image-20211119213022148.png)
+
+##### Access List 설정
+
+```
+RouterA# conf t
+RouterA(conf)# access-list 2 deny 210.240.100.5
+RouterA(conf)# access-list 2 permit 210.240.100.0 0.0.0.255
+RouterA(conf)# access-list 2 permit 210.240.150.0 0.0.0.255
+RouterA(conf)# inter eth 0/0
+RouterA(conf-if)# ip access-group 2 out
+```
+
+##### 연결 확인
+
+- PC2 -> PC1
+  - ![image-20211119213705996](images/image-20211119213705996.png)
+
+- PC3 -> PC1
+  - ![image-20211119213730203](images/image-20211119213730203.png)
+
+- PC4 -> PC1
+  - ![image-20211119213749413](images/image-20211119213749413.png)
+
+- access list 확인
+  - `show ip access-lists`
+  - ![image-20211119213850140](images/image-20211119213850140.png)
