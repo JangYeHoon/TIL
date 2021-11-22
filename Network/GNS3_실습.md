@@ -1507,12 +1507,11 @@ RouterC(config-router)# network 172.16.30.1 0.0.0.255 area 0
   Router(config-if)# ip access-group access-list-number {in | out}   // 설정할 인터페이스에서 실행
   ```
 
-
-#### Standard Access List 예제
+### Standard Access List 예제
 
 > 후니의 쉽게 쓴 CISCO 네트워킹 Vol.2 110p
 
-##### 예제 구성
+#### 예제 구성
 
 ![image-20211119212318994](images/image-20211119212318994.png)
 
@@ -1521,7 +1520,7 @@ RouterC(config-router)# network 172.16.30.1 0.0.0.255 area 0
 - 210.240.150.0 네트워크에서는 PC 4를 포함해서 나머지 모든 PC들이 PC A를 접속할 수 있다.
 - 이 외의 모든 PC는 PC A를 접속할 수 없다.
 
-##### 호스트 설정
+#### 호스트 설정
 
 ```
 PC1> ip 203.210.100.15 /24 203.210.100.1
@@ -1530,7 +1529,7 @@ PC3> ip 210.240.100.10 /24 210.240.100.2
 PC4> ip 210.240.150.100 /24 210.240.15.1
 ```
 
-##### RouterA IP 설정
+#### RouterA IP 설정
 
 ```
 RouterA# conf t 
@@ -1549,7 +1548,7 @@ RouterA(conf-router)# network 150.100.0.0
 RouterA(conf-router)# network 150.200.0.0
 ```
 
-##### RouterB 설정
+#### RouterB 설정
 
 ```
 RouterB# conf t
@@ -1564,7 +1563,7 @@ RouterB(conf-router)# network 210.240.150.0
 RouterB(conf-router)# network 150.200.0.0
 ```
 
-##### RouterC 설정
+#### RouterC 설정
 
 ```
 RouterC# conf t
@@ -1578,7 +1577,7 @@ RouterC(conf-router)# network 150.100.0.0
 RouterC(conf-router)# network 210.240.100.0
 ```
 
-##### 연결 확인
+#### 연결 확인
 
 - PC2 -> PC1
   - `ping 203.210.100.15`
@@ -1590,7 +1589,7 @@ RouterC(conf-router)# network 210.240.100.0
 - PC4 -> PC1
   - ![image-20211119213022148](images/image-20211119213022148.png)
 
-##### Access List 설정
+#### Access List 설정
 
 ```
 RouterA# conf t
@@ -1601,7 +1600,7 @@ RouterA(conf)# inter eth 0/0
 RouterA(conf-if)# ip access-group 2 out
 ```
 
-##### 연결 확인
+#### 연결 확인
 
 - PC2 -> PC1
   - ![image-20211119213705996](images/image-20211119213705996.png)
@@ -1615,3 +1614,68 @@ RouterA(conf-if)# ip access-group 2 out
 - access list 확인
   - `show ip access-lists`
   - ![image-20211119213850140](images/image-20211119213850140.png)
+
+### 텔넷포트의 액세스 리스트
+
+- 텔넷 포트 설정
+
+  ```
+  Router(config)# line vty 0 4
+  Router(config-line)# password cisco
+  Router(config-line)# login
+  ```
+
+- access list 설정
+
+  ```
+  Router(config)# line vty 0 4
+  Router(config-line)# access-class {access-list-number} {in|out}
+  ```
+
+### Extended Access List
+
+- `Router(config)# access-list access-list-number {permit|deny} protocol source source-wildcard [operator port] destination destination-wildcard [operator port] [established] [log]`
+
+### Extended Access List 예제
+
+> 후니의 쉽게 쓴 CISCO 네트워킹 Vol.2 120p
+
+#### 예제 구성
+
+![image-20211122205443716](images/image-20211122205443716.png)
+
+- 150.100.1.0 255.255.255.0 네트워크에 있는 호스틀에 대해서 15.100.2.0 255.255.255.0에 있는 호스트들이 FTP와 TELNET을 못하게 제한한다.
+- 나머지 모든 곳에서 150.100.1.0 255.255.255.0 네트워크로 들어오는 트래픽은 허가하기로 한다.
+- access list number는 110
+
+#### 호스트 구성
+
+```
+PC1> ip 150.100.1.10 /24 150.100.1.1
+PC2> ip 150.100.2.10 /24 150.100.2.1
+```
+
+#### RouterA 구성
+
+```
+RouterA# conf t
+RouterA(conf)# inter eth 0/0
+RouterA(conf-if)# no shutdown
+RouterA(conf-if)# ip address 150.100.1.1 255.255.255.0
+RouterA(conf)# inter eth 0/1
+RouterA(conf-if)# no shutdown
+RouterA(conf-if)# ip address 150.100.2.1 255.255.255.0
+```
+
+#### Access List 구성
+
+```
+RouterA# conf t
+RouterA(conf)# access-list 110 deny tcp 150.100.2.0 0.0.0.255 150.100.1.0 0.0.0.255 eq ftp
+RouterA(conf)# access-list 110 deny tcp 150.100.2.0 0.0.0.255 150.100.1.0 0.0.0.255 eq ftp-data
+RouterA(conf)# access-list 110 deny tcp 150.100.2.0 0.0.0.255 150.100.1.0 0.0.0.255 eq telnet
+RouterA(conf)# access-list 110 permit ip any any
+RouterA(conf)# inter eth 0/0
+RouterA(conf-if)# ip access-group 110 out
+```
+
