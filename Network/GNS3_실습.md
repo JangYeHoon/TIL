@@ -18,6 +18,7 @@
 - [DHCP 구성](#dhcp-구성)
 - [OSPF 라우팅 프로토콜](#ospf-라우팅-프로토콜)
 - [Access List](#access-list)
+- [Hot Standby Routing Protocol(HSRP)](#hot-standby-routing-protocolhsrp)
 
 ---
 
@@ -1678,4 +1679,85 @@ RouterA(conf)# access-list 110 permit ip any any
 RouterA(conf)# inter eth 0/0
 RouterA(conf-if)# ip access-group 110 out
 ```
+
+---
+
+
+
+## Hot Standby Routing Protocol(HSRP)
+
+- HSRP는 라우터가 고장나는 것에 대비해서 라우터 한 대를 더 구성에 포함한 후 메인 라우터가 고장나면 자동으로 두 번째 라우터가 메인 라우터의 역할을 대신하는 기능
+  - 쉽게 말해 라우터 두 대를 active-standby로 구동
+- HSRP는 시스코 장비에서만 사용되는 기능
+- HSRP는 실제 존재하지 않는 가상의 라우터 IP 주소를 디폴트 게이트웨이로 세팅
+  - 그 주소에 대해서 Active와 Standby 중에 Active 라우터가 그 주소의 역할을 수행
+
+### HSRP 예제
+
+> 후니의 쉽게 쓴 CISCO 네트워킹 Vol.2 126p
+
+### 예제 구성
+
+![image-20211127194924511](images/image-20211127194924511.png)
+
+- 라우터 B는 액티브 라우터로, 라우터 C는 스탠바이 라우터
+- PC들의 디폴트 게이트웨이 주소는 172.70.100.1
+- 라우터 B가 다운되면 라우터 C가 액티브 라우터의 역할을 수행하지만, 만약 라우터 B가 다시 살아나면 라우터 C는 다시 스탠바이로 복귀
+- 라우터 자체의 다운뿐만 아니라 라우터의 시리얼 인터페이스에 문제가 생겨도 액티브 라우터에서 스탠바이 라우터로 역할 교대
+  - 트래킹(Tracking) 기법
+  - 라우터의 시리얼에 문제가 생겼을 때도 액티브 라우터를 교채하는 기법
+- HSRP 그룹은 1
+
+#### 호스트 설정
+
+```
+# ip 172.70.100.100 /16 172.70.100.1
+```
+
+#### RouterA 설정
+
+```
+RouterA# conf t
+RouterA(conf)# interface serial 2/0  // 테스트를 위해 우선 RouterB와 연결된 인터페이스에 ip 할당
+RouterA(conf-ip)# no shutdown
+RouterA(conf-ip)# ip address 203.240.15.1 255.255.255.0
+```
+
+#### RouterB 설정
+
+```
+RouterB# conf t
+RouterB(conf)# interface serial 2/0
+RouterB(conf-if)# no shutdown
+RouterB(conf-if)# ip address 203.240.15.2 255.255.255.0
+RouterB(conf)# interface eth 0/0
+RouterB(conf-if)# no shutdown
+RouterB(conf-if)# ip address 172.70.100.2 255.255.0.0
+RouterB(conf-if)# standby 1 timers 3 10
+RouterB(conf-if)# standby 1 priority 105  // default 100, 높은 라우터가 active
+RouterB(conf-if)# standby 1 preempt delay reload 5    // 라우터 B가 죽었다 다시 올라왔을 때 5초 후에 다시 액티브 라우터로 복귀
+RouterB(conf-if)# standby 1 ip 172.70.100.1   // 가상의 디폴트 게이트웨이
+RouterB(conf-if)# standby 1 track 10 decrement 10  // serial 2/0 인터페이스에 문제가 생기면 priority를 10 낮춤
+```
+
+#### RouterC 설정
+
+```
+RouterC# conf t
+RouterC(conf)# interface serial 2/0
+RouterC(conf-if)# no shutdown
+RouterC(conf-if)# ip address 203.240.15.3 255.255.255.0
+RouterC(conf)# interface eth 0/0
+RouterC(conf-if)# no shutdown
+RouterC(conf-if)# ip address 172.70.100.3 255.255.0.0
+RouterC(conf-if)# standby 1 timers 3 10
+RouterC(conf-if)# standby 1 priority 100
+RouterC(conf-if)# standby 1 preempt delay reload 5
+RouterC(conf-if)# standby 1 ip 172.70.100.1
+RouterC(conf-if)# standby 1 track Serial2/0 10
+```
+
+- 설정 확인은 `show standby`
+
+> 테스트 결과 이유를 모르겠지만 RouterB와 RouterC에서 HRRP 그룹이 안되어 이후 실습이 되지 않았다. 일단 설정하는 방법만 기억하고 넘어가기로 하였다.
 
