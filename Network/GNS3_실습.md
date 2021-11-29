@@ -19,6 +19,7 @@
 - [OSPF 라우팅 프로토콜](#ospf-라우팅-프로토콜)
 - [Access List](#access-list)
 - [Hot Standby Routing Protocol(HSRP)](#hot-standby-routing-protocolhsrp)
+- [Network Address Translation(NAT)](#network-address-translationnat)
 
 ---
 
@@ -1761,3 +1762,84 @@ RouterC(conf-if)# standby 1 track Serial2/0 10
 
 > 테스트 결과 이유를 모르겠지만 RouterB와 RouterC에서 HRRP 그룹이 안되어 이후 실습이 되지 않았다. 일단 설정하는 방법만 기억하고 넘어가기로 하였다.
 
+---
+
+
+
+## Network Address Translation(NAT)
+
+- NAT는 한쪽 네트워크의 IP주소가 다른 네트워크로 넘어갈 때 변환이 되어서 넘어가는 것
+- NAT를 사용하는 이유
+  - 내부의 네트워크에는 비공인 IP 주소를 사용하고 외부 인터넷으로 나가는 경우에만 공인 IP 주소를 사용하고자 하는 경우
+  - 기존에 사용하던 ISP에서 새로운 ISP로 바꾸면서 내부 전체의 IP를 바꾸지 않고 기존의 IP 주소를 그대로 사용하고자 하는 경우
+  - 2개의 인트라넷을 서로 합하려다 보니 두 네트워크의 IP가 서로 겹치는 경우
+  - TCP 로드 분배가 필요한 경우
+
+### NAT 예제
+
+> 후니의 쉽게 쓴 CISCO 네트워킹 Vol.2 133p
+
+#### 예제 구성
+
+![image-20211129214701209](images/image-20211129214701209.png)
+
+#### 호스트 설정
+
+```
+PC1> ip 172.20.7.3 /16 172.20.7.1
+PC2> ip 10.1.1.2 /24 10.1.1.1
+```
+
+#### RouterB 설정
+
+```
+RouterB# conf t
+RouterB(conf)# inter eth 0/0
+RouterB(conf-if)# ip address 172.20.7.1 255.255.0.0
+RouterB(conf-if)# no shutdown
+RouterB(conf)# inter serial 2/0
+RouterB(conf-if)# ip address 172.16.217.3 255.255.0.0
+RouterB(conf-if)# no shutdown
+```
+
+#### RouterA 설정
+
+```
+RouterA# conf t
+RouterA(conf)# inter eth 0/0
+RouterA(conf-if)# ip address 10.1.1.1 255.255.255.0
+RouterA(conf-if)# no shutdown
+RouterA(conf)# inter serial 2/0
+RouterA(conf-if)# ip address 172.16.217.1 255.255.0.0
+RouterA(conf-if)# no shutdown
+```
+
+#### NAT 설정
+
+```
+RouterA(conf)# ip nat pool global 172.16.217.2 172.16.217.254 netmask 255.255.0.0
+RouterA(conf)# ip nat inside source list 1 pool global
+RouterA(conf)# ip nat pool local 10.1.1.2 10.1.1.254 netmask 255.255.255.0
+RouterA(conf)# ip nat outside source list 2 pool local
+RouterA(conf)# ip nat inside source static 10.1.1.100 172.16.217.100
+RouterA(conf)# access-list 1 permit 10.1.1.0 0.0.0.255
+RouterA(conf)# access-list 2 permit 172.16.0.0. 0.0.255.255
+RouterA(conf)# inter eth 0/0
+RouterA(conf-if)# ip nat inside
+RouterA(conf)# inter serial 2/0
+RouterA(conf-if)# ip nat outside
+```
+
+- pool 설정
+  - 라우터 밖으로 나가면서 바뀔 주소를 의미
+  - `ip nat pool <pool_name> <first_ip_address> <last_ip_address> netmask <subnet_mask>`
+- inside 설정
+  - inside로 정의한 인터페이스에서 오는 패킷의 source 주소가 정의한 액세스 리스트에 해당하면 지정된 풀에 있는 주소로 변환
+  - `ip nat inside source list <access_list_number> pool <pool_name>`
+- outside 설정
+  - 정의한 인터페이스에서 들어오는 패킷의 목적지 주소를 보고 정의한 액세스 리스트에 해당하면 지정된 풀에 있는 주소로 변환
+  - `ip nat outside source list <access_list_number> pool <pool_name>`
+- 주소 지정 변환
+  - `ip nat inside source static <원래 주소> <변환 주소>`
+
+> 현재 핑이 나가지 않아 다른 예제를 참고하여 다시 설정
