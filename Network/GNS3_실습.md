@@ -20,6 +20,7 @@
 - [Access List](#access-list)
 - [Hot Standby Routing Protocol(HSRP)](#hot-standby-routing-protocolhsrp)
 - [Network Address Translation(NAT)](#network-address-translationnat)
+- [Frame Relay](#frame-relay)
 
 ---
 
@@ -1817,13 +1818,9 @@ RouterA(conf-if)# no shutdown
 #### NAT 설정
 
 ```
-RouterA(conf)# ip nat pool global 172.16.217.2 172.16.217.254 netmask 255.255.0.0
-RouterA(conf)# ip nat inside source list 1 pool global
-RouterA(conf)# ip nat pool local 10.1.1.2 10.1.1.254 netmask 255.255.255.0
-RouterA(conf)# ip nat outside source list 2 pool local
-RouterA(conf)# ip nat inside source static 10.1.1.100 172.16.217.100
 RouterA(conf)# access-list 1 permit 10.1.1.0 0.0.0.255
-RouterA(conf)# access-list 2 permit 172.16.0.0. 0.0.255.255
+RouterA(conf)# ip nat pool global 172.16.217.2 172.16.217.2 netmask 255.255.0.0
+RouterA(conf)# ip nat inside source list 1 pool global
 RouterA(conf)# inter eth 0/0
 RouterA(conf-if)# ip nat inside
 RouterA(conf)# inter serial 2/0
@@ -1831,15 +1828,86 @@ RouterA(conf-if)# ip nat outside
 ```
 
 - pool 설정
-  - 라우터 밖으로 나가면서 바뀔 주소를 의미
+  - 변환되어 나가는 아이피 주소를 의미
   - `ip nat pool <pool_name> <first_ip_address> <last_ip_address> netmask <subnet_mask>`
 - inside 설정
   - inside로 정의한 인터페이스에서 오는 패킷의 source 주소가 정의한 액세스 리스트에 해당하면 지정된 풀에 있는 주소로 변환
   - `ip nat inside source list <access_list_number> pool <pool_name>`
+  - 만약 pat도 같이 설정할 경우 `ip nat inside source list <access_list_number> pool <pool_name> overload`
+  - 해당 인터페이스에 있는 ip주소로 변경을 원하는 경우
+    - `ip nat inside source list <access_list_number> int <interface_name>`
 - outside 설정
   - 정의한 인터페이스에서 들어오는 패킷의 목적지 주소를 보고 정의한 액세스 리스트에 해당하면 지정된 풀에 있는 주소로 변환
   - `ip nat outside source list <access_list_number> pool <pool_name>`
 - 주소 지정 변환
   - `ip nat inside source static <원래 주소> <변환 주소>`
 
-> 현재 핑이 나가지 않아 다른 예제를 참고하여 다시 설정
+> 현재 핑이 나가지 않아 다른 예제를 확인하니 외부와 통신이 가능한 환경을 설정해야 하는데 해당 환경은 설정이 안되어 하는 방법만 익히는 것으로 완료
+
+---
+
+
+
+## Frame Relay
+
+- 기존 WAN에서 전통적으로 사용하던 통신 방식은 X.25
+
+  - 이 방식은 느리고 에러가 많았던 옛날의 WAN 환경에 알맞도록 여러가지 에러 복구 기능 및 흐름 제어 기능이 들어가 있음
+  - 프레임 릴레이 방식은 에러 복구와 흐름 제어 등의 데이터 처리 과정을 생략함으로써 보다 효율적인 데이터 전송 방법을 제공
+
+- 프레임 릴레이 용어
+
+  - Data-Link Connection Identifier(DLCI) : 프레임 릴레이 연결을 위한 주소
+    - 하나의 인터페이스에 여러 개의 DLCI가 있을 수 있음
+  - Local Management Interface(MLI) : DLCI 정보와 함께 설정된 PVC 정보를 알려줌으로써 인터페이스의 다양한 정보와 동작 상태등을 제공하는 기능
+    - 라우터에서 MLI를 세팅할 때 LMI 타입을 서로 맞추어야 통신이 가능
+
+- Frame Relay 인캡슐레이션 방식
+
+  - Cisco 방식
+
+    ```
+    Router(config)# interface serial 0   // inter s 0
+    Router(config-if)# encapsulation frame-relay
+    ```
+
+  - IETF 방식
+
+    ```
+    Router(config)# inter s 0
+    Router(config-if)# encapsulation frame-relay ietf
+    ```
+
+- Frame Relay LMI 설정
+
+  ```
+  Router(config)# inter s 0
+  Router(config-if)# frame-relay lmi-type ?
+  ```
+
+  - LMI는 IOS 버전 11.2 이상부터는 자동으로 세팅하기 때문에 따로 구성할 필요 없음
+
+- 서브 인터페이스 설정
+
+  ```
+  Router(config)# interface serial 0.1   // 인터페이스 뒤에 점을 찍고 서브 번호를 붙임
+  Router(config)# interface serial 0.1 ?
+  	multipoint
+  	point-to-point
+  ```
+
+- DLCI 연결
+  - 프레임 릴레이 구성에서 Encapsulation 타입과 LMI를 잡아주면 Inverse ARP가 동작해서 자동으로 연결
+  - 수동으로 연결하기 위해서는 `frame-relay interface` 나 `frame-relay map` 명령을 수행
+    - 주의 사항은 `frame-relay map` 명령과 Inverse ARP는 같이 동작하지 않음
+    - Inverse ARP를 사용하는 경우에는 절대로 frame-relay map을 같이 사용하면 안됨
+  - 서브 인터페이스 타입이 point-to-point인 경우 `frame-relay map` 명령이 아닌 `frame-relay interface-dlci` 명령어 사용
+  - 피지컬 인터페이스나 multi-point 서브 인터페이스를 이용해서 프레임 릴레이를 구성하면 `frame-relay map` 명령어 사용
+
+### Frame Relay 예제 - 1
+
+> 후니의 쉽게 쓴 CISCO 네트워킹 Vol.2 154p
+
+#### 예제 구성
+
+![image-20211202201956155](images/image-20211202201956155.png)
