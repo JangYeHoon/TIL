@@ -1911,3 +1911,97 @@ RouterA(conf-if)# ip nat outside
 #### 예제 구성
 
 ![image-20211202201956155](images/image-20211202201956155.png)
+
+#### RouterA 구성
+
+```
+RouterA# conf t
+RouterA(conf)# inter serial 2/0
+RouterA(conf-if)# no shutdown
+RouterA(conf-if)# no ip directed-broadcast
+RouterA(conf-if)# encapsulation frame-relay
+RouterA(conf-if)# frame-relay lmi-type ansi
+RouterA(conf)# inter serial 2/0.1 point-to-point
+RouterA(conf-subif)# no shutdown
+RouterA(conf-subif)# ip address 203.240.15.1 255.255.255.0
+RouterA(conf-subif)# frame-relay interface-dlci 102  // point-to-point인 경우 map 명령어 대신 해당 명령어 사용
+RouterA(conf)# inter serial 2/0.2 point-to-point
+RouterA(conf-subif)# no shutdown
+RouterA(conf-subif)# ip address 203.240.20.1 255.255.255.0
+RouterA(conf-subif)# frame-relay interface-dlci 103
+```
+
+#### RouterB 구성
+
+```
+RouterB# conf t
+RouterB(conf)# inter serial 2/0
+RouterB(conf-if)# no shutdown
+RouterB(conf-if)# ip address 203.240.15.2 255.255.255.0
+RouterB(conf-if)# encapsulation frame-relay
+RouterB(conf-if)# no ip mroute-cache
+RouterB(conf-if)# frame-relay map ip 203.240.15.1 201 broadcast
+RouterB(conf-if)# frame-relay lmi-type ansi
+```
+
+#### RouterC 구성
+
+```
+RouterC# conf t
+RouterC(conf)# inter serial 2/0
+RouterC(conf-if)# no shutdown
+RouterC(conf-if)# ip address 203.240.20.3 255.255.255.0
+RouterC(conf-if)# encapsulation frame-relay
+RouterC(conf-if)# frame-relay map ip 203.240.20.1 301 broadcast
+RouterC(conf-if)# frame-relay lmi-type ansi
+```
+
+#### Frame Relay Switch 구성
+
+```
+FR-SW# conf t
+FR-SW(conf)# frame-relay switching   // 자신이 프레임 릴레이 스위치의 역할을 수행
+FR-SW(conf)# inter serial 2/0
+FR-SW(conf-if)# no shutdown
+FR-SW(conf-if)# encapsulation frame-relay
+FR-SW(conf-if)# clock rate threshold 2000000
+FR-SW(conf-if)# frame-relay lmi-type ansi
+FR-SW(conf-if)# frame-relay intf-type dce
+FR-SW(conf-if)# frame-relay route 102 interface Serial2/1 201
+FR-SW(conf-if)# frmae-relay route 103 interface Serial2/2 301
+FR-SW(conf)# inter serial 2/1
+FR-SW(conf-if)# no shutdown
+FR-SW(conf-if)# encapsulation frame-relay
+FR-SW(conf-if)# clockrate 2000000
+FR-SW(conf-if)# frame-relay lmi-type ansi
+FR-SW(conf-if)# frame-relay intf-type dce
+FR-SW(conf-if)# frame-relay route 201 interface Serial2/0 102
+FR-SW(conf)# inter serial 2/2
+FR-SW(conf-if)# no shutdown
+FR-SW(conf-if)# encapsulation frame-relay
+FR-SW(conf-if)# clock rate threshold 2000000
+FR-SW(conf-if)# frame-relay lmi-type ansi
+FR-SW(conf-if)# frame-relay intf-type dce
+FR-SW(conf-if)# frame-relay route 301 interface Serial2/0 103
+```
+
+
+
+#### 프레임 릴레이 검증
+
+- `show frame-relay pvc`
+  - ![image-20211203150738927](images/image-20211203150738927.png)
+
+- `show frame-relay map`
+  - ![image-20211203150815239](images/image-20211203150815239.png)
+
+### Frame Relay 예제 - 2
+
+> 후니의 쉽게 쓴 CISCO 네트워킹 Vol.2 160p
+
+#### 예제 구성
+
+![image-20211203151713205](images/image-20211203151713205.png)
+
+- 예제 1과 다르게 RouterA-RouterB와 RouterA-RouterC이 같은 네트워크 대역
+
