@@ -18,7 +18,6 @@
 - [AWS Cloud](#aws-cloud)
 - [SDN / NFV](#sdnnfv)
 - [Network](#network)
-- [자격증](#자격증)
 
 
 
@@ -73,9 +72,3 @@
 
 - [Trunk / Access Port](Network/Trunk_Access_Port.md)
 - [GNS3 실습](Network/GNS3_실습.md)
-
-
-
-## 자격증
-
-- [rhcsa](자격증/rhcsa.md)
