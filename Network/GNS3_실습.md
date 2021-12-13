@@ -21,6 +21,7 @@
 - [Hot Standby Routing Protocol(HSRP)](#hot-standby-routing-protocolhsrp)
 - [Network Address Translation(NAT)](#network-address-translationnat)
 - [Frame Relay](#frame-relay)
+- [IPv6](#ipv6)
 
 ---
 
@@ -2087,3 +2088,48 @@ FR-SW(conf-if)# frame-relay route 301 interface Serial2/0 103
 
 - RouterB -> RouterC
   - ![image-20211205184158629](images/image-20211205184158629.png)
+
+---
+
+
+
+## IPv6
+
+- 라우터에서 IPv6 사용 설정
+
+  ```
+  Router(config)# ipv6 unicast-routing   // ipv6 트래픽에 대한 포워딩 Enable
+  ```
+
+- 인터페이스에 IPv6 주소 부여
+
+  ```
+  Router(config-if)# Ipv6 address <ipv6addr> [/prefix-length>] [link-local]
+  // 기본적인 설정 방법, 모든 값을 입력해야됨
+  Router(config-if)# Ipv6 address <ipv6<prefix>/<prefix-length> eui-64
+  // IPv6 주소 중 앞쪽 prefix만 넣어주고 뒤는 eui-64 방식인 48bit인 mac address를 64bit로 변환하여 채움
+  Router(config-if)# Ipv6 unnumbered <interface>
+  // 다른 인터페이스의 주소를 가져와 같이 사용
+  Router(config-if) Ipv6 enable
+  // 주소를 배정하지 않고 IPv6 인터페이스로 쓰겠다는 의미
+  ```
+
+- eui-64에서 mac address 변환 방법
+
+  - 원래 mac address : 0016.9D43.F2E0
+
+  - 중간에 FF:EE를 넣어줌
+
+    - 0016.9D   43.F2E0
+    - 0016.9DFF:EE43.F2E0
+
+  - 맨 앞 8bit에 MAC 주소의 유일성 추가
+
+    - 유일하면 02로 표시
+
+      **0216:9DFF:EE43:F2E0**
+
+    - 유일한 주소가 아니면 00으로 표시
+
+      **0016:9DFF:EE43:F2E0**
+
