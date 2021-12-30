@@ -22,6 +22,7 @@
 - [Network Address Translation(NAT)](#network-address-translationnat)
 - [Frame Relay](#frame-relay)
 - [IPv6](#ipv6)
+- [Router 실습](#router-실습)
 
 ---
 
@@ -2132,4 +2133,173 @@ FR-SW(conf-if)# frame-relay route 301 interface Serial2/0 103
     - 유일한 주소가 아니면 00으로 표시
 
       **0016:9DFF:EE43:F2E0**
+
+---
+
+
+
+## Router 실습
+
+> 후니의 쉽게 쓴 CISCO 네트워킹 Vol.2 309p
+
+### 예제 구성
+
+![image-20211230171139282](images/image-20211230171139282.png)
+
+- 특별한 지시가 없는 한 150.100.0.0/24 주소를 사용해서 설정
+- 특별한 지시가 ㅇ벗는 한 모든 라우터의 인터페이스에 핑이 가능해야 한다.
+- 특별한 지시가 없는 한 스태틱 라우트(ip route ~) 명령을 사용하지 않는다.
+- `ip ospf network point-to-multipoint'와 'ip ospf network point-to-point' 명령은 사용하지 않는다.
+- R1은 2개의 서브 인터페이스를 사용해서 구성하고, R2는 하나의 point-to-point 서브 인터페이스를 사용하며, R3와 R4는 서브 인터페이스를 사용하지 않는다.
+- R1은 DLCI 번호 102, 103, 104를 사용하고, R2는 DLCI 201번을, R3는 DLCI 301번을, 그리고 R4는 DLCI 401번을 로컬 DLCI로 사용한다.
+
+#### IP 주소 배정표
+
+|        | R1             | R2               | R3              | R4              | R5              |
+| ------ | -------------- | ---------------- | --------------- | --------------- | --------------- |
+| S2/0.1 | 150.100.1.1/24 | 150.100.1.2/24   |                 |                 |                 |
+| S2/0.2 | 150.100.5.1/24 |                  |                 |                 |                 |
+| E0     |                | 150.100.28.9/30  |                 |                 | 150.100.17.1/24 |
+| L0     |                | 150.100.28.1/30  | 160.100.1.1/24  | 150.100.64.1/24 |                 |
+| L1     |                | 150.100.28.5/30  | 165.100.1.1/24  | 150.100.65.1/24 |                 |
+| L2     |                | 150.100.32.1/28  | 150.100.20.1/24 | 150.100.66.1/24 |                 |
+| L3     |                | 150.100.32.17/28 | 150.100.21.1/24 |                 |                 |
+| L4     |                | 150.100.36.1/26  | 150.100.22.1/24 |                 |                 |
+| L5     |                | 150.100.36.65/26 |                 |                 |                 |
+| S2/0   |                |                  | 150.100.1.3/24  | 150.100.5.2/24  | 150.100.9.2/24  |
+| S2/1   |                |                  | 150.100.9.1/24  |                 |                 |
+
+
+
+### 환경 구성
+
+#### 프레임 릴레이 구성
+
+```
+FR-SW(conf)# frame-relay switching
+# 2/0 interface 구성
+FR-SW(conf)# inter serial 2/0
+FR-SW(conf-if)# no shutdown
+FR-SW(conf-if)# encapsulation frame-relay
+FR-SW(conf-if)# clock rate threshold 56000
+FR-SW(conf-if)# frame-relay lmi-type ansi
+FR-SW(conf-if)# frame-relay intf-type dce
+FR-SW(conf-if)# frame-relay route 102 interface Serial2/1 201
+FR-SW(conf-if)# frame-relay route 103 interface Serial2/2 301
+FR-SW(conf-if)# frame-relay route 104 interface Serial2/3 401
+# 2/1 interface 구성
+FR-SW(conf)# inter serial 2/1
+FR-SW(conf-if)# no shutdown
+FR-SW(conf-if)# encapsulation frame-relay
+FR-SW(conf-if)# clock rate threshold 56000
+FR-SW(conf-if)# frame-relay lmi-type ansi
+FR-SW(conf-if)# frame-relay intf-type dce
+FR-SW(conf-if)# frame-relay route 201 interface Serial2/0 102
+# 2/2 interface 구성
+FR-SW(conf)# inter serial 2/2
+FR-SW(conf-if)# no shutdown
+FR-SW(conf-if)# encapsulation frame-relay
+FR-SW(conf-if)# clock rate threshold 56000
+FR-SW(conf-if)# frame-relay lmi-type ansi
+FR-SW(conf-if)# frame-relay intf-type dce
+FR-SW(conf-if)# frame-relay route 301 interface Serial2/0 103
+# 2/3 interface 구성
+FR-SW(conf)# inter serial 2/3
+FR-SW(conf-if)# no shutdown
+FR-SW(conf-if)# encapsulation frame-relay
+FR-SW(conf-if)# clock rate threshold 56000
+FR-SW(conf-if)# frame-relay lmi-type ansi
+FR-SW(conf-if)# frame-relay intf-type dce
+FR-SW(conf-if)# frame-relay route 401 interface Serial2/0 104
+```
+
+#### R1 구성
+
+```
+R1(conf)# interface serial 2/0
+R1(conf-if)# no shutdown
+R1(conf-if)# no ip directed-broadcast
+R1(conf-if)# encapsulation frame-relay
+R1(conf-if)# frame-relay lmi-type ansi
+R1(conf)# interface serial 2/0.1 multipoint
+R1(conf-subif)# no shutdown
+R1(conf-subif)# ip address 150.100.1.1 255.255.255.0
+R1(conf-subif)# frame-relay map ip 150.100.1.2 102 broadcast
+R1(conf-subif)# frame-relay map ip 150.100.1.3 103 broadcast
+R1(conf)# interface serial 2/0.2 point-to-point
+R1(conf-subif)# no shutdown
+R1(conf-subif)# ip address 150.100.5.1 255.255.255.0
+R1(conf-subif)# frame-relay interface-dlci 104
+```
+
+#### R2 구성
+
+```
+R2(conf)# inter serial 2/0
+R2(conf-if)# no shutdown
+R2(conf-if)# encapsulation frame-relay
+R2(conf-if)# frame-relay lmi-type ansi
+R2(conf)# inter serial 2/0.1 point-to-point
+R2(conf-subif)# no shutdown
+R2(conf-subif)# ip address 150.100.1.2 255.255.255.0
+R2(conf-subif)# frame-relay interface-dlci 201
+```
+
+#### R3 구성
+
+```
+R3(conf)# inter serial 2/0
+R3(conf-if)# no shutdown
+R3(conf-if)# ip address 150.100.1.3 255.255.255.0
+R3(conf-if)# encapsulation frame-relay
+R3(conf-if)# frame-relay lmi-type ansi
+R3(conf-if)# frame-relay map ip 150.100.1.1 301 broadcast
+R3(conf-if)# frame-relay map ip 150.100.1.2 301 broadcast
+```
+
+### 문제 1
+
+- 서브넷 '150.100.1.0/24'를 사용해서 R1, R2, R3 간을 'OSPF area 0'으로 구성해라. R1, R2, R3 간에는 서로 핑이 가능해야 한다.
+
+  - 현재 R1, R2, R3의 인터페이스 타입이 서로 다르기 때문에 Neighbor를 맺지 못해서 통신이 불가능
+
+- 인터페이스 타입
+
+  - 서브 인터페이스가 multipoint로 구성되어 있으면 : Non broadcast
+  - 서브 인터페이스가 point-to-point로 구성되어 있으면 : point-to-point
+  - 피지컬 인터페이스가 point-to-point로 구성되어 있으면 : Non broadcast
+
+- OSPF 인터페이스를 맞춰주는 명령어
+
+  - `ip ospf network point-to-multipoint`
+
+    - 이 방식은 DR election이 없는 방식
+
+  - `ip ospf network point-to-point`
+
+    - 이 방식도 DR election이 없는 방식
+
+  - `ip ospf network nonbroadcast`
+
+    - 이 방식을 사용할 경우에는 R2에만 입력해 주면 된다. R1, R3는 이미 nonbroadcast이기 때문
+
+    - DR 라우터에서 Neighbor 설정 방법
+
+      ```
+      router ospf 100
+       neighbor 150.100.1.2
+       neighbor 150.100.1.3
+      ```
+
+      
+
+  - `ip ospf network broadcast`
+
+    - 해당 방식을 사용하면 R1이 DR이 되도록 해줘야 한다. HUB and spoke 구조에서는 항상 hub 라우터가 DR이 되어야 한다는 규칙이 있다. 따라서 나머지 라우터는 절대 DR이 되지 않도록 R2와 R3에서 priority를 0으로 지정해 주어야 한다.
+
+#### R1 구성
+
+```
+R1(conf)# inter serial 2/0.1 
+```
 
