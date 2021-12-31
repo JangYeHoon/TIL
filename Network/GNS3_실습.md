@@ -2257,6 +2257,26 @@ R3(conf-if)# frame-relay map ip 150.100.1.1 301 broadcast
 R3(conf-if)# frame-relay map ip 150.100.1.2 301 broadcast
 ```
 
+#### R4 구성
+
+```
+R4(conf)# inter serial 2/0
+R4(conf-if)# no shutdown
+R4(conf-if)# ip address 150.100.5.2 255.255.255.0
+R4(conf-if)# encapsulation frame-relay
+R4(conf-if)# no ip mroute-cache
+R4(conf-if)# no fair-queue
+R4(conf-if)# frame-relay lmi-type ansi
+R4(conf-if)# frame-relay map ip 150.100.5.1 401 broadcast
+```
+
+
+
+#### 구성 확인
+
+- `show frame-relay map`
+  - ![image-20211231110726112](images/image-20211231110726112.png)
+
 ### 문제 1
 
 - 서브넷 '150.100.1.0/24'를 사용해서 R1, R2, R3 간을 'OSPF area 0'으로 구성해라. R1, R2, R3 간에는 서로 핑이 가능해야 한다.
@@ -2300,6 +2320,140 @@ R3(conf-if)# frame-relay map ip 150.100.1.2 301 broadcast
 #### R1 구성
 
 ```
-R1(conf)# inter serial 2/0.1 
+R1(conf)# inter serial 2/0.1
+R1(conf-subif)# ip ospf network broadcast
+R1(conf)# router ospf 100
+R1(conf-router)# network 150.100.1.0 0.0.0.255 area 0
+```
+
+#### R2 구성
+
+```
+R2(conf)# inter serial 2/0.1
+R2(conf-if)# ip ospf network broadcast
+R2(conf-if)# ip ospf priority 0
+R2(conf)# router ospf 100
+R2(conf-router)# network 150.100.1.0 0.0.0.255 area 0
+```
+
+#### R3 구성
+
+```
+R3(conf)# inter serial 2/0
+R3(conf-if)# ip ospf network broadcast
+R3(conf-if)# ip ospf priority 0
+R3(conf)# router ospf 100
+R3(conf-router)# network 150.100.1.0 0.0.0.255 area 0
+```
+
+#### 연결 확인
+
+- R1 -> R2
+  - ![image-20211231111422215](images/image-20211231111422215.png)
+
+- R1 -> R3
+  - ![image-20211231111439638](images/image-20211231111439638.png)
+
+### 문제2
+
+- R1과 R4 사이를 RIP로 구성해라.
+  - R1의 경우 하나의 피지컬 인터페으스를 2개로 나누어서 서브 인터페이스로 사용하고 있는데 그 중 하나는 OSPF 라우팅으로 사용하고 있기 때문에 하나는 라우팅 업데이트를 제외시켜야 한다.
+- 라우팅 업데이트를 보내지 않는 명령어
+  - `passive interface`
+
+#### R1 구성
+
+```
+R1(conf)# router rip
+R1(conf-router)# passive-interface Serial2/0.1
+R1(conf-router)# network 150.100.0.0
+```
+
+#### R4 구성
+
+```
+R4(conf)# inter serial 2/0
+R4(conf-if)# ip split-horizon
+# split horizon은 한 번 받은 라우팅 정보를 다시 같은 쪽으로 내보내지 않는다는 의미
+# frame relay가 enable되면 자동으로 split horizon이 disable
+# 이렇게 되면 나중에 OSPF와 RIP 간에 redistribution을 해줄 때 OSPF에서 RIP 쪽으로 redistribute한 정보가 다시 OSPF쪽으로 redistribute되어서 하나의 네트워크에 대해서 2개의 테이블이 보임
+# 따라서 ip split-horizon을 enable시켜야 rip가 받은 OSPF 정보를 다시 OSPF 쪽으로 내보내지 않음
+# OSPF가 돌고 있는 쪽은 할 필요가 없고 RIP와 IGRP 프로토콜이 돌고 있는 곳에서 해줘야 함
+R4(conf)# router rip
+R4(conf-if)# network 150.100.0.0
+```
+
+####  연결 확인
+
+- R1 -> R4
+  - ![image-20211231113007510](images/image-20211231113007510.png)
+
+### 문제 3
+
+- R2에서 30비트 서브넷 마스크를 이용해서 2개의 Loopback과 하나의 이더넷 인터페이스를 만들고 이것을 'OSPF area 22'로 구성해라. 또한 R2에 최소한 14개의 호스트 주소를 가질 수 있는 2개의 loopback 인터페이스를 만들어 OSPF area 25에 위치시켜라.
+
+#### R2 구성
+
+```
+R2(conf)# inter Loopback0
+R2(conf-if)# no shutdown
+R2(conf-if)# ip address 150.100.28.1 255.255.255.252
+R2(conf)# inter Loopback1
+R2(conf-if)# no shutdown
+R2(conf-if)# ip address 150.100.28.5 255.255.255.252
+R2(conf)# inter eth0/0
+R2(conf-if)# no shutdown
+R2(conf-if)# ip address 150.100.28.9 255.255.255.252
+R2(conf)# inter Loopback2
+R2(conf-if)# no shutdown
+R2(conf-if)# ip address 150.100.32.1 255.255.255.240
+R2(conf)# inter Loopback3
+R2(conf-if)# no shutdown
+R2(conf-if)# ip address 150.100.32.17 255.255.255.240
+R2(conf)# router ospf 100
+R2(conf-router)# network 150.100.28.0 0.0.0.3 area 22
+R2(conf-router)# network 150.100.28.4 0.0.0.3 area 22
+R2(conf-router)# network 150.100.28.8 0.0.0.3 area 22
+R2(conf-router)# network 150.100.32.0 0.0.0.15 area 25
+R2(conf-router)# network 150.100.32.16 0.0.0.15 area 25
+```
+
+### 문제 4
+
+- R3과 R5 사이를 'OSPF area 54'로 구성하라. 또한 R5의 E0 인터페이스를 OSPF area 33으로 구성해라. R4를 제외한 모든 라우터들이 R5의 'Ehternet 0'으로 핑이 가능한지 확인해라.
+  - Area 33이 백본 Area, 즉 area 0과 직접 연결되어 있지 않다.
+  - 모든 area는 백본 area, 즉 OSPF area 0과 연결되어 있어야 한다는 규칙에 어긋나기 때문에 Virtual Link를 이용
+- Virtual Link에서 중요한 것은 라우터의 ID
+  - Virtual Link에서는 상대편 area의 라우터 ID를 사용하기 때문에 처음에 `show ip ospf`를 통해 라우터 ID를 보고 구성해도 새로운 인터페이스를 계속 추가하면 라우터 ID가 바뀔 수 있음
+  - 절대 바뀌지 않을 만한 값을 루프백 인터페이스로 잡아서 구성
+
+#### R3 구성
+
+```
+R3(conf)# inter Loopback1
+R3(conf-if)# ip address 165.100.1.1 255.255.255.0
+# 현재 라우터 IP 주소에 비해 가장 높은 IP 주소를 루프백 주소로 잡아줌으로써 이 주소를 라우터 ID로 만들어 줌
+R3(conf)# inter serial 2/1
+R3(conf-if)# no shutdown
+R3(conf-if)# ip address 150.100.9.1 255.255.255.0
+R3(conf)# router ospf 100
+R3(conf-router)# area 54 virtual-link 150.100.17.1
+# area 54는 'transit area', 즉 Area0과 Area 33 사이에 위치한 area이고 뒤에 붙는 '150.100.17.1'은 상대방 라우터의 ID
+R3(conf-router)# network 150.100.9.0 0.0.0.255 area 54
+```
+
+#### R5 구성
+
+```
+R5(conf)# inter eth 0/0
+R5(conf-if)# no shutdown
+R5(conf-if)# ip address 150.100.17.1 255.255.255.0
+R5(conf)# inter serial 2/0
+R5(conf-if)# no shutdown
+R5(conf-if)# ip address 150.100.9.2 255.255.255.0
+R5(conf)# router ospf 100
+R5(conf-router)# network 150.100.9.0 0.0.0.255 area 54
+R5(conf-router)# network 150.100.17.0 0.0.0.255 area 33
+R5(conf-router)# area 54 virtual-link 165.100.1.1
 ```
 
