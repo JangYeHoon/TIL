@@ -2440,6 +2440,8 @@ R3(conf)# router ospf 100
 R3(conf-router)# area 54 virtual-link 150.100.17.1
 # area 54는 'transit area', 즉 Area0과 Area 33 사이에 위치한 area이고 뒤에 붙는 '150.100.17.1'은 상대방 라우터의 ID
 R3(conf-router)# network 150.100.9.0 0.0.0.255 area 54
+R3# clear ip ospf 100 process
+# router id를 다시 할당 받기 위해 ospf process 재시작
 ```
 
 #### R5 구성
@@ -2455,5 +2457,17 @@ R5(conf)# router ospf 100
 R5(conf-router)# network 150.100.9.0 0.0.0.255 area 54
 R5(conf-router)# network 150.100.17.0 0.0.0.255 area 33
 R5(conf-router)# area 54 virtual-link 165.100.1.1
+R5# clear ip ospf 100 process
+# router id를 다시 할당받기 위해 ospf process 재시작
 ```
 
+#### 연결 확인
+
+- R1 -> R5(eth0/0)
+  - ![image-20220102174704724](images/image-20220102174704724.png)
+
+- R2- > R5(eth0/0)
+  - ![image-20220102174727574](images/image-20220102174727574.png)
+
+- R3 -> R5(eth0/0)
+  - ![image-20220102174749770](images/image-20220102174749770.png)
