@@ -1434,8 +1434,8 @@ RouterA(config)# inter serial 2/0
 RouterA(config-if)# no shutdown
 RouterA(config-if)# ip address 192.168.12.1 255.255.255.240
 RouterA(config)# router ospf 100
-RouterA(config-router)# network 192.168.12.0 0.0.0.15
-RouterA(config-router)# network 172.16.10.0 0.0.0.255
+RouterA(config-router)# network 192.168.12.0 0.0.0.15 area 0
+RouterA(config-router)# network 172.16.10.0 0.0.0.255 area 0
 ```
 
 #### RouterB 구성
@@ -1663,7 +1663,7 @@ RouterA(conf-if)# ip access-group 2 out
 
 ![image-20211122205443716](images/image-20211122205443716.png)
 
-- 150.100.1.0 255.255.255.0 네트워크에 있는 호스틀에 대해서 15.100.2.0 255.255.255.0에 있는 호스트들이 FTP와 TELNET을 못하게 제한한다.
+- 150.100.1.0 255.255.255.0 네트워크에 있는 호스트에 대해서 15.100.2.0 255.255.255.0에 있는 호스트들이 FTP와 TELNET을 못하게 제한한다.
 - 나머지 모든 곳에서 150.100.1.0 255.255.255.0 네트워크로 들어오는 트래픽은 허가하기로 한다.
 - access list number는 110
 
