@@ -702,7 +702,7 @@
   - 따라서 스태틱 라우텅 프로토콜은 갈 수 있는 경로가 하나밖에 없는 Stub 라우터용으로 많이 사용합니다.
 
 - 스태틱 라우팅 프로토콜 명령어
-  - `Router(config)# ip route network [mask] {address | interface} [distance]`
+  - `Router(config)# ip route [ip_address] [mask] {address | interface} [distance]`
   - 지정하는 방법은 두 가지로 address를 주는 방법과 interface를 주는 방법이 있다.
     - address : 목적지 네트워크를 가기 위해서는 여기 나오는 address로 전송(1홉을 건너뛴 상대방 라우터의 주소)
     - interface : 목적지 네트워크를 가기 위해서는 여기 나오는 interface로 전송(자기 라우터의 인터페이스)
@@ -1160,7 +1160,7 @@ Router(config-router)# network 150.150.100.0
   - 다이나믹 프로토콜
   - 내부용 라우팅 프로토콜(IGP)
   - 디스턴스 벡터 라우팅 프로토콜
-  - 시스코라우터에서만 사용 가능
+  - 시스코 라우터에서만 사용 가능
   - VLSM을 지원하지 못함
 - IGRP 라우팅 프로토콜에서 경로 결정 요소
   - 대역폭
