@@ -210,16 +210,17 @@
 
 ### 트렁크 포트 설정
 
-- 트렁크 포트는 IEEEE 802.1Q 방식과 ISL 방식 존재
+- 트렁크 포트는 IEEEE 802.1Q(dot1q) 방식과 ISL(isl) 방식 존재
 
 - 트렁크 포트 설정
 
   ````bash
   Switch# conf t
   Switch(config)# int ethernet 0/1
+  Switch(config-if)# switchport mode trunk
   Switch(config-if)# switchport trunk ?
   Switch(config-if)# switchport trunk encapsulation ?
-  Switch(config-if)# switchport trunk encapsulation dot1q
+  Switch(config-if)# switchport trunk encapsulation [dot1q|isl]
   ````
 
   ![image-20210608230707296](images/image-20210608230707296.png)
@@ -972,7 +973,7 @@ Router(config-router)# network 150.150.100.0
 - ![image-20210815170831638](images/image-20210815170831638.png)
 - `router rip`는 현재 라우터에서 RIP 라우팅을 사용하겠다는 명령어입니다.
 - `network 150.150.100.0`은 라우팅을 사용할 네트워크를 지정하는 명령어로 서브넷 마스크를 입력하지 않고 Classful하게 모든 네트워크를 인식합니다.
-  - 그렇기 때문에`show running-config`를 수행하면 네트워크가 `150.150.0.0`으로 설정되어 있는 것을 확인할 수 있습니다.
+  - 그렇기 때문에`show running-config`를 수행하면 네트워크가 `150.150.100.0`이 아닌 `150.150.0.0`으로 설정되어 있는 것을 확인할 수 있습니다.
   - ![image-20210815170801907](images/image-20210815170801907.png)
 
 ### RIP 예제-1
@@ -1161,7 +1162,8 @@ Router(config-router)# network 150.150.100.0
   - 내부용 라우팅 프로토콜(IGP)
   - 디스턴스 벡터 라우팅 프로토콜
   - 시스코 라우터에서만 사용 가능
-  - VLSM을 지원하지 못함
+  - RIP와 동일하게 VLSM을 지원하지 못함
+  - 최근 IGRP를 확장한 EIGRP 사용
 - IGRP 라우팅 프로토콜에서 경로 결정 요소
   - 대역폭
   - Delay
@@ -1396,13 +1398,14 @@ Router(config-router)# network 150.150.100.0
 - OSPF 구성할 때 주의사항
   - Hello/dead intervals, Area-ID, password, Stub area flag 가 라우터들끼리 모두 동일해야 함
   - 라우터 ID로 사용할 인터페이스는 보통 Loopback 인터페이스를 사용
+    - Loopback 인터페이스는 연결이 끊어지거나 ip가 바뀌지 않기 때문
 
 ### OSPF 구성
 
 - OSPF Enable
   - `Router(config)# router ospf <process-id>`
 - 네트워크 설정
-  - `Router(config-router)# network <wildcard-mask> area <area-id>`
+  - `Router(config-router)# network <network-address> <wildcard-mask> area <area-id>`
   - `network 150.100.1.0 0.0.0255 area 0`
 
 ### OSPF 예제
@@ -1772,7 +1775,7 @@ RouterC(conf-if)# standby 1 timers 3 10
 RouterC(conf-if)# standby 1 priority 100
 RouterC(conf-if)# standby 1 preempt delay reload 5
 RouterC(conf-if)# standby 1 ip 172.70.100.1
-RouterC(conf-if)# standby 1 track Serial2/0 10
+RouterC(conf-if)# standby 1 track 10 decrement 10
 ```
 
 - 설정 확인은 `show standby`
@@ -1988,7 +1991,7 @@ FR-SW(conf-if)# frmae-relay route 103 interface Serial2/2 301
 FR-SW(conf)# inter serial 2/1
 FR-SW(conf-if)# no shutdown
 FR-SW(conf-if)# encapsulation frame-relay
-FR-SW(conf-if)# clockrate 2000000
+FR-SW(conf-if)# clock rate threshold 2000000
 FR-SW(conf-if)# frame-relay lmi-type ansi
 FR-SW(conf-if)# frame-relay intf-type dce
 FR-SW(conf-if)# frame-relay route 201 interface Serial2/0 102
@@ -2161,7 +2164,7 @@ FR-SW(conf-if)# frame-relay route 301 interface Serial2/0 103
 ![image-20211230171139282](images/image-20211230171139282.png)
 
 - 특별한 지시가 없는 한 150.100.0.0/24 주소를 사용해서 설정
-- 특별한 지시가 ㅇ벗는 한 모든 라우터의 인터페이스에 핑이 가능해야 한다.
+- 특별한 지시가 없는 한 모든 라우터의 인터페이스에 핑이 가능해야 한다.
 - 특별한 지시가 없는 한 스태틱 라우트(ip route ~) 명령을 사용하지 않는다.
 - `ip ospf network point-to-multipoint'와 'ip ospf network point-to-point' 명령은 사용하지 않는다.
 - R1은 2개의 서브 인터페이스를 사용해서 구성하고, R2는 하나의 point-to-point 서브 인터페이스를 사용하며, R3와 R4는 서브 인터페이스를 사용하지 않는다.
@@ -2296,6 +2299,8 @@ R4(conf-if)# frame-relay map ip 150.100.5.1 401 broadcast
 - 서브넷 '150.100.1.0/24'를 사용해서 R1, R2, R3 간을 'OSPF area 0'으로 구성해라. R1, R2, R3 간에는 서로 핑이 가능해야 한다.
 
   - 현재 R1, R2, R3의 인터페이스 타입이 서로 다르기 때문에 Neighbor를 맺지 못해서 통신이 불가능
+  - R1, R3 - multipoint
+  - R2 - point-to-point
 
 - 인터페이스 타입
 
@@ -2336,6 +2341,7 @@ R4(conf-if)# frame-relay map ip 150.100.5.1 401 broadcast
 ```
 R1(conf)# inter serial 2/0.1
 R1(conf-subif)# ip ospf network broadcast
+// DR이 되도록 따로 priority 값 수정하지 않음
 R1(conf)# router ospf 100
 R1(conf-router)# network 150.100.1.0 0.0.0.255 area 0
 ```
@@ -2345,7 +2351,7 @@ R1(conf-router)# network 150.100.1.0 0.0.0.255 area 0
 ```
 R2(conf)# inter serial 2/0.1
 R2(conf-if)# ip ospf network broadcast
-R2(conf-if)# ip ospf priority 0
+R2(conf-if)# ip ospf priority 0   // DR이 되지 않도록 priority 값 0으로 설정
 R2(conf)# router ospf 100
 R2(conf-router)# network 150.100.1.0 0.0.0.255 area 0
 ```
@@ -2355,7 +2361,7 @@ R2(conf-router)# network 150.100.1.0 0.0.0.255 area 0
 ```
 R3(conf)# inter serial 2/0
 R3(conf-if)# ip ospf network broadcast
-R3(conf-if)# ip ospf priority 0
+R3(conf-if)# ip ospf priority 0   // DR이 되지 않도록 priority 값 0으로 설정
 R3(conf)# router ospf 100
 R3(conf-router)# network 150.100.1.0 0.0.0.255 area 0
 ```
@@ -2371,7 +2377,7 @@ R3(conf-router)# network 150.100.1.0 0.0.0.255 area 0
 ### 문제2
 
 - R1과 R4 사이를 RIP로 구성해라.
-  - R1의 경우 하나의 피지컬 인터페으스를 2개로 나누어서 서브 인터페이스로 사용하고 있는데 그 중 하나는 OSPF 라우팅으로 사용하고 있기 때문에 하나는 라우팅 업데이트를 제외시켜야 한다.
+  - R1의 경우 하나의 피지컬 인터페이스를 2개로 나누어서 서브 인터페이스로 사용하고 있는데 그 중 하나는 OSPF 라우팅으로 사용하고 있기 때문에 하나는 라우팅 업데이트를 제외시켜야 한다.
 - 라우팅 업데이트를 보내지 않는 명령어
   - `passive interface`
 
@@ -2405,30 +2411,33 @@ R4(conf-if)# network 150.100.0.0
 ### 문제 3
 
 - R2에서 30비트 서브넷 마스크를 이용해서 2개의 Loopback과 하나의 이더넷 인터페이스를 만들고 이것을 'OSPF area 22'로 구성해라. 또한 R2에 최소한 14개의 호스트 주소를 가질 수 있는 2개의 loopback 인터페이스를 만들어 OSPF area 25에 위치시켜라.
+  - 최소한 14개의 호스트를 가질 수 있으려면 16개의 호스트를 가질 수 있도록  설정
+
 
 #### R2 구성
 
 ```
 R2(conf)# inter Loopback0
 R2(conf-if)# no shutdown
-R2(conf-if)# ip address 150.100.28.1 255.255.255.252
+R2(conf-if)# ip address 150.100.28.1 255.255.255.252   // 30bit subnet mask
 R2(conf)# inter Loopback1
 R2(conf-if)# no shutdown
-R2(conf-if)# ip address 150.100.28.5 255.255.255.252
+R2(conf-if)# ip address 150.100.28.5 255.255.255.252   // 30bit subnet mask
 R2(conf)# inter eth0/0
 R2(conf-if)# no shutdown
-R2(conf-if)# ip address 150.100.28.9 255.255.255.252
+R2(conf-if)# ip address 150.100.28.9 255.255.255.252   // 30bit subnet mask
 R2(conf)# inter Loopback2
 R2(conf-if)# no shutdown
-R2(conf-if)# ip address 150.100.32.1 255.255.255.240
+R2(conf-if)# ip address 150.100.32.1 255.255.255.240   // 최소 14개의 호스트를 가지도록 28bit subnet mask
 R2(conf)# inter Loopback3
 R2(conf-if)# no shutdown
-R2(conf-if)# ip address 150.100.32.17 255.255.255.240
+R2(conf-if)# ip address 150.100.32.17 255.255.255.240   // 최소 14개의 호스트를 가지도록 28bit subnet mask
 R2(conf)# router ospf 100
-R2(conf-router)# network 150.100.28.0 0.0.0.3 area 22
+// 각 네트워크마다 라우팅되도록 설정
+R2(conf-router)# network 150.100.28.0 0.0.0.3 area 22     // wildcard - 00000011
 R2(conf-router)# network 150.100.28.4 0.0.0.3 area 22
 R2(conf-router)# network 150.100.28.8 0.0.0.3 area 22
-R2(conf-router)# network 150.100.32.0 0.0.0.15 area 25
+R2(conf-router)# network 150.100.32.0 0.0.0.15 area 25    // wildcard - 00001111
 R2(conf-router)# network 150.100.32.16 0.0.0.15 area 25
 ```
 
