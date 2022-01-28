@@ -1987,7 +1987,7 @@ FR-SW(conf-if)# clock rate threshold 2000000
 FR-SW(conf-if)# frame-relay lmi-type ansi
 FR-SW(conf-if)# frame-relay intf-type dce
 FR-SW(conf-if)# frame-relay route 102 interface Serial2/1 201
-FR-SW(conf-if)# frmae-relay route 103 interface Serial2/2 301
+FR-SW(conf-if)# frame-relay route 103 interface Serial2/2 301
 FR-SW(conf)# inter serial 2/1
 FR-SW(conf-if)# no shutdown
 FR-SW(conf-if)# encapsulation frame-relay
@@ -2082,7 +2082,7 @@ FR-SW(conf)# inter serial 2/1
 FR-SW(conf-if)# no shutdown
 FR-SW(conf-if)# clock rate threshold 2000000
 FR-SW(conf-if)# encapsulation frmae-relay
-FR-SW(conf-if)# frmae-relay lmi-type ansi
+FR-SW(conf-if)# frame-relay lmi-type ansi
 FR-SW(conf-if)# frame-relay intf-type dce
 FR-SW(conf-if)# frame-relay route 201 interface Serial2/0 102
 FR-SW(conf)# inter serial 2/2
@@ -2090,7 +2090,7 @@ FR-SW(conf-if)# no shutdown
 FR-SW(conf-if)# clock rate threshold 2000000
 FR-SW(conf-if)# encapsulation frame-relay
 FR-SW(conf-if)# frame-relay lmi-type ansi
-FR-SW(conf-if)# frmae-relay intf-type dce
+FR-SW(conf-if)# frame-relay intf-type dce
 FR-SW(conf-if)# frame-relay route 301 interface Serial2/0 103
 ```
 
@@ -2166,7 +2166,7 @@ FR-SW(conf-if)# frame-relay route 301 interface Serial2/0 103
 - 특별한 지시가 없는 한 150.100.0.0/24 주소를 사용해서 설정
 - 특별한 지시가 없는 한 모든 라우터의 인터페이스에 핑이 가능해야 한다.
 - 특별한 지시가 없는 한 스태틱 라우트(ip route ~) 명령을 사용하지 않는다.
-- `ip ospf network point-to-multipoint'와 'ip ospf network point-to-point' 명령은 사용하지 않는다.
+- `ip ospf network point-to-multipoint`와 `ip ospf network point-to-point` 명령은 사용하지 않는다.
 - R1은 2개의 서브 인터페이스를 사용해서 구성하고, R2는 하나의 point-to-point 서브 인터페이스를 사용하며, R3와 R4는 서브 인터페이스를 사용하지 않는다.
 - R1은 DLCI 번호 102, 103, 104를 사용하고, R2는 DLCI 201번을, R3는 DLCI 301번을, 그리고 R4는 DLCI 401번을 로컬 DLCI로 사용한다.
 
@@ -2296,7 +2296,7 @@ R4(conf-if)# frame-relay map ip 150.100.5.1 401 broadcast
 
 ### 문제 1
 
-- 서브넷 '150.100.1.0/24'를 사용해서 R1, R2, R3 간을 'OSPF area 0'으로 구성해라. R1, R2, R3 간에는 서로 핑이 가능해야 한다.
+- 서브넷 `150.100.1.0/24`를 사용해서 R1, R2, R3 간을 `OSPF area 0`으로 구성해라. R1, R2, R3 간에는 서로 핑이 가능해야 한다.
 
   - 현재 R1, R2, R3의 인터페이스 타입이 서로 다르기 때문에 Neighbor를 맺지 못해서 통신이 불가능
   - R1, R3 - multipoint
@@ -2410,7 +2410,7 @@ R4(conf-if)# network 150.100.0.0
 
 ### 문제 3
 
-- R2에서 30비트 서브넷 마스크를 이용해서 2개의 Loopback과 하나의 이더넷 인터페이스를 만들고 이것을 'OSPF area 22'로 구성해라. 또한 R2에 최소한 14개의 호스트 주소를 가질 수 있는 2개의 loopback 인터페이스를 만들어 OSPF area 25에 위치시켜라.
+- R2에서 30비트 서브넷 마스크를 이용해서 2개의 Loopback과 하나의 이더넷 인터페이스를 만들고 이것을 `OSPF area 22`로 구성해라. 또한 R2에 최소한 14개의 호스트 주소를 가질 수 있는 2개의 loopback 인터페이스를 만들어 OSPF area 25에 위치시켜라.
   - 최소한 14개의 호스트를 가질 수 있으려면 16개의 호스트를 가질 수 있도록  설정
 
 
@@ -2443,7 +2443,7 @@ R2(conf-router)# network 150.100.32.16 0.0.0.15 area 25
 
 ### 문제 4
 
-- R3과 R5 사이를 'OSPF area 54'로 구성하라. 또한 R5의 E0 인터페이스를 OSPF area 33으로 구성해라. R4를 제외한 모든 라우터들이 R5의 'Ehternet 0'으로 핑이 가능한지 확인해라.
+- R3과 R5 사이를 `OSPF area 54`로 구성하라. 또한 R5의 E0 인터페이스를 `OSPF area 33`으로 구성해라. R4를 제외한 모든 라우터들이 R5의 `Ehternet 0`으로 핑이 가능한지 확인해라.
   - Area 33이 백본 Area, 즉 area 0과 직접 연결되어 있지 않다.
   - 모든 area는 백본 area, 즉 OSPF area 0과 연결되어 있어야 한다는 규칙에 어긋나기 때문에 Virtual Link를 이용
 - Virtual Link에서 중요한 것은 라우터의 ID
