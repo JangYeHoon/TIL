@@ -66,6 +66,7 @@
   - [OpenStack Installation](OpenStack/OpenStack_Installation.md)
   - [OpenStack Service Installation](OpenStack/OpenStack_Service_Installation.md)
 - [OpenStack compute 서버 hostname 변경 방법](OpenStack/OpenStack_Compute_Hostname_Change.md)
+- [ResourceProviderCreationFailed Error 해결 방법](OpenStack/ResourceProviderCreationFailed_Error.md)
 
 
 
