@@ -84,3 +84,4 @@
 - [GNS3 IOS/IOU 설정](Network/GNS3_IOS_IOU_Install.md)
 - [GNS3 실습](Network/GNS3_실습.md)
 - [Network Command](Network/Network_Command.md)
+- [Network Basic](Network/Network_Basic.md)
