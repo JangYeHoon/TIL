@@ -15,7 +15,7 @@
 - [Git](#git)
 - [OS](#os)
 - [Naver Cloud](#naver-cloud)
-- [AWS Cloud](#aws-cloud)
+- [AWS](#aws)
 - [SDN / NFV](#sdnnfv)
 - [Network](#network)
 - [OpenStack](#openstack)
@@ -71,9 +71,10 @@
 
 
 
-## AWS Cloud
+## AWS
 
-- [A Cloud Guru 실습](AWS_Cloud/A_Cloud_Guru_실습.md)
+- [A Cloud Guru 실습](AWS/A_Cloud_Guru_실습.md)
+- [AWS 서비스 비교 정리](AWS/AWS_서비스_비교_정리.md)
 
 
 
