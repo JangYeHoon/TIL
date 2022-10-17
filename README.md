@@ -19,7 +19,7 @@
 - [SDN / NFV](#sdnnfv)
 - [Network](#network)
 - [OpenStack](#openstack)
-- 책 정리(#책정리)
+- [책 정리](#책정리)
 
 
 
