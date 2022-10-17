@@ -19,6 +19,7 @@
 - [SDN / NFV](#sdnnfv)
 - [Network](#network)
 - [OpenStack](#openstack)
+- 책 정리(#책정리)
 
 
 
@@ -86,3 +87,7 @@
 - [GNS3 실습](Network/GNS3_실습.md)
 - [Network Command](Network/Network_Command.md)
 - [Network Basic](Network/Network_Basic.md)
+
+## 책정리
+
+- [Clean Code](책정리/Clean_Code_정리.md)
