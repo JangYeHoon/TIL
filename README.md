@@ -20,6 +20,7 @@
 - [Network](#network)
 - [OpenStack](#openstack)
 - [책 정리](#책정리)
+- [프로젝트 회고](#프로젝트-회고)
 
 
 
@@ -91,3 +92,7 @@
 ## 책정리
 
 - [Clean Code](책정리/Clean_Code_정리.md)
+
+## 프로젝트 회고
+
+- [YOGO 앱 프로젝트](프로젝트_회고/YOGO_앱_프로젝트.md)
