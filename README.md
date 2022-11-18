@@ -19,7 +19,7 @@
 - [SDN / NFV](#sdnnfv)
 - [Network](#network)
 - [OpenStack](#openstack)
-- [책 정리](#책정리)
+- [책 및 세미나 정리](#책-및-세미나-정리)
 - [프로젝트 회고](#프로젝트-회고)
 
 
@@ -89,9 +89,10 @@
 - [Network Command](Network/Network_Command.md)
 - [Network Basic](Network/Network_Basic.md)
 
-## 책정리
+## 책 및 세미나 정리
 
-- [Clean Code](책정리/Clean_Code_정리.md)
+- [Clean Code](책_세미나_정리/Clean_Code_정리.md)
+- [OpenInfra & Cloud Native Days Korea 2022](책_세미나_정리/OpenInfra_&_Cloud_Native_Days_Korea_2022.md)
 
 ## 프로젝트 회고
 
