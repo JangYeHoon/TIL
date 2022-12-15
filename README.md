@@ -19,8 +19,12 @@
 - [SDN / NFV](#sdn/nfv)
 - [Network](#network)
 - [OpenStack](#openstack)
+<<<<<<< HEAD
 - [CI/CD](#ci/cd)
 - [책 정리](#책정리)
+=======
+- [책 및 세미나 정리](#책-및-세미나-정리)
+>>>>>>> 8da9cccc4bcb520252ae9755608c50937fed331a
 - [프로젝트 회고](#프로젝트-회고)
 
 
@@ -90,13 +94,18 @@
 - [Network Command](Network/Network_Command.md)
 - [Network Basic](Network/Network_Basic.md)
 
+<<<<<<< HEAD
 ## CI/CD
 
 - [jenkins 설치 오류](CI&CD/Jenkins_설치_오류.md)
 
 ## 책정리
+=======
+## 책 및 세미나 정리
+>>>>>>> 8da9cccc4bcb520252ae9755608c50937fed331a
 
-- [Clean Code](책정리/Clean_Code_정리.md)
+- [Clean Code](책_세미나_정리/Clean_Code_정리.md)
+- [OpenInfra & Cloud Native Days Korea 2022](책_세미나_정리/OpenInfra_&_Cloud_Native_Days_Korea_2022.md)
 
 ## 프로젝트 회고
 
