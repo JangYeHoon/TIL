@@ -16,10 +16,10 @@
 - [OS](#os)
 - [Naver Cloud](#naver-cloud)
 - [AWS](#aws)
-- [SDN / NFV](#sdn/nfv)
+- [SDN / NFV](#sdnnfv)
 - [Network](#network)
 - [OpenStack](#openstack)
-- [CI/CD](#ci/cd)
+- [CI/CD](#cicd)
 - [책 및 세미나 정리](#책-및-세미나-정리)
 
 

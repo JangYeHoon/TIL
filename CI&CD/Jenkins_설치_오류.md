@@ -1,7 +1,3 @@
----
-typora-copy-images-to: images
----
-
 ## Jenkins 설치 오류
 
 설치 환경 : Ubuntu 20.04
