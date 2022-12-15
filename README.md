@@ -16,9 +16,10 @@
 - [OS](#os)
 - [Naver Cloud](#naver-cloud)
 - [AWS](#aws)
-- [SDN / NFV](#sdnnfv)
+- [SDN / NFV](#sdn/nfv)
 - [Network](#network)
 - [OpenStack](#openstack)
+- [CI/CD](#ci/cd)
 - [책 정리](#책정리)
 - [프로젝트 회고](#프로젝트-회고)
 
@@ -88,6 +89,10 @@
 - [GNS3 실습](Network/GNS3_실습.md)
 - [Network Command](Network/Network_Command.md)
 - [Network Basic](Network/Network_Basic.md)
+
+## CI/CD
+
+- [jenkins 설치 오류](CI&CD/Jenkins_설치_오류.md)
 
 ## 책정리
 
