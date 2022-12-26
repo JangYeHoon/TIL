@@ -24,6 +24,7 @@
 
 
 - [프로젝트 회고](#프로젝트-회고)
+- [Backend](#Backend)
 
 
 
@@ -96,6 +97,10 @@
 
 - [jenkins 설치 오류](CI&CD/Jenkins_설치_오류.md)
 - [Jenkins를 이용한 react web을 s3에 자동 배포](CI&CD/jenkins_s3_react_deploy.md)
+
+## Backend
+
+- [Django ec2 배포](Backend/Django_EC2_배포.md)
 
 ## 책 및 세미나 정리
 - [Clean Code](책_세미나_정리/Clean_Code_정리.md)
