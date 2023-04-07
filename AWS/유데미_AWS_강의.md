@@ -1,6 +1,7 @@
 # 유데미 AWS 강의
 
 - [IAM](#iam)
+- [EC2](#ec2)
 
 ## IAM
 
@@ -76,4 +77,32 @@
 - CLI/SDK를 사용하려면 Access Key 사용
 - 계정의 권한을 체크할 때는 IAM Credentials Report & IAM Access Advisor를 사용
 - 절대 IAM 사용자와 Access Key를 공유하지 않는다.
+
+
+
+
+## EC2
+
+###	 EC2 User Data
+
+- EC2 User data 스크립트를 통해 bootstrap 구성 가능
+- bootstrap은 EC2 인스턴스 처음 생성 시 정의한 스크립트를 수행
+
+### Security Group
+
+- 허용 규칙만 설정 가능
+- 허용 규칙 외의 모든 ip나 포트는 차단
+- 보안 그룹 끼리 참조 가능
+- EC2 외부에 있음
+- 기본적으로 모든 인바운드 트래픽은 차단
+- 기본적으로 모든 아웃바운드 트래픽은 허용
+
+### Classic Port
+
+- 22 = SSH(Secure Shell)
+- 21 = FTP(File Transfer Protocol)
+- 22 = SFTP(Secure File Transfer Protocol)
+- 80 = HTTP
+- 443 = HTTPS
+- 3389 = RDP(Remote Desktop Protocol)
 
