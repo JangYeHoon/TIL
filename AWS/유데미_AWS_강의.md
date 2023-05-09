@@ -2,6 +2,7 @@
 
 - [IAM](#iam)
 - [EC2](#ec2)
+- [Storage](#storage)
 
 ## IAM
 
@@ -106,3 +107,77 @@
 - 443 = HTTPS
 - 3389 = RDP(Remote Desktop Protocol)
 
+
+### EC2 Instances Purchasing Options
+
+- On-Demand Instances
+- Reserved(1 & 3 years)
+  - Reserved Instances - long workloads
+  - Convertible Reserved Instances - long workloads with flexible instnaces
+- Savings Plans(1 & 3 years) - 달러 단위로 사용량 약정, long workloads
+- Spot Instances - short workloads, 저렴하지만 인스턴스가 손실될 수 있어 신뢰성이 낮음
+  - 데이터베이스나 중요한 작업에 적절하지 않음
+  - 배치 작업, 데이터 분석, 실패해도 복원할 수 있는 워크로드에서 사용
+  - spot instances 종료는 먼저 request를 취소해 새로운 인스턴스를 생성하지 않게 하고 인스턴스를 종료
+  - Spot Fleets - Spot Instaces + (optional) On-Demand Instaces
+    - 한 세트의 스팟 인스턴스에 선택적으로 온디맨드 인스턴스를 조합
+    - 정의된 비용 내에서 용량을 맞추려 노력
+      - 사용가능한 런치풀을 통해서 실행(인스턴스 유형, OS, AZ)
+      - 가장 적합하고 좋은 런치풀을 선택
+      - 정해진 예산 혹은 원하는 용량에 달한 경우 인스턴스 실행을 멈춤
+    - 스팟 인스턴스 할당 전략
+      - lowestPrice : 스팟 플릿이 가장 적은 비용을 가진 풀에서 인스턴스를 실행(비용 최적화, shot workload)
+      - diversified : 기존에 정의한 모든 풀에 걸쳐 분산(greate for availability, log workloads)
+      - capacityOptimized : 인스턴스의 개수에 따라서 최적 용량으로 실행되고 적절한 풀을 찾아줌
+- Dedicated Hosts - 전용 물리서버를 빌려 인스턴스 배치를 제어
+- Dedicated Instances - 다른 고객과 하드웨어를 공유하지 않음
+- Capacity Reservations - 특정한 AZ에 용량을 예약
+
+### Elastic IP
+
+- EC2 인스턴스를 종료하고 시작할 때 바뀌지 않는 IP
+- 계정 당 5개를 가질 수 있음
+- 사용하지 않는 것이 좋음
+
+### Elastic Network Interfaces(ENI)
+
+- VPC에서 사용하는 가상의 네트워크 카드
+- 생성할 때 지정한 AZ에서만 사용 가능
+- failover에 유용
+
+### Placement Groups
+
+- EC2 인스턴스를 어디에 배치할 지 제어
+- 배치 그룹 전략
+  - Cluster - 단일 가용 영역 내에서 지연 시간이 짧은 하드웨어 설정
+    - 동일한 하드웨어, 동일한 가용영역에 존재
+  - Spread - 인스턴스가 다른 하드웨어에 분산
+    - 다른 하드웨어, 다른 가용영역에 존재
+  - Partition - 여러 파티션에 인스턴스가 분할되어 있음
+    - 다른 랙, 다른 가용 영역에 존재
+
+### EC2 Hibernate
+
+- EC2 stop, terminate
+  - stop - EBS 볼륨 유지
+  - terminate - EBS(root) 볼륨이 삭제되게 했으면 인스턴스 삭제
+- 재시작
+  - OS boot & EC2 User Data script run
+  - OS boots up
+  - application 시작, 캐시 구성
+- Hibernate(절전모드)
+  - RAM에 있던 인메모리 그대로 유지
+  - boot가 빠름
+  - RAM에 기록된 인메모리는 root 볼륨에 유지되기 때문에 암호화 필요
+  - bare metal 인스턴스에서는 사용 불가
+  - EBS 볼륨에서만 사용 가능
+
+## Storage
+
+### EBS
+
+- 인스턴스에서 동작 중 사용되는 네트워크 드라이브
+- 한번에 하나의 EC2 인스턴스에만 마운트 가능(일부 EBS 다중 연결 가능)
+- EBS는 생성한 가용 영역에서만 사용 가능
+  - 스냅샷을 이용해 다른 가용 영역에서 똑같이 생성 가능
+- EC2 인스턴스 생성 과정 중 인스턴스 종료 시 EBS 볼륨 삭제 옵션이 존재
