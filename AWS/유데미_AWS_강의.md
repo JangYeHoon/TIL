@@ -181,3 +181,134 @@
 - EBS는 생성한 가용 영역에서만 사용 가능
   - 스냅샷을 이용해 다른 가용 영역에서 똑같이 생성 가능
 - EC2 인스턴스 생성 과정 중 인스턴스 종료 시 EBS 볼륨 삭제 옵션이 존재
+
+### EBS 스냅샷
+
+- EBS의 특정 시점의 백업
+- 다른 AZ나 리전에 복사 가능
+
+### EBS Snapshots Features
+
+- 스냅샷 아카이브는 최대 75% 저렴하게 스냅샷을 보관
+  - 복원하는데 24에서 72시간 정도 소요
+- EBS 스냅샷 휴지통
+  - EBS 스냅샷을 영구 삭제하지 않고 휴지통에 삭제
+  - 보관 기간은 1일에서 1년 중 선택 가능
+-  Fast Snapsshot Restore(FSR)
+  - EBS나 인스턴스를 빠르게 초기화할 때 유용
+  - 매우 비쌈
+
+### EBS Volume Types
+
+- gp2/gp3(SSD) : 가장 일반적인 성능과 비용의 SSD
+- io1/io2(SSD) : 높은 성능의 SSD
+- st1(HDD) : 저비용의 HDD
+- sc1(HDD) : 가장 비용이 작은 HDD
+- Size | Throughput | IOPS 를 통해 EBS 볼륨을 나눔
+- 인스턴스의 boot volume으로는 gp2/gp3, io1/io2만 사용 가능
+
+### General Purpose SSD(gp2)
+
+- 짧은 지연 시간과 비용 효율적인 볼륨
+- 1G ~ 16T 지원
+- gp3
+  - 기본 3000IOPS, 125MiB/s 처리량
+  - 최대 16,000 IOPS, 최대 1000MB/s 처리량
+- gp2
+  - gp3보다 볼륨이 작고 최대 3000IOPS 지원
+  - 볼륨과 IOPS가 연결되어 있어서 볼륨 크기를 늘리면 최대 16,000 IOPS 지원
+
+### Provisioned IOPS SSD
+
+- IOPS 성능을 유지할 필요가 있을 때 적합
+- 16,000 IOPS 이상을 요할 때 적합
+- io1/io2(4G ~ 16T)
+  - Nitro EC2 인스턴스인 경우 최대 64000 IOPS 지원, 이외의 인스턴스는 최대 32,000 IOPS 지원
+  - IOPS를 스토리지 크기와 상관없이 늘리 수 있음
+  - io2는 동일한 비용으로 io보다 더 노퓨은 내구성과 기가바이트 당 IOPS가 더 높음
+- io2 Block Express(4G ~ 64TB)
+  - 고성능 유형의 볼륨
+  - 지연시간이 밀리초 미만
+  - IOPS:GiB 비율이 1000:1 일 때 최대 256,000 IOPS 지원
+
+### EBS Multi-Attach - io1/io2 family
+
+- 하나의 EBS 볼륨을 같은 AZ에 있는 여러 EC2 인스턴스에 연결해주는 기능
+- 각 인스턴스는 읽기/쓰기 권한을 가짐
+- 16개의 인스턴스만 연결 가능
+- 클러스터 인식 파일 시스템에서만 사용 가능(XFS, EX4 등의 파일 시스템에서 사용 불가)
+
+### EBS Encryption
+
+- 볼륨 내부, 데이터 이동, 스냅샷, 스냅샷을 통해 생성한 모든 볼륨 암호화  가능
+- KMS의 키를 통해 EBS 볼륨 암호화(AES-256)
+
+### Hard Disk Drives
+
+- 부트 볼륨 사용 불가능
+- 125MB ~ 16TB
+- 볼륨 유형
+  - Throughput Optimized HDD (st1)
+    - 최대 500MB 처리량, 최대 500 IOPS
+  - Cold HDD(sc1)
+    - 접근 빈도가 낮은 데이터에 적합
+    - 최저 비용
+    - 최대 처리량은 250M, 최대 250 IOPS
+
+### AMI Overview
+
+- Amazon Machine Image
+- EC2 인스턴스를 통해 만든 이미지
+- AMI을 통해 다른 리전에서 인스턴스 생성 가능
+- AMI 종류
+  - Public AMI : AWS 제공
+  - Your own AMI : 자체적으로 생성한 AMI
+  - AWS Marketplace AMI : 기업에서 자체적으로 만든 AMI
+
+### AMI Process
+
+- 커스텀 EC2 인스턴스 시작 가능
+- 데이터를 보존하면서 인스턴스 stop 가능
+- AMI 빌드 - EBS snapshots 생성
+- AMI를 통한 인스턴스 생성
+
+### EC2 Instance Store
+
+- EBS 볼륨은 좋지만 성능에 제한이 있음
+- EC2 Instance Store를 사용하면 높은 성능의 하드웨어 디스크를 사용할 수 있음
+  - 물리적으로 연결되어 있는 디스크
+- Better I/O performance
+- 인스턴스를 중지하거나 종료하면 스토리지 손실
+  - 임시 스토리지
+
+### Amazon EFS(Elastic File System)
+
+- EFS는 관리형 NFS로 여러 EC2 인스턴스에 마운트 가능
+- EFS는 여러 AZ에 있는 EC2 인스턴스에 마운트 가능
+- HA, 확장성이 좋고 가격이 비쌈
+- EFS는 접근 제어를 위해 보안그룹이 존재
+- 윈도우는 지원하지 않고 Linux 기반 AMI만 호환
+- KMS를 사용해 EFS 드라이브의 데이터 암호화 가능
+- Linux의 표준 파일 시스템인 POSIX 파일 시스템이고 standard file API 사용
+- 용량을 지정하지 않고 사용하는 만큼 용량이 증가되며 사용한 GB 당 데이터 비용 지불
+
+### EFS - Performance & Storage Classes
+
+- EFS Scale
+  - 수천 개의 NFS 클라이언트에서 EFS에 동시 새스 가능하고 처리량은 10GB 이상
+  - PB 규모로 자동 확장
+- Performance mode
+  - general purpose(default) : 지연시간에 민감할 때 유용
+  - Max I/O : 지연 시간, 처리량, 병렬 처리 성능 향상
+- Throughput mode
+  - Bursting : 1TB 파일시스템 = 50MB/s + 100MB/s burst
+  - Provisioned : 스토리지 크기에 상관없이 처리량을 설정 가능
+
+### EFS - Storage Classes
+
+- Storage Tiers (일정 기간 후 파일을 다른 계층으로 옮김)
+  - Standard : 접근이 빈번한 파일들 저장
+  - Infrequent access(EFS-IA) : 저장 비용은 작지만 파일 검색 시 비용 발생, 수명 주기 정책 설정 필요
+- Availability and durability
+  - Standard : 다중 AZ 설정
+  - One Zone : 단일 AZ, 기본적으로 백업 활성화, EFS-IA와 호환 가능(EFS One Zone-IA)
