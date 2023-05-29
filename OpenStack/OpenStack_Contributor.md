@@ -140,4 +140,27 @@ Footers
   - APIImapct : HTTP API에 영향이 있을 때 사용하는 태그
   - SecurityImpact : 보안 사항에 영향이 있을 때 사용하는 태그
   - UpgradeImpact : 변경사항이 업그레이드에 영향을 미치는 이유에 대해 설명
-  - Depends-On : 
+  - Depends-On
+
+> commit message에 대한 추가 정리 글 : https://empty-cloud.tistory.com/m/53
+
+---
+
+## Gerrit Account
+
+- gerrit은 OpenStack 커뮤니티가 사용하는 리뷰 시스템
+
+### 회원가입
+
+- https://review.opendev.org/q/status:open+-is:wip에 접속하여 sign in을 클릭합니다.
+
+![1685347459418](images/1685347459418.png)
+
+- 선택하면 Ubuntu One으로 가게 되고 StoryBoard에서 가입한 메일과 이름이 나오는데 같은 것을 선택하고 사용합니다.
+  - 만약 로그인이 안되어있다면 StoryBoard에서 가입한 이메일로 로그인하시면 됩니다.
+
+![1685347552560](images/1685347552560.png)
+
+- 그러면 Display Name과 Username을 입력하는 화면이 나오는데 혹시 몰라 전 Full Name과 똑같이 입력했습니다.
+
+![1685347626783](images/1685347626783.png)
