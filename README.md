@@ -118,6 +118,7 @@
 ## 책 및 세미나 정리
 - [Clean Code](책_세미나_정리/Clean_Code_정리.md)
 - [OpenInfra & Cloud Native Days Korea 2022](책_세미나_정리/OpenInfra_&_Cloud_Native_Days_Korea_2022.md)
+- [클라우드 전환 그 실제 이야기](책_세미나_정리/클라우드_전환_그_실제_이야기.md)
 
 
 
