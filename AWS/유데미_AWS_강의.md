@@ -534,4 +534,98 @@
 
 - CloudWatch 경보를 기반으로 ASG를 Scale in & out 가능
 - metric(지표)를 모니터링해 경보 발생(cpu, memory, 사용자 지정 지표 등)
-- ​
+
+### Scaling Policies
+
+#### Dynamic Scaling policies
+
+- Target Tracking Scaling
+  - 가장 단순하고 설정이 쉬움
+  - 예를들어 모든 인스턴스의 평균 CPU를 40%에 맞추게 동작
+- Simple / Step Scaling
+  - CloudWatch 알람을 통해 인스턴스 생성/삭제 설정
+  - CloudWatch 알람이 울리면 한 번에 추가할 유닛의 수와 제거할 유닛의 수를 설정
+- Scheduled Actions
+  - 알고 있는 사용 패턴을 바탕으로 스케일링을 예상
+
+#### Predictive Scaling
+
+- AWS 내 오토 스케일링 서비스를 활용하여 지속적으로 예측을 생성
+- 시간에 걸쳐 과거 로드를 분석해 다음을 예측
+- 머신러닝을 기반으로 동작
+
+#### Good metrics to scale on
+
+- CPUUitilization
+- RequestCountPerTarget
+- Average Network In/Out
+- Any custom metric
+
+### Scaling Cooldowns
+
+- 스케일링 작업이 끝날 때 마다 인스턴스의 추가/삭제 시 cooldown 기간을 갖는 것(default 300초)
+- cooldown 기간에는 ASG가 추가 인스턴스를 실행 또는 종료할 수 없음
+- AMI를 준비하여 인스턴스 설정 시간을 줄여서 빠르게 추가/삭제 가능하도록 하고 cooldown 기간을 줄일 수 있음
+
+## Relational Database Service(RDS)
+
+- SQL을 사용하는 데이터베이스 용 관리형 데이터베이스 서비스
+- AWS가 관리하는 데이터베이스
+  - PostgreSQL
+  - MySQL
+  - MariaDB
+  - Oracle
+  - Microsoft SQL Server
+  - Aurora
+
+### EC2 인스턴스를 사용하지 않고 RDS를 사용하는 이유
+
+- RDS는 관리형 서비스
+  - 프로비저닝과 OS 패치의 완전 자동화
+  - 지속적으로  백업이 생성되어 특정 타임스탬프로 복원 가능
+  - 모니터링 대시보드 제공
+  - 읽기 전용 복제본을 활용해 읽기 성능 개선
+  - DR을 위한 다중 AZ 설정
+  - 유지관리 기간에 업그레이드 가능
+  - Scaling capability
+  - EBS 스토리지 사용
+- 하지만 SSH 접근 불가능
+
+### RDS - Storage Auto Scaling
+
+- 데이터베이스의 설정 용량 부족 시 오토 스케일링 기능이 활성화되어 있다면 자동으로 스토리지 확장
+- 최대 스토리지 임계값 설정 필요
+- 스토리지 자동 확장 케이스
+  - 남은 용량이 10% 이하
+  - 스토리지 부족 상태가 5분이사 지속
+  - 지난 수정으로부터 6시간이 지났을경우
+- 워크로드를 예측할 수 없을 때 유용
+- 모든 RDS 데이터베이스 엔진에서 지원
+
+### RDS Read Replicas for read scalability
+
+- 읽기 전용 복제본은 최대 15개까지 생성 가능
+- 동일 AZ 또는 다른 AZ나 다른 Regiion에 생성 가능
+- ASYN(비동기)를 통해 데이터 복제
+- 읽기 전용 복제본을 실제 DB로 승격 가능
+- SELECT 구문만 사용 가능
+
+#### Network Cost
+
+- 동일 Region이라면 AZ간 데이터 이동 비용이 없음
+
+### RDS Multi AZ
+
+- 주로 DR 구성 시 사용
+- SYNC 복제를 이용해 스탠바이 인스턴스로 데이터 복제
+- 하나의 DNS 이름을 가짐 - 마스터 DB 문제 시 자동으로 스탠바이 DB로 failover
+- 가용성을 높일 수 있음
+
+#### From Single-AZ to Multi-AZ
+
+- 다운타임 없이 전환 가능
+- 데이터베이스에서 수정 버튼을 클릭해 Multi-AZ 기능만 활성화하면 가능
+- 전환 과정
+  - 메인 DB의 snapshot 생성
+  - snapshot을 통해 다른 AZ에 스탠바이 DB 생성
+  - 두 DB간 동기화
