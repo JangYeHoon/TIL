@@ -78,6 +78,7 @@
 - [OpenStack의 Flow Rule 분석](OpenStack/OpenStack_OvS_FlowRule.md)
 - [Octavia Amphora HA 구성](OpenStack/Octavia_Amphora_HA_구성.md)
 - [OpenStack Contributor](OpenStack/OpenStack_Contributor.md)
+- [스냅샷 삭제 안되는 문제 해결 방법](OpenStack/스냅샷으로_볼륨_생성_후_스냅샷_삭제_안되는_문제.md)
 
 
 
