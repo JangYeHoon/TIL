@@ -87,6 +87,7 @@
 - [A Cloud Guru 실습](AWS/A_Cloud_Guru_실습.md)
 - [AWS 서비스 비교 정리](AWS/AWS_서비스_비교_정리.md)
 - [유데미 AWS 강의](AWS/유데미_AWS_강의.md)
+- [AWS Practitioner 자격증 합격 후기](AWS/AWS_Cloud_Practitioner_자격증_후기.md)
 
 
 
