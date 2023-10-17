@@ -629,3 +629,34 @@
   - 메인 DB의 snapshot 생성
   - snapshot을 통해 다른 AZ에 스탠바이 DB 생성
   - 두 DB간 동기화
+
+### RDS Custom
+
+- RDS Custom을 통해 데이터베이스와 OS에 직접 접근이 가능
+- RDS vs RDS Custom
+  - RDS : OS와 데이터베이스 모두 AWS에서 관리하기 때문에 사용자가 설정할 필요 없음
+  - RDS Custom : Oracle 및 Microsoft SQL Server에서만 사용 가능
+
+## Amazon Aurora
+
+- AWS의 고유 기술
+- Postgres 및 MySQL와 호환
+- 클라우드에 최적화되어 있고 MySQL보다 5배 높은 성능을 가짐
+- 자동 확장 기능을 가짐
+- 15개의 읽기 전용 복제본을 가질 수 있음
+- Multi AZ나 MySQL RDS보다 빠른 장애 조치
+- RDS보다 20% 비쌈
+
+### Aurora High Availability and Read Scaling
+
+- 3 AZ에 6개의 사본을 저장 
+  - 쓰기는 6개 사본 중 4개만 있으면 됨
+  - 읽기는 6개 사본 중 3개만 있으면 됨
+- 읽기, 쓰기에는 6개 모두 사용 하지 않고 1개의 마스터 노드에서 진행
+
+### Aurora DB Cluster
+
+- Writer Endpoint와 Reader Endpoint가 존재
+  - Writer Endpoint : Pointing to the master
+  - Reader Endpoint : Connection Load Balancing
+
