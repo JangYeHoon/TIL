@@ -122,6 +122,8 @@
 - [Clean Code](책_세미나_정리/Clean_Code_정리.md)
 - [OpenInfra & Cloud Native Days Korea 2022](책_세미나_정리/OpenInfra_&_Cloud_Native_Days_Korea_2022.md)
 - [클라우드 전환 그 실제 이야기](책_세미나_정리/클라우드_전환_그_실제_이야기.md)
+- [AWS Summit Seoul 2023](책_세미나_정리/AWS_Summit_Seoul_2023.md)
+- [AWS Industry Week 2023](책_세미나_정리/AWS_Industry_Week_2023.md)
 
 
 
